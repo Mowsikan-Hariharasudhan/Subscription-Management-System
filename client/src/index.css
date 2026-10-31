@@ -203,15 +203,10 @@
 /* 7. Interactive Elements */
 .table-row { 
   transition: all 0.2s ease-in-out; 
-  border-bottom: 1.5px solid #000000;
-  border-left: 4px solid transparent;
 }
 .table-row:hover { 
   background: #fcfbfc;
-  border-left: 4px solid #714B67;
-}
-.table-row:last-child {
-  border-bottom: none;
+  box-shadow: inset 4px 0 0 0 #714B67;
 }
 
 .anim-slide-up {

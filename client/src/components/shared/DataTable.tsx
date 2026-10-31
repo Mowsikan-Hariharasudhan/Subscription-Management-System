@@ -40,15 +40,17 @@ export function DataTable<T extends { id?: string | number }>({
   return (
     <div className={cn('glass-panel rounded-xl overflow-hidden anim-slide-up flex flex-col flex-1', className)}>
       <div className="overflow-x-auto flex-1">
-        <table className="w-full text-left border-collapse min-w-[900px]">
-          <thead className="bg-odoo text-white border-b-[1.5px] border-black">
+        <table className="w-full text-left border-separate border-spacing-0 min-w-[900px]">
+          <thead className="bg-odoo text-white">
             <tr>
               {columns.map((col, idx) => (
                 <th
                   key={idx}
                   scope="col"
                   className={cn(
-                    'px-6 py-4 text-[0.6875rem] font-bold text-white uppercase tracking-widest',
+                    'px-6 py-4 text-[0.6875rem] font-bold text-white uppercase tracking-widest border-b-[1.5px] border-black',
+                    idx === 0 && 'rounded-tl-[10px]',
+                    idx === columns.length - 1 && 'rounded-tr-[10px]',
                     col.className
                   )}
                 >
@@ -63,12 +65,20 @@ export function DataTable<T extends { id?: string | number }>({
                 key={item.id ? String(item.id) : rowIdx}
                 onClick={() => onRowClick && onRowClick(item)}
                 className={cn(
-                  'table-row cursor-pointer bg-white group',
+                  'table-row bg-white group',
                   onRowClick && 'cursor-pointer'
                 )}
               >
                 {columns.map((col, colIdx) => (
-                  <td key={colIdx} className={cn('px-6 py-4.5', col.className)}>
+                  <td
+                    key={colIdx}
+                    className={cn(
+                      'px-6 py-4.5 border-b-[1.5px] border-black group-last:border-b-0',
+                      colIdx === 0 && 'group-last:rounded-bl-[10px]',
+                      colIdx === columns.length - 1 && 'group-last:rounded-br-[10px]',
+                      col.className
+                    )}
+                  >
                     {col.cell
                       ? col.cell(item)
                       : col.accessorKey
