@@ -97,7 +97,7 @@ The application runs locally without any external database server, cloud account
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/Bright-Loop.git
+git clone https://github.com/Mowsikan-Hariharasudhan/Subscription-Management-System.git
 cd Bright-Loop
 
 # 2. Run automated setup (installs dependencies, deploys SQLite database & seeds demo data)
