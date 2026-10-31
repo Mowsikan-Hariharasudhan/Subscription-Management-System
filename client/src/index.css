@@ -20,14 +20,14 @@
     --accent-foreground: 317 27% 33%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 315 8% 91%;
-    --input: 315 8% 91%;
+    --border: 315 8% 89%;
+    --input: 315 8% 89%;
     --ring: 317 27% 33%;
-    --radius: 0.75rem;
+    --radius: 0.625rem;
   }
 
   * {
-    border-color: #EAE4E8;
+    border-color: #E5DFE4;
   }
 
   body {
@@ -45,29 +45,68 @@
   }
 }
 
-/* Card & Surface styles matching reference */
-.reference-card {
+/* Structural Minimalistic Neo-Brutalist Surfaces */
+.brutal-card {
   background-color: #FFFFFF;
-  border: 1px solid #EAE4E8;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(45, 30, 40, 0.04);
+  border: 1px solid #E5DFE4;
+  border-radius: 14px;
+  box-shadow: 2px 2px 0px #E5DFE4;
 }
 
-.reference-card-interactive {
+.brutal-card-interactive {
   background-color: #FFFFFF;
-  border: 1px solid #EAE4E8;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(45, 30, 40, 0.04);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #E5DFE4;
+  border-radius: 14px;
+  box-shadow: 2px 2px 0px #E5DFE4;
+  transition: all 0.15s ease-out;
 }
 
-.reference-card-interactive:hover {
+.brutal-card-interactive:hover {
   border-color: #6A3D5B;
-  box-shadow: 0 4px 12px rgba(106, 61, 91, 0.08);
-  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px #6A3D5B;
+  transform: translate(-1px, -1px);
 }
 
-/* Custom scrollbars */
+.brutal-button-primary {
+  background-color: #6A3D5B;
+  color: #FFFFFF;
+  border: 1px solid #522D46;
+  box-shadow: 2px 2px 0px #3E2134;
+  transition: all 0.12s ease-out;
+}
+
+.brutal-button-primary:hover {
+  background-color: #552F48;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #3E2134;
+}
+
+.brutal-button-primary:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #3E2134;
+}
+
+.brutal-button-outline {
+  background-color: #FFFFFF;
+  color: #1F1A1E;
+  border: 1px solid #E5DFE4;
+  box-shadow: 2px 2px 0px #E5DFE4;
+  transition: all 0.12s ease-out;
+}
+
+.brutal-button-outline:hover {
+  background-color: #FAF7F5;
+  border-color: #6A3D5B;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #E5DFE4;
+}
+
+.brutal-button-outline:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #E5DFE4;
+}
+
+/* Custom scrollbars with crisp 1px borders */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -76,9 +115,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #EAE4E8;
-  border-radius: 9999px;
+  background: #E5DFE4;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #D8CED5;
+  background: #D4CAD2;
 }

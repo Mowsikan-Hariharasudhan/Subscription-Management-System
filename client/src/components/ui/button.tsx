@@ -10,14 +10,14 @@ export interface ButtonProps
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading = false, children, disabled, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum-primary/20 disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none';
+    const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum-primary/20 disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none';
 
     const variants = {
-      primary: 'bg-plum-primary text-white hover:bg-plum-hover shadow-sm active:translate-y-[0.5px]',
-      secondary: 'bg-plum-surface text-plum-primary border border-plum-border hover:bg-[#F2E5EE]',
-      outline: 'border border-border-main bg-white hover:bg-surface-hover text-text-primary shadow-sm active:bg-surface-subtle',
-      ghost: 'hover:bg-surface-hover hover:text-text-primary text-text-secondary',
-      danger: 'bg-rose-600 text-white hover:bg-rose-700 shadow-sm active:translate-y-[0.5px]',
+      primary: 'bg-plum-primary text-white border border-[#522D46] shadow-plum-btn hover:shadow-[3px_3px_0px_#3E2134] hover:-translate-x-[0.5px] hover:-translate-y-[0.5px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#3E2134]',
+      secondary: 'bg-plum-surface text-plum-primary border border-plum-border hover:bg-[#F2E5EE] shadow-xs',
+      outline: 'bg-white text-text-primary border border-border-main shadow-outline-btn hover:border-plum-primary hover:shadow-[3px_3px_0px_#E5DFE4] hover:-translate-x-[0.5px] hover:-translate-y-[0.5px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#E5DFE4]',
+      ghost: 'hover:bg-surface-hover hover:text-text-primary text-text-secondary border border-transparent',
+      danger: 'bg-rose-600 text-white border border-rose-800 shadow-[2px_2px_0px_#991B1B] hover:shadow-[3px_3px_0px_#991B1B] hover:-translate-x-[0.5px] hover:-translate-y-[0.5px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#991B1B]',
       link: 'text-plum-primary underline-offset-4 hover:underline p-0 h-auto font-medium',
     };
 

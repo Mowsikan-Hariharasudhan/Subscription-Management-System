@@ -7,28 +7,29 @@ export default {
     extend: {
       colors: {
         plum: {
-          primary: '#6A3D5B',    // Primary Brand Plum from reference
-          hover: '#552F48',      // Darker plum on button hover
-          deep: '#3E2134',       // Deep plum for gradients / hero
-          muted: '#8A5F7C',      // Muted plum text / secondary
-          surface: '#F8F0F5',    // Light plum tint for icon boxes & active pills
-          border: '#EAE0E7',     // Soft plum border
+          primary: '#6A3D5B',    // Primary Brand Plum
+          hover: '#552F48',      // Darker plum on hover
+          deep: '#3E2134',       // Deep plum for structural accents
+          muted: '#8A5F7C',      // Muted plum text
+          surface: '#F8F0F5',    // Soft plum surface tint
+          border: '#E8DCE5',     // Plum border
         },
         surface: {
-          main: '#FAF7F5',       // Warm porcelain background from reference
+          main: '#FAF7F5',       // Warm canvas background
           card: '#FFFFFF',       // Pure white card background
-          subtle: '#F6F3F5',     // Subtle row & table header background
-          hover: '#F8F2F6',      // Hover row / button background
+          subtle: '#F6F3F5',     // Subtle row background
+          hover: '#F8F2F6',      // Hover background
         },
         border: {
-          main: '#EAE4E8',       // Crisp 1px border matching reference
-          light: '#F2EDF0',
+          main: '#E5DFE4',       // Crisp structural 1px border
+          dark: '#3E2134',       // High-contrast outline for accents
+          light: '#F0EAF0',
           focus: '#6A3D5B',
         },
         text: {
-          primary: '#1F1A1E',    // Dark charcoal primary text
+          primary: '#1F1A1E',    // High-contrast charcoal text
           secondary: '#756C73',  // Refined slate secondary text
-          muted: '#9E949B',      // Placeholder / subtle text
+          muted: '#9E949B',      // Metadata / subtle text
         },
         accent: {
           emerald: '#059669',
@@ -39,18 +40,21 @@ export default {
         },
       },
       borderRadius: {
-        '2xl': '16px',
-        '3xl': '24px',
-        xl: '12px',
-        lg: '10px',
-        md: '8px',
-        sm: '6px',
+        '2xl': '14px',
+        '3xl': '20px',
+        xl: '10px',
+        lg: '8px',
+        md: '6px',
+        sm: '4px',
       },
       boxShadow: {
-        sm: '0 1px 3px rgba(45, 30, 40, 0.04)',
-        card: '0 2px 8px rgba(45, 30, 40, 0.03), 0 1px 3px rgba(45, 30, 40, 0.05)',
-        elevated: '0 10px 25px -5px rgba(45, 30, 40, 0.07), 0 8px 10px -6px rgba(45, 30, 40, 0.05)',
-        subtle: '0 1px 2px rgba(0, 0, 0, 0.03)',
+        xs: '1px 1px 0px rgba(45, 30, 40, 0.08)',
+        sm: '2px 2px 0px rgba(45, 30, 40, 0.06)',
+        card: '2px 2px 0px #E5DFE4',
+        'card-interactive': '3px 3px 0px #D8CFD7',
+        'plum-btn': '2px 2px 0px #3E2134',
+        'outline-btn': '2px 2px 0px #E5DFE4',
+        elevated: '4px 4px 0px #E5DFE4',
       },
       fontFamily: {
         sans: ['Inter', 'Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
