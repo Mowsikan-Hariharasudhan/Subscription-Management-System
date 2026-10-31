@@ -137,7 +137,7 @@ export const Dashboard: React.FC = () => {
                 className={`h-9 px-3.5 rounded-xl border text-xs font-medium flex items-center gap-2 shadow-sm transition-all cursor-pointer ${
                   filterPlan !== 'All Plans'
                     ? 'border-plum-primary bg-plum-surface text-plum-primary font-bold'
-                    : 'border-border-main bg-white text-text-primary hover:bg-surface-hover'
+                    : 'border-[1.5px] border-black bg-white text-text-primary hover:bg-surface-hover'
                 }`}
               >
                 <span>{filterPlan}</span>
@@ -178,7 +178,7 @@ export const Dashboard: React.FC = () => {
                 className={`h-9 px-3.5 rounded-xl border text-xs font-medium flex items-center gap-2 shadow-sm transition-all cursor-pointer ${
                   filterTime !== 'All Time'
                     ? 'border-plum-primary bg-plum-surface text-plum-primary font-bold'
-                    : 'border-border-main bg-white text-text-primary hover:bg-surface-hover'
+                    : 'border-[1.5px] border-black bg-white text-text-primary hover:bg-surface-hover'
                 }`}
               >
                 <span>{filterTime}</span>
@@ -211,7 +211,7 @@ export const Dashboard: React.FC = () => {
             {/* Refresh Button */}
             <button
               onClick={handleRefresh}
-              className="h-9 px-3.5 rounded-xl border border-border-main bg-white text-xs font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-hover shadow-sm transition-colors cursor-pointer"
+              className="h-9 px-3.5 rounded-xl border-[1.5px] border-black bg-white text-xs font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-hover shadow-sm transition-colors cursor-pointer"
             >
               <RotateCw className={`w-3.5 h-3.5 text-text-secondary ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>Refresh</span>

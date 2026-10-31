@@ -38,7 +38,7 @@ export function DataTable<T extends { id?: string | number }>({
   }
 
   return (
-    <div className={cn('w-full bg-white border border-border-main rounded-2xl shadow-card overflow-hidden anim-slide-up flex flex-col flex-1', className)}>
+    <div className={cn('w-full bg-white border-[1.5px] border-black rounded-2xl shadow-card overflow-hidden anim-slide-up flex flex-col flex-1', className)}>
       <div className="overflow-x-auto flex-1 px-6 pb-6 pt-2">
         <table className="w-full text-left border-collapse min-w-[750px]">
           <thead className="border-b border-border-main/80 select-none">

@@ -52,14 +52,14 @@
 /* Structural Minimalistic Neo-Brutalist Surfaces */
 .brutal-card {
   background-color: #FFFFFF;
-  border: 1px solid #E5DFE4;
+  border: 1.5px solid #000000;
   border-radius: 14px;
   box-shadow: 2px 2px 0px #E5DFE4;
 }
 
 .brutal-card-interactive {
   background-color: #FFFFFF;
-  border: 1px solid #E5DFE4;
+  border: 1.5px solid #000000;
   border-radius: 14px;
   box-shadow: 2px 2px 0px #E5DFE4;
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
@@ -93,7 +93,7 @@
 .brutal-button-outline {
   background-color: #FFFFFF;
   color: #1F1A1E;
-  border: 1px solid #E5DFE4;
+  border: 1.5px solid #000000;
   box-shadow: 2px 2px 0px #E5DFE4;
   transition: all 0.12s ease-out;
 }
@@ -149,7 +149,7 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
   border-radius: 8px;
-  border: 1px solid #E5DFE4;
+  border: 1.5px solid #000000;
 }
 @keyframes shimmer {
   0% { background-position: 200% 0; }
