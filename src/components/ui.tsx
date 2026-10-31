@@ -1,37 +1,61 @@
-// Shared UI primitives — all design-system compliant
-import type { ReactNode, ButtonHTMLAttributes, InputHTMLAttributes, SelectHTMLAttributes, ThHTMLAttributes, TdHTMLAttributes } from 'react'
+import type {
+  ReactNode,
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  SelectHTMLAttributes,
+  ThHTMLAttributes,
+  TdHTMLAttributes,
+} from 'react'
 
-// ---- Badge ----
-interface BadgeProps { children: ReactNode; variant?: 'ok' | 'warn' | 'bad' | 'info' | 'neutral' }
+// ---- Badge (Neo-Brutalist with Shadow) ----
+interface BadgeProps {
+  children: ReactNode
+  variant?: 'ok' | 'warn' | 'bad' | 'info' | 'neutral'
+}
+
 export function Badge({ children, variant = 'neutral' }: BadgeProps) {
   const cls = {
-    ok:      'bg-green-50 text-green-700 border-green-300',
-    warn:    'bg-yellow-50 text-yellow-700 border-yellow-300',
-    bad:     'bg-red-50 text-red-700 border-red-300',
-    info:    'bg-blue-50 text-blue-700 border-blue-300',
-    neutral: 'bg-zinc-100 text-zinc-600 border-zinc-300',
+    ok: 'bg-[#d1fae5] text-[#047857]',
+    warn: 'bg-[#fef3c7] text-[#b45309]',
+    bad: 'bg-[#fee2e2] text-[#b91c1c]',
+    info: 'bg-[#e0e7ff] text-[#3730a3]',
+    neutral: 'bg-white text-gray-700',
   }[variant]
+
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wide border rounded-sm ${cls}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-wider border-[1.5px] border-black rounded-md shadow-[2px_2px_0_#000] font-mono ${cls}`}
+    >
       {children}
     </span>
   )
 }
 
-// ---- Button ----
+// ---- Buttons (Shimmering Primary & Tactile Secondary) ----
 interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
   size?: 'sm' | 'md'
 }
-export function Btn({ children, variant = 'secondary', size = 'md', className = '', ...props }: BtnProps) {
-  const base = 'inline-flex items-center gap-1.5 font-medium rounded transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
-  const sizes = { sm: 'px-2.5 py-1 text-xs', md: 'px-3.5 py-1.5 text-sm' }
+
+export function Btn({
+  children,
+  variant = 'secondary',
+  size = 'md',
+  className = '',
+  ...props
+}: BtnProps) {
+  const base =
+    'inline-flex items-center justify-center gap-2 font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
+  const sizes = { sm: 'px-3.5 py-1.5 text-xs', md: 'px-5 py-2.5 text-sm' }
   const variants = {
-    primary:   'bg-[var(--accent)] text-white hover:bg-blue-900',
-    secondary: 'bg-white text-[var(--ink)] border border-[var(--line-strong)] hover:bg-[var(--surface-2)]',
-    ghost:     'bg-transparent text-[var(--ink-60)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]',
-    danger:    'bg-[var(--bad)] text-white hover:bg-red-700',
+    primary: 'btn-primary text-white',
+    secondary:
+      'bg-white border-[1.5px] border-black text-[#4A3043] hover:bg-gray-50 hover:shadow-[0_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none shadow-[0_2px_0_0_#000]',
+    ghost: 'bg-transparent text-gray-700 hover:bg-black/5 border border-transparent',
+    danger:
+      'bg-red-600 hover:bg-red-700 text-white border-[1.5px] border-black shadow-[0_4px_0_0_#000] hover:shadow-[0_6px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none',
   }
+
   return (
     <button className={`${base} ${sizes[size]} ${variants[variant]} ${className}`} {...props}>
       {children}
@@ -39,37 +63,58 @@ export function Btn({ children, variant = 'secondary', size = 'md', className = 
   )
 }
 
-// ---- Input ----
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> { label?: string; error?: string; hint?: string }
+// ---- Input Fields with Smooth Focus ----
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string
+  error?: string
+  hint?: string
+}
+
 export function Input({ label, error, hint, className = '', id, ...props }: InputProps) {
   const innerId = id ?? label?.toLowerCase().replace(/\s+/g, '-')
   return (
-    <div className="flex flex-col gap-1">
-      {label && <label htmlFor={innerId} className="text-xs font-medium text-[var(--ink-60)]">{label}</label>}
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <label
+          htmlFor={innerId}
+          className="text-[0.6875rem] font-bold text-gray-800 tracking-[0.1em] uppercase font-mono"
+        >
+          {label}
+        </label>
+      )}
       <input
         id={innerId}
-        className={`w-full px-3 py-2 text-sm border rounded bg-white text-[var(--ink)] placeholder:text-[var(--ink-40)]
-          border-[var(--line)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)] focus:outline-none
-          transition-colors ${error ? 'border-[var(--bad)] focus:border-[var(--bad)]' : ''} ${className}`}
+        className={`input-focus w-full px-4 py-2.5 text-[0.875rem] bg-white border-[1.5px] border-black rounded-xl text-[#4A3043] placeholder:text-gray-400 shadow-sm ${
+          error ? '!border-red-600' : ''
+        } ${className}`}
         {...props}
       />
-      {error && <p className="text-xs text-[var(--bad)]">{error}</p>}
-      {hint && !error && <p className="text-xs text-[var(--ink-40)]">{hint}</p>}
+      {error && <p className="text-xs text-red-600 font-mono">{error}</p>}
+      {hint && !error && <p className="text-xs text-gray-500 font-mono">{hint}</p>}
     </div>
   )
 }
 
-// ---- Select ----
-interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> { label?: string }
+// ---- Select Dropdowns ----
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string
+}
+
 export function Select({ label, className = '', id, children, ...props }: SelectProps) {
   const innerId = id ?? label?.toLowerCase().replace(/\s+/g, '-')
   return (
-    <div className="flex flex-col gap-1">
-      {label && <label htmlFor={innerId} className="text-xs font-medium text-[var(--ink-60)]">{label}</label>}
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <label
+          htmlFor={innerId}
+          className="text-[0.6875rem] font-bold text-gray-800 tracking-[0.1em] uppercase font-mono"
+        >
+          {label}
+        </label>
+      )}
       <select
         id={innerId}
-        className={`w-full px-3 py-2 text-sm border border-[var(--line)] rounded bg-white text-[var(--ink)]
-          focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)] focus:outline-none transition-colors ${className}`}
+        className={`input-focus w-full px-4 py-2.5 text-[0.875rem] bg-white border-[1.5px] border-black rounded-xl text-[#4A3043] shadow-sm font-medium ${className}`}
         {...props}
       >
         {children}
@@ -78,18 +123,23 @@ export function Select({ label, className = '', id, children, ...props }: Select
   )
 }
 
-// ---- Table primitives ----
+// ---- Table Primitives (Glass Neo-Brutalist Panel) ----
 export function Table({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className="w-full overflow-x-auto">
-      <table className={`w-full text-sm border-collapse ${className}`}>{children}</table>
+    <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
+      <div className="w-full overflow-x-auto">
+        <table className={`w-full text-left border-collapse ${className}`}>{children}</table>
+      </div>
     </div>
   )
 }
 
 export function Th({ children, className = '', ...props }: ThHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <th className={`px-4 py-2.5 text-left text-[10px] font-mono font-semibold uppercase tracking-wide text-[var(--ink-40)] bg-[var(--surface)] border-b border-[var(--line-strong)] whitespace-nowrap ${className}`} {...props}>
+    <th
+      className={`px-6 py-4 text-left text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 bg-white/60 border-b-[1.5px] border-black font-mono whitespace-nowrap ${className}`}
+      {...props}
+    >
       {children}
     </th>
   )
@@ -97,16 +147,24 @@ export function Th({ children, className = '', ...props }: ThHTMLAttributes<HTML
 
 export function Td({ children, className = '', ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td className={`px-4 py-3 text-[var(--ink)] border-b border-[var(--line)] ${className}`} {...props}>
+    <td className={`px-6 py-4 text-[0.875rem] border-b border-black/10 text-gray-900 ${className}`} {...props}>
       {children}
     </td>
   )
 }
 
-export function Tr({ children, className = '', onClick }: { children: ReactNode; className?: string; onClick?: () => void }) {
+export function Tr({
+  children,
+  className = '',
+  onClick,
+}: {
+  children: ReactNode
+  className?: string
+  onClick?: () => void
+}) {
   return (
     <tr
-      className={`hover:bg-[var(--surface-2)] transition-colors ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`table-row ${onClick ? 'cursor-pointer' : ''} ${className}`}
       onClick={onClick}
     >
       {children}
@@ -114,54 +172,126 @@ export function Tr({ children, className = '', onClick }: { children: ReactNode;
   )
 }
 
-// ---- Card ----
-export function Card({ children, className = '', padding = true }: { children: ReactNode; className?: string; padding?: boolean }) {
+// ---- Glass Cards ----
+export function Card({
+  children,
+  className = '',
+  padding = true,
+}: {
+  children: ReactNode
+  className?: string
+  padding?: boolean
+}) {
   return (
-    <div className={`bg-white border border-[var(--line)] rounded-lg shadow-sm ${padding ? 'p-5' : ''} ${className}`}>
+    <div className={`glass-panel rounded-2xl anim-spring ${padding ? 'p-6' : ''} ${className}`}>
       {children}
     </div>
   )
 }
 
-// ---- Page header ----
-export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
+// ---- Page Header ----
+export function PageHeader({
+  title,
+  subtitle,
+  actions,
+}: {
+  title: string
+  subtitle?: string
+  actions?: ReactNode
+}) {
   return (
-    <div className="mb-6">
-      <div className="flex items-start justify-between gap-4 pb-4 border-b border-[var(--line-strong)]">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">{title}</h1>
-          {subtitle && <p className="mt-1 text-sm text-[var(--ink-60)]">{subtitle}</p>}
-        </div>
-        {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2 border-b border-black/10 anim-spring stagger-1 mb-8">
+      <div>
+        <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">{title}</h1>
+        {subtitle && <p className="text-[0.9375rem] text-gray-600 font-medium mt-1">{subtitle}</p>}
       </div>
+      {actions && <div className="flex items-center gap-3 shrink-0">{actions}</div>}
     </div>
   )
 }
 
-// ---- Empty state ----
-export function EmptyState({ icon, title, action }: { icon: ReactNode; title: string; action?: ReactNode }) {
+// ---- Empty State ----
+export function EmptyState({
+  icon,
+  title,
+  action,
+}: {
+  icon: ReactNode
+  title: string
+  action?: ReactNode
+}) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 gap-3 text-[var(--ink-40)]">
-      <div className="text-[var(--line)]">{icon}</div>
+    <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+      <div className="text-gray-400">{icon}</div>
       <p className="text-sm font-medium">{title}</p>
       {action}
     </div>
   )
 }
 
-// ---- Stat card (KPI) ----
-export function KpiCell({ label, value, delta, deltaPositive }: {
-  label: string; value: string; delta?: string; deltaPositive?: boolean
+// ---- Stat Card / KPI ----
+export function KpiCell({
+  label,
+  value,
+  delta,
+  deltaPositive,
+}: {
+  label: string
+  value: string
+  delta?: string
+  deltaPositive?: boolean
 }) {
   return (
-    <div className="flex-1 min-w-0 px-6 py-5 border-r border-[var(--line-strong)] last:border-r-0">
-      <p className="text-[10px] font-mono font-semibold uppercase tracking-widest text-[var(--ink-40)] mb-1">{label}</p>
-      <p className="text-2xl font-semibold font-mono tracking-tight text-[var(--ink)]">{value}</p>
+    <div className="glass-panel rounded-2xl p-6 anim-spring cursor-default">
+      <p className="text-[0.6875rem] font-bold uppercase tracking-widest text-gray-500 mb-2 font-mono">
+        {label}
+      </p>
+      <p className="text-[2rem] font-bold font-mono tracking-tight text-[#4A3043] leading-none tabular-nums">
+        {value}
+      </p>
       {delta && (
-        <p className={`text-xs mt-1 font-mono ${deltaPositive ? 'text-[var(--ok)]' : 'text-[var(--bad)]'}`}>
-          {deltaPositive ? '↑' : '↓'} {delta}
+        <p
+          className={`text-xs mt-3 font-mono font-medium flex items-center gap-1 ${
+            deltaPositive ? 'text-emerald-600' : 'text-red-600'
+          }`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${deltaPositive ? 'bg-emerald-500' : 'bg-red-500'}`} />
+          {delta}
         </p>
       )}
+    </div>
+  )
+}
+
+// ---- Search Input ----
+export function SearchInput({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string
+  onChange: (v: string) => void
+  placeholder?: string
+}) {
+  return (
+    <div className="relative">
+      <svg
+        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+        width="14"
+        height="14"
+        viewBox="0 0 14 14"
+        fill="none"
+      >
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.25" />
+        <path d="M10 10L12.5 12.5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+      </svg>
+      <input
+        type="text"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder ?? 'Search records…'}
+        className="input-focus pl-9 pr-4 py-2 text-[0.8125rem] bg-white border-[1.5px] border-black rounded-xl text-[#4A3043] placeholder:text-gray-400 w-56 shadow-xs"
+      />
     </div>
   )
 }
@@ -169,32 +299,14 @@ export function KpiCell({ label, value, delta, deltaPositive }: {
 // ---- Pill toggle flag ----
 export function FlagBadge({ on, label }: { on: boolean; label: string }) {
   return (
-    <span className={`inline-flex items-center px-1.5 py-px text-[9px] font-mono font-semibold uppercase tracking-wide border rounded-sm
-      ${on ? 'border-[var(--accent)] text-[var(--accent)] bg-[var(--accent-soft)]' : 'border-[var(--line)] text-[var(--ink-40)] bg-white'}`}>
+    <span
+      className={`inline-flex items-center px-2 py-0.5 text-[0.625rem] font-mono font-bold uppercase tracking-wide border-[1.5px] rounded-md ${
+        on
+          ? 'border-black text-[#4A3043] bg-emerald-100 shadow-[1px_1px_0_#000]'
+          : 'border-black/30 text-gray-400 bg-white'
+      }`}
+    >
       {label}
     </span>
   )
 }
-
-// ---- Search input ----
-export function SearchInput({ value, onChange, placeholder }: {
-  value: string; onChange: (v: string) => void; placeholder?: string
-}) {
-  return (
-    <div className="relative">
-      <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--ink-40)]" width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.25"/>
-        <path d="M10 10L12.5 12.5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
-      </svg>
-      <input
-        type="text"
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder ?? 'Search…'}
-        className="pl-8 pr-3 py-1.5 text-sm border border-[var(--line)] rounded bg-white text-[var(--ink)] placeholder:text-[var(--ink-40)]
-          focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)] focus:outline-none w-56 transition-colors"
-      />
-    </div>
-  )
-}
-

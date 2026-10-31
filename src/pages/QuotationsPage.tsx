@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CUSTOMERS, PRODUCTS, PLANS, formatPaise } from '../data/seed'
 import { Badge, Btn } from '../components/ui'
-import { FileText, Check, ArrowRight, Plus } from 'lucide-react'
+import { FileText, Check, ArrowRight, Plus, X } from 'lucide-react'
 
 interface QuotationItem {
   id: string
@@ -58,164 +58,148 @@ export default function QuotationsPage() {
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault()
-    const cust = CUSTOMERS.find(c => c.id === selectedCustomerId)
-    const newQuote: QuotationItem = {
+    const customer = CUSTOMERS.find(c => c.id === selectedCustomerId)
+    const newQ: QuotationItem = {
       id: `q-${Date.now()}`,
-      number: `QTN-2026-0000${quotes.length + 45}`,
-      customerName: cust?.company || 'Enterprise Client',
-      planName: `${activeProduct.name} ${activeVariant ? `(${activeVariant.name})` : ''}`,
+      number: `QTN-2026-${String(quotes.length + 42).padStart(6, '0')}`,
+      customerName: customer?.company || 'Enterprise Client',
+      planName: `${activeProduct.name}${activeVariant ? ` (${activeVariant.name})` : ''}`,
       total: grandTotal,
-      validUntil: '2026-11-30',
+      validUntil: '2026-12-31',
       state: 'DRAFT',
     }
-    setQuotes([newQuote, ...quotes])
-    setSelectedQuote(newQuote)
+    setQuotes([newQ, ...quotes])
+    setSelectedQuote(newQ)
     setModalOpen(false)
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--line-strong)]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-black/10 anim-spring stagger-1">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">Quotations & Order Proposals</h1>
-          <p className="text-xs font-mono text-[var(--ink-40)] uppercase tracking-wider mt-0.5">
-            Pre-Configured B2B Sales Templates · 5-Stage Conversion Stepper
+          <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">Quotations & Orders</h1>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mt-1">
+            Status Pipeline: Draft → Quotation → Confirmed → Converted to Active Subscription
           </p>
         </div>
-        <Btn variant="primary" size="sm" onClick={() => setModalOpen(true)} className="font-mono text-xs">
-          <Plus size={13} /> New Quotation
+        <Btn variant="primary" size="md" onClick={() => setModalOpen(true)}>
+          <Plus size={15} strokeWidth={2.5} /> Create Quotation
         </Btn>
       </div>
 
-      {/* 5-Stage Stepper for Selected Quote */}
-      <div className="border border-[var(--line-strong)] bg-white p-5">
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-4">
-          <div>
-            <span className="font-mono text-xs font-bold text-[var(--accent)]">{selectedQuote.number}</span>
-            <span className="text-xs text-[var(--ink-40)] ml-2">for {selectedQuote.customerName}</span>
-          </div>
-          <div className="flex items-center gap-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 anim-spring stagger-2">
+        {/* Left Column: Quotes List */}
+        <div className="lg:col-span-1 space-y-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 font-mono">
+            QUOTATIONS LIST ({quotes.length})
+          </p>
+          {quotes.map(q => (
+            <div
+              key={q.id}
+              onClick={() => setSelectedQuote(q)}
+              className={`p-5 glass-panel rounded-2xl cursor-pointer transition-all ${
+                selectedQuote.id === q.id
+                  ? '!border-black !bg-white shadow-[0_6px_0_0_#000] translate-x-1'
+                  : 'hover:border-black/50'
+              }`}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <span className="font-bold font-mono text-[#4A3043] text-sm">{q.number}</span>
+                <Badge
+                  variant={
+                    q.state === 'ACTIVE'
+                      ? 'ok'
+                      : q.state === 'CONFIRMED'
+                      ? 'info'
+                      : q.state === 'QUOTATION'
+                      ? 'warn'
+                      : 'neutral'
+                  }
+                >
+                  {q.state}
+                </Badge>
+              </div>
+              <p className="font-bold text-[#4A3043]">{q.customerName}</p>
+              <p className="text-xs text-gray-500 font-mono mt-0.5">{q.planName}</p>
+              <div className="flex justify-between items-center mt-3 pt-3 border-t border-black/10 text-xs font-mono">
+                <span className="font-bold text-black">{formatPaise(q.total)}</span>
+                <span className="text-gray-400">Valid: {q.validUntil}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Right Column: Selected Quote Detail */}
+        <div className="lg:col-span-2 glass-panel rounded-2xl p-8 space-y-6">
+          <div className="flex justify-between items-start pb-4 border-b border-black/10">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-xs font-bold text-[#714B67]">{selectedQuote.number}</span>
+                <Badge variant={selectedQuote.state === 'ACTIVE' ? 'ok' : 'info'}>{selectedQuote.state}</Badge>
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight text-[#4A3043] mt-1">
+                {selectedQuote.customerName}
+              </h2>
+              <p className="text-xs text-gray-500 font-mono mt-0.5">Commercial Offer Specification</p>
+            </div>
             {selectedQuote.state !== 'ACTIVE' && (
               <button
                 onClick={() => advanceStage(selectedQuote.id)}
-                className="px-3 py-1 bg-[var(--accent)] text-white text-xs font-mono font-bold uppercase rounded hover:bg-blue-900 transition-colors flex items-center gap-1 cursor-pointer"
+                className="btn-primary text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer"
               >
-                Advance to Next Stage <ArrowRight size={12} />
+                <span>Advance to {selectedQuote.state === 'DRAFT' ? 'Quotation' : selectedQuote.state === 'QUOTATION' ? 'Confirmed' : 'Active Subscription'}</span>
+                <ArrowRight size={14} />
               </button>
             )}
-            {selectedQuote.state === 'ACTIVE' && (
-              <span className="font-mono text-xs font-bold text-[var(--ok)] flex items-center gap-1">
-                <Check size={14} /> Converted to Active Subscription
-              </span>
-            )}
+          </div>
+
+          {/* Pricing Box */}
+          <div className="p-6 bg-white border-[1.5px] border-black rounded-2xl shadow-xs space-y-3 font-mono text-xs">
+            <div className="flex justify-between">
+              <span className="text-gray-500">Plan & Included Modules</span>
+              <span className="font-bold text-[#4A3043]">{selectedQuote.planName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">GST (18% Statutory Rate)</span>
+              <span className="font-bold text-gray-700">Included</span>
+            </div>
+            <div className="flex justify-between text-base pt-3 border-t border-black/10">
+              <span className="font-bold text-black">Net Total (Payable)</span>
+              <span className="font-bold text-[#4A3043] tabular-nums text-lg">{formatPaise(selectedQuote.total)}</span>
+            </div>
           </div>
         </div>
-
-        {/* Structural Stepper Bar */}
-        <div className="grid grid-cols-4 divide-x divide-[var(--line-strong)] border border-[var(--line-strong)] font-mono text-xs">
-          {[
-            { label: '1. DRAFT', key: 'DRAFT' },
-            { label: '2. QUOTATION', key: 'QUOTATION' },
-            { label: '3. CONFIRMED', key: 'CONFIRMED' },
-            { label: '4. ACTIVE SUB', key: 'ACTIVE' },
-          ].map((st, idx) => {
-            const stages = ['DRAFT', 'QUOTATION', 'CONFIRMED', 'ACTIVE']
-            const currentIdx = stages.indexOf(selectedQuote.state)
-            const isCompleted = idx <= currentIdx
-            const isCurrent = idx === currentIdx
-
-            return (
-              <div
-                key={st.key}
-                className={`p-3 text-center transition-colors ${
-                  isCurrent
-                    ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-bold'
-                    : isCompleted
-                    ? 'bg-zinc-100 text-[var(--ink)]'
-                    : 'bg-white text-[var(--ink-40)]'
-                }`}
-              >
-                {st.label}
-              </div>
-            )
-          })}
-        </div>
       </div>
 
-      {/* Quotations List */}
-      <div className="border border-[var(--line-strong)] bg-white overflow-x-auto">
-        <table className="w-full text-left text-xs font-mono">
-          <thead>
-            <tr className="border-b border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--ink-40)]">
-              <th className="px-4 py-3">QUOTATION ID</th>
-              <th className="px-4 py-3">CUSTOMER</th>
-              <th className="px-4 py-3">PROPOSAL PLAN</th>
-              <th className="px-4 py-3">VALIDITY</th>
-              <th className="px-4 py-3 text-right">TOTAL AMOUNT</th>
-              <th className="px-4 py-3">LIFECYCLE STATE</th>
-              <th className="px-4 py-3 text-right">ACTION</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[var(--line)]">
-            {quotes.map(q => (
-              <tr
-                key={q.id}
-                onClick={() => setSelectedQuote(q)}
-                className={`hover:bg-[var(--surface-2)] transition-colors cursor-pointer ${
-                  selectedQuote.id === q.id ? 'bg-[var(--accent-soft)]' : ''
-                }`}
-              >
-                <td className="px-4 py-3 font-bold text-[var(--ink)]">{q.number}</td>
-                <td className="px-4 py-3 font-semibold text-[var(--ink)]">{q.customerName}</td>
-                <td className="px-4 py-3 text-[var(--ink-60)]">{q.planName}</td>
-                <td className="px-4 py-3 text-[var(--ink-40)]">{q.validUntil}</td>
-                <td className="px-4 py-3 text-right font-bold text-[var(--ink)]">{formatPaise(q.total)}</td>
-                <td className="px-4 py-3">
-                  <Badge variant={q.state === 'ACTIVE' ? 'ok' : q.state === 'CONFIRMED' ? 'info' : 'warn'}>
-                    {q.state}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <button
-                    onClick={e => {
-                      e.stopPropagation()
-                      advanceStage(q.id)
-                    }}
-                    disabled={q.state === 'ACTIVE'}
-                    className="text-[10px] font-bold text-[var(--accent)] hover:underline disabled:opacity-30 disabled:no-underline"
-                  >
-                    {q.state === 'ACTIVE' ? 'Active Sub' : 'Advance →'}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Create Quote Modal */}
+      {/* Creation Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white border border-[var(--line-strong)] rounded-lg p-6 max-w-lg w-full shadow-2xl font-mono text-xs">
-            <h2 className="text-base font-bold text-[var(--ink)] font-sans">Draft B2B Quotation Template</h2>
-            <p className="text-[11px] text-[var(--ink-40)] mt-0.5">Automated tax & variant calculations</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop" onClick={() => setModalOpen(false)} />
+          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-3xl shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] overflow-hidden modal-panel p-8">
+            <div className="flex justify-between items-center pb-4 border-b border-black">
+              <h3 className="text-xl font-bold text-[#4A3043]">Create New Quotation</h3>
+              <button onClick={() => setModalOpen(false)} className="p-1.5 rounded-lg border border-black hover:bg-gray-100">
+                <X size={16} />
+              </button>
+            </div>
 
-            <form onSubmit={handleCreate} className="mt-4 space-y-3">
+            <form onSubmit={handleCreate} className="py-6 space-y-4">
               <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">Customer Account</label>
+                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase font-mono mb-1">Select Customer</label>
                 <select
                   value={selectedCustomerId}
                   onChange={e => setSelectedCustomerId(e.target.value)}
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
+                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs font-mono"
                 >
                   {CUSTOMERS.map(c => (
-                    <option key={c.id} value={c.id}>{c.company} ({c.code})</option>
+                    <option key={c.id} value={c.id}>{c.company} ({c.name})</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">Product</label>
+                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase font-mono mb-1">Base Product</label>
                 <select
                   value={selectedProductId}
                   onChange={e => {
@@ -223,76 +207,58 @@ export default function QuotationsPage() {
                     const p = PRODUCTS.find(x => x.id === e.target.value)
                     setSelectedVariantId(p?.variants[0]?.id || '')
                   }}
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
+                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs font-mono"
                 >
                   {PRODUCTS.map(p => (
-                    <option key={p.id} value={p.id}>{p.name} - Base: {formatPaise(p.salesPrice)}</option>
+                    <option key={p.id} value={p.id}>{p.name} — {formatPaise(p.salesPrice)}</option>
                   ))}
                 </select>
               </div>
 
               {activeProduct.variants.length > 0 && (
                 <div>
-                  <label className="block text-[11px] text-[var(--ink-60)] mb-1">Variant Configuration</label>
+                  <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase font-mono mb-1">Additive Variant</label>
                   <select
                     value={selectedVariantId}
                     onChange={e => setSelectedVariantId(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
+                    className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs font-mono"
                   >
-                    <option value="">No Variant (+₹0)</option>
+                    <option value="">No variant (+₹0.00)</option>
                     {activeProduct.variants.map(v => (
-                      <option key={v.id} value={v.id}>
-                        {v.name} (+{formatPaise(v.priceDelta)})
-                      </option>
+                      <option key={v.id} value={v.id}>{v.name} (+{formatPaise(v.priceDelta)})</option>
                     ))}
                   </select>
                 </div>
               )}
 
-              <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">Seats / Quantity</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onChange={e => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
-                />
-              </div>
-
-              {/* Order Lines Calculation Strip */}
-              <div className="p-3 bg-[var(--surface-2)] border border-[var(--line)] rounded space-y-1 text-[11px]">
+              <div className="p-4 bg-gray-50 border-[1.5px] border-black rounded-xl font-mono text-xs space-y-1">
                 <div className="flex justify-between">
-                  <span>Effective Unit Price:</span>
+                  <span>Unit Price:</span>
                   <span className="font-bold">{formatPaise(unitPrice)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Subtotal ({quantity} seats):</span>
-                  <span>{formatPaise(subtotal)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Applicable GST (18%):</span>
+                  <span>GST 18%:</span>
                   <span>{formatPaise(taxAmount)}</span>
                 </div>
-                <div className="flex justify-between border-t border-[var(--line)] pt-1 font-bold text-sm text-[var(--accent)]">
-                  <span>Grand Total (Paise):</span>
+                <div className="flex justify-between text-sm font-bold text-[#4A3043] pt-1 border-t border-black/10">
+                  <span>Total Payable:</span>
                   <span>{formatPaise(grandTotal)}</span>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-3 pt-4 border-t border-black">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-3 py-1.5 border border-[var(--line)] rounded hover:bg-zinc-100"
+                  className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-[var(--accent)] text-white font-bold rounded hover:bg-blue-900"
+                  className="btn-primary text-white text-xs font-bold px-5 py-2.5 rounded-xl"
                 >
-                  Generate Quotation
+                  Save & Generate Offer
                 </button>
               </div>
             </form>
@@ -302,4 +268,3 @@ export default function QuotationsPage() {
     </div>
   )
 }
-

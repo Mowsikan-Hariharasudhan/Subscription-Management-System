@@ -9,7 +9,7 @@ import {
   CUSTOMERS,
 } from '../data/seed'
 import { Badge, Btn } from '../components/ui'
-import { Download, FileSpreadsheet, BarChart2, Filter } from 'lucide-react'
+import { Download, BarChart2 } from 'lucide-react'
 
 type ReportType =
   | 'RECOGNIZED_REVENUE'
@@ -26,7 +26,7 @@ export default function ReportsPage() {
   const [downloadNotice, setDownloadNotice] = useState('')
 
   const handleExportCSV = () => {
-    setDownloadNotice(`Export generated: brightloop_${activeReport.toLowerCase()}_2026.csv`)
+    setDownloadNotice(`Export generated: peoplepay360_${activeReport.toLowerCase()}_2026.csv`)
     setTimeout(() => setDownloadNotice(''), 4000)
   }
 
@@ -43,142 +43,151 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--line-strong)]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-black/10 anim-spring stagger-1">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">Financial Reports & Statements</h1>
-          <p className="text-xs font-mono text-[var(--ink-40)] uppercase tracking-wider mt-0.5">
-            Strict GAAP Accrual Separation · Recognized Revenue vs Cash Collected (INR Paise Safe)
+          <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">Financial Reports</h1>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mt-1">
+            GAAP Accrual Separation · Recognized Invoicing vs Verified Cash Receipts
           </p>
         </div>
-        <Btn variant="primary" size="sm" onClick={handleExportCSV} className="font-mono text-xs">
-          <Download size={13} /> Export Report (.CSV)
+        <Btn variant="primary" size="md" onClick={handleExportCSV}>
+          <Download size={15} /> Export Statement (.CSV)
         </Btn>
       </div>
 
       {downloadNotice && (
-        <div className="p-3 bg-green-50 border border-green-300 text-green-900 text-xs font-mono rounded flex justify-between items-center">
+        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-emerald-800 flex justify-between items-center anim-spring">
           <span>{downloadNotice}</span>
           <button onClick={() => setDownloadNotice('')} className="font-bold cursor-pointer">×</button>
         </div>
       )}
 
       {/* 8-Report Navigation Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 font-mono text-xs">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono text-xs anim-spring stagger-2">
         {reportsList.map(r => (
           <button
             key={r.id}
             onClick={() => setActiveReport(r.id as ReportType)}
-            className={`p-3 border rounded text-left transition-all cursor-pointer ${
+            className={`p-4 border-[1.5px] border-black rounded-2xl text-left transition-all cursor-pointer ${
               activeReport === r.id
-                ? 'bg-[var(--accent-soft)] border-[var(--accent)] text-[var(--accent)] font-bold'
-                : 'bg-white border-[var(--line)] hover:border-[var(--line-strong)] text-[var(--ink)]'
+                ? 'glass-odoo text-white font-bold shadow-[0_4px_0_0_#000] -translate-y-0.5'
+                : 'bg-white/80 hover:bg-white text-gray-800 hover:shadow-[2px_2px_0_#000]'
             }`}
           >
-            <p className="text-xs leading-tight">{r.label}</p>
-            <p className="text-[10px] text-[var(--ink-40)] mt-0.5 truncate">{r.desc}</p>
+            <p className="text-xs font-bold leading-tight">{r.label}</p>
+            <p className={`text-[10px] mt-1 truncate ${activeReport === r.id ? 'text-white/70' : 'text-gray-500'}`}>
+              {r.desc}
+            </p>
           </button>
         ))}
       </div>
 
       {/* Report Container */}
-      <div className="border border-[var(--line-strong)] bg-white p-6 font-mono text-xs">
-        <div className="flex justify-between items-center pb-4 border-b border-[var(--line)] mb-4">
+      <div className="glass-panel rounded-2xl p-8 font-mono text-xs anim-spring stagger-3 shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
+        <div className="flex justify-between items-center pb-4 border-b-[1.5px] border-black mb-6">
           <div>
-            <h2 className="text-base font-bold font-sans text-[var(--ink)]">
+            <h2 className="text-xl font-bold font-sans text-[#4A3043]">
               {reportsList.find(r => r.id === activeReport)?.label}
             </h2>
-            <p className="text-xs text-[var(--ink-60)]">
+            <p className="text-xs text-gray-500 mt-0.5">
               {reportsList.find(r => r.id === activeReport)?.desc}
             </p>
           </div>
-          <span className="text-[10px] px-2 py-0.5 bg-[var(--surface-2)] border border-[var(--line)] rounded font-semibold">
-            Status: Aggregated (&lt; 2s cached)
+          <span className="text-[10px] px-3 py-1 bg-white border-[1.5px] border-black rounded-md font-bold shadow-[1px_1px_0_#000]">
+            Validated (&lt; 2s cached)
           </span>
         </div>
 
         {/* Dynamic Report Content */}
         {activeReport === 'RECOGNIZED_REVENUE' && (
-          <div className="space-y-4">
-            <div className="p-3 bg-zinc-50 border border-[var(--line)] text-xs">
-              <span className="font-bold text-[var(--ink)]">ACCOUNTING DEFINITION: </span>
+          <div className="space-y-5">
+            <div className="p-4 bg-white/70 border-[1.5px] border-black rounded-xl text-xs">
+              <span className="font-bold text-[#4A3043]">ACCOUNTING DEFINITION: </span>
               Recognized Revenue represents total invoiced value for the period regardless of whether cash has arrived in the bank account.
             </div>
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-[var(--line-strong)] text-[var(--ink-40)]">
-                  <th className="py-2">PERIOD / MONTH</th>
-                  <th className="py-2 text-right">INVOICES ISSUED</th>
-                  <th className="py-2 text-right">SUBTOTAL (₹)</th>
-                  <th className="py-2 text-right">GST APPLICABLE (₹)</th>
-                  <th className="py-2 text-right">GROSS RECOGNIZED (₹)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--line)]">
-                {getRevenueByMonth().slice(-6).map((m, i) => (
-                  <tr key={i} className="hover:bg-[var(--surface-2)]">
-                    <td className="py-2.5 font-bold">{m.month}</td>
-                    <td className="py-2.5 text-right">{14 + i * 2}</td>
-                    <td className="py-2.5 text-right font-mono">{formatPaise(m.recognized * 82)}</td>
-                    <td className="py-2.5 text-right font-mono text-[var(--ink-40)]">{formatPaise(m.recognized * 18)}</td>
-                    <td className="py-2.5 text-right font-bold font-mono text-[var(--ink)]">{formatPaise(m.recognized * 100)}</td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead className="border-b-[1.5px] border-black bg-white/60">
+                  <tr>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-gray-800">PERIOD / MONTH</th>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-right text-gray-800">INVOICES</th>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-right text-gray-800">SUBTOTAL (₹)</th>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-right text-gray-800">GST (₹)</th>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-right text-gray-800">GROSS RECOGNIZED (₹)</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-black/10">
+                  {getRevenueByMonth().slice(-6).map((m, i) => (
+                    <tr key={i} className="table-row">
+                      <td className="px-6 py-4 font-bold text-[#4A3043]">{m.month}</td>
+                      <td className="px-6 py-4 text-right text-gray-600">{14 + i * 2}</td>
+                      <td className="px-6 py-4 text-right">{formatPaise(m.recognized * 82)}</td>
+                      <td className="px-6 py-4 text-right text-gray-500">{formatPaise(m.recognized * 18)}</td>
+                      <td className="px-6 py-4 text-right font-bold text-[#4A3043]">{formatPaise(m.recognized * 100)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
         {activeReport === 'CASH_COLLECTED' && (
-          <div className="space-y-4">
-            <div className="p-3 bg-blue-50 border border-blue-200 text-xs text-blue-900">
+          <div className="space-y-5">
+            <div className="p-4 bg-emerald-50 border-[1.5px] border-black rounded-xl text-xs text-emerald-900">
               <span className="font-bold">ACCOUNTING DEFINITION: </span>
               Cash Collected reflects actual banking receipts verified via UPI, NEFT, RTGS or card rails into company accounts.
             </div>
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-[var(--line-strong)] text-[var(--ink-40)]">
-                  <th className="py-2">RECEIPT ID</th>
-                  <th className="py-2">CUSTOMER ACCOUNT</th>
-                  <th className="py-2">METHOD</th>
-                  <th className="py-2">CLEARANCE DATE</th>
-                  <th className="py-2 text-right">FUNDS SETTLED (₹)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--line)]">
-                {PAYMENTS.slice(0, 8).map(p => {
-                  const cust = CUSTOMERS.find(c => c.id === p.customerId)
-                  return (
-                    <tr key={p.id} className="hover:bg-[var(--surface-2)]">
-                      <td className="py-2.5 font-bold">{p.number}</td>
-                      <td className="py-2.5">{cust?.company}</td>
-                      <td className="py-2.5 text-[var(--ink-60)]">{p.method}</td>
-                      <td className="py-2.5 text-[var(--ink-40)]">{p.paidAt}</td>
-                      <td className="py-2.5 text-right font-bold text-[var(--ok)]">{formatPaise(p.amount)}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead className="border-b-[1.5px] border-black bg-white/60">
+                  <tr>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-gray-800">RECEIPT ID</th>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-gray-800">CUSTOMER</th>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-gray-800">METHOD</th>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-gray-800">CLEARANCE</th>
+                    <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase text-right text-gray-800">FUNDS SETTLED (₹)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-black/10">
+                  {PAYMENTS.slice(0, 8).map(p => {
+                    const cust = CUSTOMERS.find(c => c.id === p.customerId)
+                    return (
+                      <tr key={p.id} className="table-row">
+                        <td className="px-6 py-4 font-bold text-[#4A3043]">{p.number}</td>
+                        <td className="px-6 py-4 font-medium">{cust?.company}</td>
+                        <td className="px-6 py-4"><Badge variant="ok">{p.method}</Badge></td>
+                        <td className="px-6 py-4 text-gray-500">{p.paidAt}</td>
+                        <td className="px-6 py-4 text-right font-bold text-emerald-700">{formatPaise(p.amount)}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
         {activeReport !== 'RECOGNIZED_REVENUE' && activeReport !== 'CASH_COLLECTED' && (
-          <div className="space-y-4">
-            <div className="p-3 bg-[var(--surface-2)] border border-[var(--line)] rounded">
-              <p className="font-bold">Real-Time Ledger Query Results:</p>
-              <p className="text-xs text-[var(--ink-60)] mt-1">
-                Active dataset populated across 30 enterprise clients, 100 invoices, and 80 payment receipts.
+          <div className="space-y-6">
+            <div className="p-4 bg-white/70 border-[1.5px] border-black rounded-xl text-xs">
+              <p className="font-bold text-[#4A3043]">Real-Time Ledger Query Results:</p>
+              <p className="text-gray-600 mt-1">
+                Active dataset populated across enterprise clients, invoices, and payments.
               </p>
             </div>
-            <div className="p-8 text-center text-[var(--ink-40)] border border-dashed border-[var(--line)] rounded">
-              <BarChart2 size={32} className="mx-auto mb-2 text-[var(--ink-40)]" />
-              <p className="font-bold text-[var(--ink)]">Ledger Calculated & Validated</p>
-              <p className="text-xs mt-1">Ready for high-speed CSV or PDF export without database throttling.</p>
+            <div className="p-10 text-center border-[1.5px] border-dashed border-black/40 rounded-2xl bg-white/50">
+              <BarChart2 size={36} className="mx-auto mb-3 text-[#714B67]" />
+              <p className="font-bold text-base text-[#4A3043]">Ledger Calculated & Validated</p>
+              <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
+                All integer paise transactions verified for export with zero floating-point drift.
+              </p>
               <button
                 onClick={handleExportCSV}
-                className="mt-4 px-4 py-1.5 bg-[var(--line-strong)] text-white text-xs font-bold rounded"
+                className="mt-5 btn-primary text-white text-xs font-bold px-6 py-2.5 rounded-xl inline-block"
               >
-                Download Statement
+                Download Statement (.CSV)
               </button>
             </div>
           </div>

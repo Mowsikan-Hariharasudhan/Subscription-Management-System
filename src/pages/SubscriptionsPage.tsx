@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { SUBSCRIPTIONS, CUSTOMERS, PLANS, formatPaise, type Subscription, type SubscriptionState } from '../data/seed'
 import { Badge, Btn, SearchInput } from '../components/ui'
-import { Play, Pause, RefreshCw, XCircle, ArrowUpRight, Check, X, ShieldAlert } from 'lucide-react'
+import { Play, Pause, RefreshCw, XCircle, X, ShieldAlert, Check } from 'lucide-react'
 
 export default function SubscriptionsPage() {
   const [subs, setSubs] = useState<Subscription[]>(SUBSCRIPTIONS)
@@ -22,7 +22,7 @@ export default function SubscriptionsPage() {
 
   const notify = (msg: string) => {
     setToastNotice(msg)
-    setTimeout(() => setToastNotice(''), 3000)
+    setTimeout(() => setToastNotice(''), 4000)
   }
 
   // State Machine Transitions
@@ -31,7 +31,7 @@ export default function SubscriptionsPage() {
     const plan = PLANS.find(p => p.id === sub?.planId)
 
     if (plan && !plan.allowPause) {
-      notify('POLICY VIOLATION: Pause is strictly prohibited on this plan tier.')
+      notify('POLICY VIOLATION: Pausing is disabled by plan terms.')
       return
     }
 
@@ -59,7 +59,7 @@ export default function SubscriptionsPage() {
     const plan = PLANS.find(p => p.id === sub?.planId)
 
     if (plan && !plan.allowEarlyClose) {
-      notify('POLICY VIOLATION: Early closure not allowed on this annual contract.')
+      notify('POLICY VIOLATION: Early closure prohibited on this annual contract.')
       return
     }
 
@@ -72,55 +72,44 @@ export default function SubscriptionsPage() {
     notify(`Subscription closed early. Contract terminated and audit logged.`)
   }
 
-  const handleRenew = (id: string) => {
-    setSubs(prev =>
-      prev.map(s => {
-        if (s.id === id) {
-          return {
-            ...s,
-            state: 'ACTIVE',
-            expiryDate: '2028-01-01',
-            mrr: s.totalAmount,
-          }
-        }
-        return s
-      })
-    )
-    notify('Subscription contract renewed for another 12-month billing window.')
-  }
-
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--line-strong)]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-black/10 anim-spring stagger-1">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">Subscriptions Engine</h1>
-          <p className="text-xs font-mono text-[var(--ink-40)] uppercase tracking-wider mt-0.5">
-            Finite State Machine: Draft → Quotation → Confirmed → Active → Closed (Paused)
+          <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">Subscriptions Engine</h1>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mt-1">
+            Finite State Transitions · Automated Recurring Invoicing Pipeline
           </p>
         </div>
+        <Btn variant="primary" size="md">
+          + New Subscription
+        </Btn>
       </div>
 
       {toastNotice && (
-        <div className="p-3 bg-zinc-900 text-white text-xs font-mono rounded flex justify-between items-center shadow-lg border border-[var(--line-strong)]">
+        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-[#4A3043] flex justify-between items-center anim-spring">
           <span className="flex items-center gap-2">
-            <ShieldAlert size={14} className="text-yellow-400" />
+            <ShieldAlert size={16} className="text-amber-500" />
             {toastNotice}
           </span>
-          <button onClick={() => setToastNotice('')} className="text-zinc-400 hover:text-white cursor-pointer">×</button>
+          <button onClick={() => setToastNotice('')} className="font-bold text-gray-500 hover:text-black cursor-pointer">×</button>
         </div>
       )}
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
-        <div className="flex items-center gap-2">
-          <SearchInput value={search} onChange={setSearch} placeholder="Search subscription number..." />
-          <div className="flex border border-[var(--line)] rounded bg-white p-0.5 text-xs font-mono overflow-x-auto max-w-md">
-            {(['ALL', 'ACTIVE', 'PAUSED', 'CONFIRMED', 'CLOSED', 'EXPIRED'] as const).map(st => (
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center anim-spring stagger-2">
+        <div className="flex items-center gap-3">
+          <SearchInput value={search} onChange={setSearch} placeholder="Search contract or company..." />
+          <div className="flex border-[1.5px] border-black rounded-xl bg-white p-1 text-xs font-mono shadow-[2px_2px_0_#000] overflow-x-auto">
+            {(['ALL', 'ACTIVE', 'PAUSED', 'CONFIRMED', 'CLOSED'] as const).map(st => (
               <button
                 key={st}
-                onClick={() => setStateFilter(st)}
-                className={`px-2 py-1 rounded cursor-pointer ${
-                  stateFilter === st ? 'bg-[var(--line-strong)] text-white font-bold' : 'text-[var(--ink-60)]'
+                onClick={() => setStateFilter(st as any)}
+                className={`px-3 py-1 rounded-lg cursor-pointer transition-colors ${
+                  stateFilter === st
+                    ? 'glass-odoo text-white font-bold'
+                    : 'text-gray-600 hover:text-black'
                 }`}
               >
                 {st}
@@ -129,28 +118,26 @@ export default function SubscriptionsPage() {
           </div>
         </div>
 
-        <span className="text-xs font-mono text-[var(--ink-40)]">
+        <span className="text-xs font-mono text-gray-500">
           Showing {filtered.length} subscriptions
         </span>
       </div>
 
       {/* Table */}
-      <div className="border border-[var(--line-strong)] bg-white overflow-x-auto">
-        <table className="w-full text-left text-xs font-mono">
-          <thead>
-            <tr className="border-b border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--ink-40)]">
-              <th className="px-4 py-3">NUMBER</th>
-              <th className="px-4 py-3">CUSTOMER</th>
-              <th className="px-4 py-3">PLAN</th>
-              <th className="px-4 py-3">STATE</th>
-              <th className="px-4 py-3">START DATE</th>
-              <th className="px-4 py-3">EXPIRY</th>
-              <th className="px-4 py-3 text-right">MRR (PAISE)</th>
-              <th className="px-4 py-3">NEXT INVOICE</th>
-              <th className="px-4 py-3 text-right">ACTIONS</th>
+      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+        <table className="w-full text-left border-collapse">
+          <thead className="border-b-[1.5px] border-black bg-white/60">
+            <tr>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CONTRACT</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CUSTOMER</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PLAN</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">STATE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">MRR (PAISE)</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">NEXT INVOICE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">ACTIONS</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--line)]">
+          <tbody className="divide-y divide-black/10">
             {filtered.map(s => {
               const cust = CUSTOMERS.find(c => c.id === s.customerId)
               const plan = PLANS.find(p => p.id === s.planId)
@@ -158,30 +145,29 @@ export default function SubscriptionsPage() {
                 <tr
                   key={s.id}
                   onClick={() => setSelectedSub(s)}
-                  className="hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
+                  className="table-row cursor-pointer"
                 >
-                  <td className="px-4 py-3 font-bold text-[var(--ink)]">{s.number}</td>
-                  <td className="px-4 py-3 font-semibold text-[var(--ink)] max-w-[140px] truncate">
-                    {cust?.company || cust?.name}
+                  <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{s.number}</td>
+                  <td className="px-6 py-4">
+                    <p className="font-bold text-[#4A3043] text-sm">{cust?.company || cust?.name}</p>
+                    <p className="text-[10px] text-gray-500 font-mono">{s.startDate} - {s.expiryDate}</p>
                   </td>
-                  <td className="px-4 py-3 text-[var(--ink-60)]">{plan?.name || 'ERP Plan'}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={s.state === 'ACTIVE' ? 'ok' : s.state === 'PAUSED' ? 'warn' : s.state === 'CLOSED' ? 'neutral' : 'bad'}>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-700">{plan?.name || 'ERP Plan'}</td>
+                  <td className="px-6 py-4">
+                    <Badge variant={s.state === 'ACTIVE' ? 'ok' : s.state === 'PAUSED' ? 'warn' : 'neutral'}>
                       {s.state}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-[var(--ink-40)]">{s.startDate}</td>
-                  <td className="px-4 py-3 text-[var(--ink-40)]">{s.expiryDate}</td>
-                  <td className="px-4 py-3 text-right font-bold text-[var(--ink)]">{formatPaise(s.mrr)}</td>
-                  <td className="px-4 py-3 text-[var(--accent)] font-semibold">{s.nextBillingAt}</td>
-                  <td className="px-4 py-3 text-right space-x-2">
+                  <td className="px-6 py-4 text-right font-bold font-mono text-[#4A3043]">{formatPaise(s.mrr)}</td>
+                  <td className="px-6 py-4 text-xs font-mono font-bold text-[#714B67]">{s.nextBillingAt}</td>
+                  <td className="px-6 py-4 text-right space-x-2 font-mono text-xs">
                     {s.state === 'ACTIVE' && (
                       <button
                         onClick={e => {
                           e.stopPropagation()
                           handlePause(s.id)
                         }}
-                        className="text-[10px] font-bold text-yellow-700 hover:underline"
+                        className="font-bold text-amber-700 hover:underline cursor-pointer"
                       >
                         Pause
                       </button>
@@ -192,7 +178,7 @@ export default function SubscriptionsPage() {
                           e.stopPropagation()
                           handleResume(s.id)
                         }}
-                        className="text-[10px] font-bold text-green-700 hover:underline"
+                        className="font-bold text-emerald-700 hover:underline cursor-pointer"
                       >
                         Resume
                       </button>
@@ -203,7 +189,7 @@ export default function SubscriptionsPage() {
                           e.stopPropagation()
                           handleCloseEarly(s.id)
                         }}
-                        className="text-[10px] font-bold text-red-700 hover:underline"
+                        className="font-bold text-red-600 hover:underline cursor-pointer"
                       >
                         Close
                       </button>
@@ -216,109 +202,94 @@ export default function SubscriptionsPage() {
         </table>
       </div>
 
-      {/* Subscription Detail 2-Column Slide-Over */}
+      {/* Subscription Drawer Modal */}
       {selectedSub && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/30 backdrop-blur-xs">
-          <div className="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col border-l border-[var(--line-strong)]">
-            <div className="p-6 border-b border-[var(--line)] flex justify-between items-start bg-[var(--surface-2)]">
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div
+            className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop"
+            onClick={() => setSelectedSub(null)}
+          />
+          <div className="relative w-full max-w-xl bg-white/95 backdrop-blur-2xl h-full shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] flex flex-col border-l-[1.5px] border-black z-10 anim-spring">
+            {/* Drawer Header */}
+            <div className="p-6 border-b-[1.5px] border-black flex justify-between items-start bg-white/80">
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-[var(--accent)]">{selectedSub.number}</span>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono text-xs font-bold text-[#714B67]">{selectedSub.number}</span>
                   <Badge variant={selectedSub.state === 'ACTIVE' ? 'ok' : 'warn'}>{selectedSub.state}</Badge>
                 </div>
-                <h2 className="text-xl font-bold tracking-tight text-[var(--ink)] mt-1">
-                  Contract Agreement Specification
+                <h2 className="text-xl font-bold tracking-tight text-[#4A3043]">
+                  Subscription Contract Agreement
                 </h2>
-                <p className="text-xs font-mono text-[var(--ink-40)]">
-                  Customer ID: {selectedSub.customerId} · Plan: {selectedSub.planId}
+                <p className="text-xs font-mono text-gray-500 mt-0.5">
+                  Start: {selectedSub.startDate} · Expiry: {selectedSub.expiryDate}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedSub(null)}
-                className="p-1 rounded hover:bg-zinc-200 text-[var(--ink-60)] cursor-pointer"
+                className="w-8 h-8 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
-            {/* 2-Column Detail Layout */}
-            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
-              {/* Left Rail: Contract parameters & lines (2 Cols) */}
-              <div className="md:col-span-2 space-y-4">
-                <div className="p-4 border border-[var(--line)] rounded bg-[var(--surface-2)] space-y-2">
-                  <p className="text-[10px] uppercase font-bold text-[var(--ink-40)]">Billing & Schedule</p>
-                  <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                    <span className="text-[var(--ink-60)]">Contract Start Date</span>
-                    <span className="font-bold">{selectedSub.startDate}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                    <span className="text-[var(--ink-60)]">Expiry Date</span>
-                    <span className="font-bold">{selectedSub.expiryDate}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                    <span className="text-[var(--ink-60)]">Next Recurring Billing Date</span>
-                    <span className="font-bold text-[var(--accent)]">{selectedSub.nextBillingAt}</span>
-                  </div>
-                  <div className="flex justify-between py-1">
-                    <span className="text-[var(--ink-60)]">Payment Terms</span>
-                    <span>NET 15 Days</span>
-                  </div>
+            {/* Body */}
+            <div className="p-6 flex-1 overflow-y-auto space-y-5 font-mono text-xs">
+              <div className="p-4 border-[1.5px] border-black rounded-xl bg-white shadow-xs space-y-2">
+                <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Financial Breakdown</p>
+                <div className="flex justify-between py-1 border-b border-black/10">
+                  <span className="text-gray-500">Total Recurring Price</span>
+                  <span className="font-bold text-[#4A3043]">{formatPaise(selectedSub.totalAmount)}</span>
                 </div>
-
-                <div className="p-4 border border-[var(--line)] rounded bg-white space-y-2">
-                  <p className="text-[10px] uppercase font-bold text-[var(--ink-40)]">Audit Trail Log Activity</p>
-                  <div className="space-y-1.5 text-[11px] text-[var(--ink-60)]">
-                    <p>• 2026-10-31 09:30: State transitioned to {selectedSub.state} by Admin</p>
-                    <p>• 2026-09-01 00:00: Automatic billing cycle executed (paise safe)</p>
-                    <p>• 2025-02-10 14:22: Subscription created from Quotation QTN-001</p>
-                  </div>
+                <div className="flex justify-between py-1 border-b border-black/10">
+                  <span className="text-gray-500">Normalized MRR</span>
+                  <span className="font-bold text-[#4A3043]">{formatPaise(selectedSub.mrr)}</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-gray-500">Next Scheduled Billing</span>
+                  <span className="font-bold text-emerald-700">{selectedSub.nextBillingAt}</span>
                 </div>
               </div>
 
-              {/* Right Rail: Financial Actions (1 Col) */}
-              <div className="space-y-4 border-l md:border-l border-[var(--line)] md:pl-4">
-                <div className="p-3 border border-[var(--line-strong)] bg-[var(--surface-2)] rounded">
-                  <span className="text-[10px] uppercase text-[var(--ink-40)] font-bold">MRR Value</span>
-                  <p className="text-xl font-bold text-[var(--ink)] mt-0.5">{formatPaise(selectedSub.mrr)}</p>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-[10px] uppercase font-bold text-[var(--ink-40)]">Permitted Actions</p>
-
+              {/* State Controls */}
+              <div className="p-4 border-[1.5px] border-black rounded-xl bg-white shadow-xs space-y-3">
+                <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Lifecycle Actions</p>
+                <div className="flex gap-2">
                   {selectedSub.state === 'ACTIVE' && (
                     <button
                       onClick={() => handlePause(selectedSub.id)}
-                      className="w-full py-2 px-3 border border-yellow-600 bg-yellow-50 text-yellow-900 font-bold rounded flex items-center justify-center gap-1.5 hover:bg-yellow-100 transition-colors"
+                      className="px-4 py-2 border-[1.5px] border-black rounded-xl font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 shadow-[2px_2px_0_#000] cursor-pointer"
                     >
-                      <Pause size={13} /> Pause Subscription
+                      Pause Subscription
                     </button>
                   )}
-
                   {selectedSub.state === 'PAUSED' && (
                     <button
                       onClick={() => handleResume(selectedSub.id)}
-                      className="w-full py-2 px-3 border border-green-600 bg-green-50 text-green-900 font-bold rounded flex items-center justify-center gap-1.5 hover:bg-green-100 transition-colors"
+                      className="px-4 py-2 border-[1.5px] border-black rounded-xl font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 shadow-[2px_2px_0_#000] cursor-pointer"
                     >
-                      <Play size={13} /> Resume Subscription
+                      Resume Subscription
                     </button>
                   )}
-
-                  <button
-                    onClick={() => handleRenew(selectedSub.id)}
-                    className="w-full py-2 px-3 border border-[var(--line-strong)] bg-white text-[var(--ink)] font-bold rounded flex items-center justify-center gap-1.5 hover:bg-[var(--surface-2)] transition-colors"
-                  >
-                    <RefreshCw size={13} /> Renew Contract
-                  </button>
-
-                  <button
-                    onClick={() => handleCloseEarly(selectedSub.id)}
-                    disabled={selectedSub.state === 'CLOSED'}
-                    className="w-full py-2 px-3 border border-red-300 bg-red-50 text-red-900 font-bold rounded flex items-center justify-center gap-1.5 hover:bg-red-100 transition-colors disabled:opacity-40"
-                  >
-                    <XCircle size={13} /> Close Contract Early
-                  </button>
+                  {selectedSub.state !== 'CLOSED' && (
+                    <button
+                      onClick={() => handleCloseEarly(selectedSub.id)}
+                      className="px-4 py-2 border-[1.5px] border-black rounded-xl font-bold text-red-800 bg-red-50 hover:bg-red-100 shadow-[2px_2px_0_#000] cursor-pointer"
+                    >
+                      Terminate Contract
+                    </button>
+                  )}
                 </div>
               </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-5 border-t-[1.5px] border-black bg-white/80 flex justify-end">
+              <button
+                onClick={() => setSelectedSub(null)}
+                className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
+              >
+                Close Drawer
+              </button>
             </div>
           </div>
         </div>
@@ -326,4 +297,3 @@ export default function SubscriptionsPage() {
     </div>
   )
 }
-

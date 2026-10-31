@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CUSTOMERS, SUBSCRIPTIONS, INVOICES, PAYMENTS, formatPaise, type Customer } from '../data/seed'
 import { Badge, Btn, SearchInput } from '../components/ui'
-import { Plus, X, ExternalLink, Mail, Phone, MapPin, Building, CreditCard } from 'lucide-react'
+import { Plus, X, Mail, Phone, MapPin, Building, CreditCard } from 'lucide-react'
 
 export default function CustomersPage() {
   const [search, setSearch] = useState('')
@@ -36,29 +36,32 @@ export default function CustomersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--line-strong)]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-black/10 anim-spring stagger-1">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">Customer Directory</h1>
-          <p className="text-xs font-mono text-[var(--ink-40)] uppercase tracking-wider mt-0.5">
-            30 Enterprise Accounts · Indian GSTIN Verified
+          <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">Customer Directory</h1>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mt-1">
+            Enterprise Accounts · Indian GSTIN Verified
           </p>
         </div>
-        <Btn variant="primary" size="sm" className="font-mono text-xs">
-          <Plus size={13} /> Add Customer
+        <Btn variant="primary" size="md">
+          <Plus size={15} strokeWidth={2.5} /> Add Customer
         </Btn>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center anim-spring stagger-2">
+        <div className="flex items-center gap-3">
           <SearchInput value={search} onChange={setSearch} placeholder="Search customers..." />
-          <div className="flex border border-[var(--line)] rounded bg-white p-0.5 text-xs font-mono">
+          <div className="flex border-[1.5px] border-black rounded-xl bg-white p-1 text-xs font-mono shadow-[2px_2px_0_#000]">
             {(['ALL', 'ACTIVE', 'INACTIVE'] as const).map(s => (
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`px-2.5 py-1 rounded cursor-pointer ${
-                  statusFilter === s ? 'bg-[var(--line-strong)] text-white font-bold' : 'text-[var(--ink-60)]'
+                className={`px-3 py-1 rounded-lg cursor-pointer transition-colors ${
+                  statusFilter === s
+                    ? 'glass-odoo text-white font-bold'
+                    : 'text-gray-600 hover:text-black'
                 }`}
               >
                 {s}
@@ -67,45 +70,52 @@ export default function CustomersPage() {
           </div>
         </div>
 
-        <div className="text-xs font-mono text-[var(--ink-40)]">
-          Showing {filtered.length} of {CUSTOMERS.length} customers
+        <div className="text-xs font-mono text-gray-500">
+          Showing {filtered.length} of {CUSTOMERS.length} accounts
         </div>
       </div>
 
       {/* Table */}
-      <div className="border border-[var(--line-strong)] bg-white overflow-x-auto">
-        <table className="w-full text-left text-xs font-mono">
-          <thead>
-            <tr className="border-b border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--ink-40)]">
-              <th className="px-4 py-3">CODE</th>
-              <th className="px-4 py-3">NAME & COMPANY</th>
-              <th className="px-4 py-3">CITY</th>
-              <th className="px-4 py-3">GSTIN (TAX ID)</th>
-              <th className="px-4 py-3">PHONE</th>
-              <th className="px-4 py-3">STATUS</th>
-              <th className="px-4 py-3 text-right">ACTION</th>
+      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+        <table className="w-full text-left border-collapse">
+          <thead className="border-b-[1.5px] border-black bg-white/60">
+            <tr>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CODE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">NAME & COMPANY</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CITY</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">GSTIN</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PHONE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">STATUS</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">ACTION</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--line)]">
+          <tbody className="divide-y divide-black/10">
             {filtered.map(c => (
               <tr
                 key={c.id}
                 onClick={() => setSelectedCustomer(c)}
-                className="hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
+                className="table-row cursor-pointer"
               >
-                <td className="px-4 py-3 font-bold text-[var(--ink)]">{c.code}</td>
-                <td className="px-4 py-3">
-                  <p className="font-sans font-semibold text-[var(--ink)] text-sm">{c.company}</p>
-                  <p className="text-[11px] text-[var(--ink-40)]">{c.name} · {c.email}</p>
+                <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{c.code}</td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#714B67] to-[#4A3043] text-white border-[1.5px] border-black font-bold flex items-center justify-center text-xs shadow-sm">
+                      {c.company.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-bold text-[#4A3043] text-sm">{c.company}</p>
+                      <p className="text-[11px] text-gray-500 font-mono">{c.name} · {c.email}</p>
+                    </div>
+                  </div>
                 </td>
-                <td className="px-4 py-3 text-[var(--ink-60)]">{c.city}</td>
-                <td className="px-4 py-3 text-[var(--ink-60)]">{c.gstin}</td>
-                <td className="px-4 py-3 text-[var(--ink-40)]">{c.phone}</td>
-                <td className="px-4 py-3">
+                <td className="px-6 py-4 text-xs font-mono text-gray-600">{c.city}</td>
+                <td className="px-6 py-4 text-xs font-mono text-gray-600">{c.gstin}</td>
+                <td className="px-6 py-4 text-xs font-mono text-gray-500">{c.phone}</td>
+                <td className="px-6 py-4">
                   <Badge variant={c.status === 'ACTIVE' ? 'ok' : 'neutral'}>{c.status}</Badge>
                 </td>
-                <td className="px-4 py-3 text-right">
-                  <span className="text-[10px] font-bold text-[var(--accent)] hover:underline">
+                <td className="px-6 py-4 text-right">
+                  <span className="text-xs font-bold text-[#714B67] hover:underline font-mono">
                     View 360° →
                   </span>
                 </td>
@@ -115,58 +125,62 @@ export default function CustomersPage() {
         </table>
       </div>
 
-      {/* Customer 360 Drawer */}
+      {/* Customer 360 Drawer / Modal */}
       {selectedCustomer && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/30 backdrop-blur-xs">
-          <div className="w-full max-w-xl bg-white h-full shadow-2xl flex flex-col border-l border-[var(--line-strong)]">
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div
+            className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop"
+            onClick={() => setSelectedCustomer(null)}
+          />
+          <div className="relative w-full max-w-xl bg-white/95 backdrop-blur-2xl h-full shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] flex flex-col border-l-[1.5px] border-black z-10 anim-spring">
             {/* Drawer Header */}
-            <div className="p-6 border-b border-[var(--line)] flex justify-between items-start bg-[var(--surface-2)]">
+            <div className="p-6 border-b-[1.5px] border-black flex justify-between items-start bg-white/80">
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-[var(--accent)]">{selectedCustomer.code}</span>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono text-xs font-bold text-[#714B67]">{selectedCustomer.code}</span>
                   <Badge variant={selectedCustomer.status === 'ACTIVE' ? 'ok' : 'neutral'}>
                     {selectedCustomer.status}
                   </Badge>
                 </div>
-                <h2 className="text-xl font-bold tracking-tight text-[var(--ink)] mt-1">
+                <h2 className="text-xl font-bold tracking-tight text-[#4A3043]">
                   {selectedCustomer.company}
                 </h2>
-                <p className="text-xs text-[var(--ink-60)] mt-0.5">Primary Contact: {selectedCustomer.name}</p>
+                <p className="text-xs text-gray-600 mt-0.5">Primary Contact: {selectedCustomer.name}</p>
               </div>
               <button
                 onClick={() => setSelectedCustomer(null)}
-                className="p-1 rounded hover:bg-zinc-200 text-[var(--ink-60)] cursor-pointer"
+                className="w-8 h-8 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
             {/* Quick KPI Strip */}
-            <div className="grid grid-cols-3 divide-x divide-[var(--line)] border-b border-[var(--line)] bg-white text-xs font-mono p-3">
+            <div className="grid grid-cols-3 divide-x divide-black/10 border-b-[1.5px] border-black bg-white/60 text-xs font-mono p-4">
               <div className="px-3">
-                <span className="text-[10px] text-[var(--ink-40)] uppercase">LTV (Paid)</span>
-                <p className="font-bold text-[var(--ink)] text-sm">{formatPaise(lifetimeValue)}</p>
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider">LTV (Paid)</span>
+                <p className="font-bold text-[#4A3043] text-sm mt-0.5">{formatPaise(lifetimeValue)}</p>
               </div>
               <div className="px-3">
-                <span className="text-[10px] text-[var(--ink-40)] uppercase">Subscriptions</span>
-                <p className="font-bold text-[var(--ink)] text-sm">{customerSubs.length} Contracts</p>
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider">Subscriptions</span>
+                <p className="font-bold text-[#4A3043] text-sm mt-0.5">{customerSubs.length} Active</p>
               </div>
               <div className="px-3">
-                <span className="text-[10px] text-[var(--ink-40)] uppercase">Invoices</span>
-                <p className="font-bold text-[var(--ink)] text-sm">{customerInvs.length} Invoices</p>
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider">Invoices</span>
+                <p className="font-bold text-[#4A3043] text-sm mt-0.5">{customerInvs.length} Invoiced</p>
               </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-[var(--line)] px-6 bg-white font-mono text-xs">
+            <div className="flex border-b border-black/10 px-6 bg-white/40 font-mono text-xs">
               {(['overview', 'subscriptions', 'invoices', 'payments'] as const).map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`py-3 px-3 uppercase font-semibold border-b-2 transition-colors cursor-pointer ${
+                  className={`py-3 px-3 uppercase font-bold border-b-2 transition-colors cursor-pointer ${
                     activeTab === tab
-                      ? 'border-[var(--accent)] text-[var(--accent)]'
-                      : 'border-transparent text-[var(--ink-40)] hover:text-[var(--ink)]'
+                      ? 'border-[#714B67] text-[#714B67]'
+                      : 'border-transparent text-gray-500 hover:text-black'
                   }`}
                 >
                   {tab}
@@ -178,104 +192,85 @@ export default function CustomersPage() {
             <div className="p-6 flex-1 overflow-y-auto space-y-4">
               {activeTab === 'overview' && (
                 <div className="space-y-4 text-xs font-mono">
-                  <div className="p-4 border border-[var(--line)] rounded bg-[var(--surface-2)] space-y-2">
-                    <p className="text-[10px] uppercase font-bold text-[var(--ink-40)]">Account Specifications</p>
-                    <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                      <span className="text-[var(--ink-60)]">Email</span>
-                      <span className="font-semibold text-[var(--ink)]">{selectedCustomer.email}</span>
+                  <div className="p-4 border-[1.5px] border-black rounded-xl bg-white shadow-xs space-y-2">
+                    <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Company Information</p>
+                    <div className="flex justify-between py-1 border-b border-black/10">
+                      <span className="text-gray-500">Email</span>
+                      <span className="font-semibold text-gray-900">{selectedCustomer.email}</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                      <span className="text-[var(--ink-60)]">Phone</span>
-                      <span className="font-semibold text-[var(--ink)]">{selectedCustomer.phone}</span>
+                    <div className="flex justify-between py-1 border-b border-black/10">
+                      <span className="text-gray-500">Phone</span>
+                      <span className="font-semibold text-gray-900">{selectedCustomer.phone}</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                      <span className="text-[var(--ink-60)]">City</span>
-                      <span className="font-semibold text-[var(--ink)]">{selectedCustomer.city}</span>
+                    <div className="flex justify-between py-1 border-b border-black/10">
+                      <span className="text-gray-500">City</span>
+                      <span className="font-semibold text-gray-900">{selectedCustomer.city}</span>
                     </div>
                     <div className="flex justify-between py-1">
-                      <span className="text-[var(--ink-60)]">GST Identification</span>
-                      <span className="font-semibold text-[var(--ink)]">{selectedCustomer.gstin}</span>
+                      <span className="text-gray-500">GSTIN</span>
+                      <span className="font-semibold text-gray-900">{selectedCustomer.gstin}</span>
                     </div>
-                  </div>
-
-                  <div className="p-4 border border-[var(--line)] rounded bg-white">
-                    <p className="text-[10px] uppercase font-bold text-[var(--ink-40)] mb-2">Customer Portal Access</p>
-                    <p className="text-xs text-[var(--ink-60)] mb-3">
-                      Authorized self-service portal route locked strictly to customer session ID.
-                    </p>
-                    <a
-                      href="/portal"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[var(--line-strong)] text-xs font-mono uppercase font-semibold hover:bg-[var(--surface-2)]"
-                    >
-                      Test Portal Session <ExternalLink size={12} />
-                    </a>
                   </div>
                 </div>
               )}
 
               {activeTab === 'subscriptions' && (
-                <div className="space-y-3 font-mono text-xs">
-                  {customerSubs.length === 0 ? (
-                    <p className="text-zinc-500 py-4 text-center">No subscriptions for this customer.</p>
-                  ) : (
-                    customerSubs.map(s => (
-                      <div key={s.id} className="p-3 border border-[var(--line)] rounded bg-[var(--surface-2)] flex justify-between items-center">
-                        <div>
-                          <p className="font-bold text-[var(--ink)]">{s.number}</p>
-                          <p className="text-[11px] text-[var(--ink-40)]">Next bill: {s.nextBillingAt}</p>
-                        </div>
-                        <div className="text-right">
-                          <Badge variant={s.state === 'ACTIVE' ? 'ok' : 'warn'}>{s.state}</Badge>
-                          <p className="font-bold text-[var(--ink)] mt-1">{formatPaise(s.totalAmount)}</p>
-                        </div>
+                <div className="space-y-3">
+                  {customerSubs.map(s => (
+                    <div key={s.id} className="p-4 bg-white border-[1.5px] border-black rounded-xl shadow-xs text-xs font-mono">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-bold text-[#4A3043]">{s.number}</span>
+                        <Badge variant="ok">{s.state}</Badge>
                       </div>
-                    ))
-                  )}
+                      <p className="text-gray-600">Recurring Total: {formatPaise(s.totalAmount)}</p>
+                    </div>
+                  ))}
                 </div>
               )}
 
               {activeTab === 'invoices' && (
-                <div className="space-y-3 font-mono text-xs">
-                  {customerInvs.length === 0 ? (
-                    <p className="text-zinc-500 py-4 text-center">No invoices issued.</p>
-                  ) : (
-                    customerInvs.map(i => (
-                      <div key={i.id} className="p-3 border border-[var(--line)] rounded bg-[var(--surface-2)] flex justify-between items-center">
-                        <div>
-                          <p className="font-bold text-[var(--ink)]">{i.number}</p>
-                          <p className="text-[11px] text-[var(--ink-40)]">Due: {i.dueDate}</p>
-                        </div>
-                        <div className="text-right">
-                          <Badge variant={i.state === 'PAID' ? 'ok' : i.state === 'OVERDUE' ? 'bad' : 'warn'}>
-                            {i.state}
-                          </Badge>
-                          <p className="font-bold text-[var(--ink)] mt-1">{formatPaise(i.total)}</p>
-                        </div>
+                <div className="space-y-3">
+                  {customerInvs.map(i => (
+                    <div key={i.id} className="p-4 bg-white border-[1.5px] border-black rounded-xl shadow-xs text-xs font-mono">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-bold text-[#4A3043]">{i.number}</span>
+                        <Badge variant={i.state === 'PAID' ? 'ok' : 'bad'}>{i.state}</Badge>
                       </div>
-                    ))
-                  )}
+                      <div className="flex justify-between text-gray-600">
+                        <span>Total: {formatPaise(i.total)}</span>
+                        <span>Date: {i.issueDate}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
               {activeTab === 'payments' && (
-                <div className="space-y-3 font-mono text-xs">
-                  {customerPays.length === 0 ? (
-                    <p className="text-zinc-500 py-4 text-center">No recorded payment receipts.</p>
-                  ) : (
-                    customerPays.map(p => (
-                      <div key={p.id} className="p-3 border border-[var(--line)] rounded bg-[var(--surface-2)] flex justify-between items-center">
-                        <div>
-                          <p className="font-bold text-[var(--ink)]">{p.number}</p>
-                          <p className="text-[11px] text-[var(--ink-40)]">{p.method} · {p.paidAt}</p>
-                        </div>
-                        <p className="font-bold text-[var(--ok)]">{formatPaise(p.amount)}</p>
+                <div className="space-y-3">
+                  {customerPays.map(p => (
+                    <div key={p.id} className="p-4 bg-white border-[1.5px] border-black rounded-xl shadow-xs text-xs font-mono">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-bold text-[#4A3043]">{p.number}</span>
+                        <Badge variant="ok">{p.method}</Badge>
                       </div>
-                    ))
-                  )}
+                      <div className="flex justify-between text-gray-600">
+                        <span>Paid: {formatPaise(p.amount)}</span>
+                        <span>{p.paidAt}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-5 border-t-[1.5px] border-black bg-white/80 flex justify-end gap-3">
+              <button
+                onClick={() => setSelectedCustomer(null)}
+                className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
+              >
+                Close Drawer
+              </button>
             </div>
           </div>
         </div>
@@ -283,4 +278,3 @@ export default function CustomersPage() {
     </div>
   )
 }
-

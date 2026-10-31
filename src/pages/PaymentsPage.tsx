@@ -59,85 +59,74 @@ export default function PaymentsPage() {
       activeInvoice.state = 'PARTIALLY_PAID'
     }
 
-    setSuccessToast(`Payment recorded: ${formatPaise(enteredPaise)} allocated to ${activeInvoice.number}. Invoice status updated.`)
+    setSuccessToast(`Payment ${newPayment.number} recorded. Balance updated in database.`)
     setTimeout(() => setSuccessToast(''), 4000)
     setModalOpen(false)
+    setPaymentAmountRupees('')
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--line-strong)]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-black/10 anim-spring stagger-1">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">Payments Ledger & Reconciliation</h1>
-          <p className="text-xs font-mono text-[var(--ink-40)] uppercase tracking-wider mt-0.5">
-            Real-Time Settlement · Partial & Multi-Payment Allocation (Paise Exact)
+          <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">Payment Receipts</h1>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mt-1">
+            Real-Time Payment Reconciliation · Total Collections: {formatPaise(totalCollected)}
           </p>
         </div>
-        <Btn variant="primary" size="sm" onClick={() => {
-          setPaymentAmountRupees((outstandingBalancePaise / 100).toString())
-          setModalOpen(true)
-        }} className="font-mono text-xs">
-          <Plus size={13} /> Record Payment Receipt
+        <Btn variant="primary" size="md" onClick={() => setModalOpen(true)}>
+          <Plus size={15} strokeWidth={2.5} /> Record Payment
         </Btn>
       </div>
 
       {successToast && (
-        <div className="p-3 bg-green-50 border border-green-300 text-green-900 text-xs font-mono rounded flex justify-between items-center">
+        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-emerald-800 flex justify-between items-center anim-spring">
           <span className="flex items-center gap-2">
-            <ShieldCheck size={14} className="text-green-700" />
+            <Check size={16} className="text-emerald-600" />
             {successToast}
           </span>
           <button onClick={() => setSuccessToast('')} className="font-bold cursor-pointer">×</button>
         </div>
       )}
 
-      {/* KPI Band */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 border border-[var(--line-strong)] bg-white divide-y sm:divide-y-0 sm:divide-x divide-[var(--line-strong)] text-xs font-mono p-4">
-        <div>
-          <span className="text-[10px] uppercase font-bold text-[var(--ink-40)]">TOTAL CASH COLLECTED</span>
-          <p className="text-2xl font-bold text-[var(--ok)] mt-1">{formatPaise(totalCollected)}</p>
-        </div>
-        <div className="sm:pl-4">
-          <span className="text-[10px] uppercase font-bold text-[var(--ink-40)]">TRANSACTIONS LOGGED</span>
-          <p className="text-2xl font-bold text-[var(--ink)] mt-1">{paymentsList.length} Receipts</p>
-        </div>
-        <div className="sm:pl-4">
-          <span className="text-[10px] uppercase font-bold text-[var(--ink-40)]">PREFERRED RAILS</span>
-          <p className="text-2xl font-bold text-[var(--accent)] mt-1">UPI & NEFT/RTGS</p>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <SearchInput value={search} onChange={setSearch} placeholder="Search payments..." />
-        <span className="text-xs font-mono text-[var(--ink-40)]">{filtered.length} entries in ledger</span>
+      {/* Filter and Search */}
+      <div className="flex justify-between items-center anim-spring stagger-2">
+        <SearchInput value={search} onChange={setSearch} placeholder="Search by payment or reference..." />
+        <span className="text-xs font-mono text-gray-500">
+          {filtered.length} settled payments
+        </span>
       </div>
 
       {/* Table */}
-      <div className="border border-[var(--line-strong)] bg-white overflow-x-auto">
-        <table className="w-full text-left text-xs font-mono">
-          <thead>
-            <tr className="border-b border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--ink-40)]">
-              <th className="px-4 py-3">PAYMENT REF</th>
-              <th className="px-4 py-3">CUSTOMER</th>
-              <th className="px-4 py-3">TARGET INVOICE</th>
-              <th className="px-4 py-3">METHOD</th>
-              <th className="px-4 py-3">PAYMENT DATE</th>
-              <th className="px-4 py-3">TRANSACTION REF</th>
-              <th className="px-4 py-3 text-right">AMOUNT SETTLED</th>
+      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+        <table className="w-full text-left border-collapse">
+          <thead className="border-b-[1.5px] border-black bg-white/60">
+            <tr>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PAYMENT NUMBER</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CUSTOMER</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">SETTLED INVOICE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">METHOD</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">BANK / GATEWAY REF</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">DATE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">AMOUNT SETTLED</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--line)]">
+          <tbody className="divide-y divide-black/10">
             {filtered.map(p => {
               const cust = CUSTOMERS.find(c => c.id === p.customerId)
+              const inv = INVOICES.find(i => i.id === p.invoiceId)
               return (
-                <tr key={p.id} className="hover:bg-[var(--surface-2)] transition-colors">
-                  <td className="px-4 py-3 font-bold text-[var(--ink)]">{p.number}</td>
-                  <td className="px-4 py-3 font-semibold text-[var(--ink)]">{cust?.company}</td>
-                  <td className="px-4 py-3 text-[var(--accent)] font-semibold">{p.invoiceId}</td>
-                  <td className="px-4 py-3 text-[var(--ink-60)]">{p.method}</td>
-                  <td className="px-4 py-3 text-[var(--ink-40)]">{p.paidAt}</td>
-                  <td className="px-4 py-3 text-[var(--ink-40)]">{p.reference}</td>
-                  <td className="px-4 py-3 text-right font-bold text-[var(--ok)] text-sm">
+                <tr key={p.id} className="table-row">
+                  <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{p.number}</td>
+                  <td className="px-6 py-4 font-bold text-sm text-[#4A3043]">{cust?.company || 'Enterprise'}</td>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{inv?.number || 'INV-REF'}</td>
+                  <td className="px-6 py-4">
+                    <Badge variant="ok">{p.method}</Badge>
+                  </td>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{p.reference}</td>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-500">{p.paidAt}</td>
+                  <td className="px-6 py-4 text-right font-bold font-mono text-emerald-700">
                     {formatPaise(p.amount)}
                   </td>
                 </tr>
@@ -147,94 +136,100 @@ export default function PaymentsPage() {
         </table>
       </div>
 
-      {/* Record Payment Drawer / Modal */}
+      {/* Record Payment Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white border border-[var(--line-strong)] rounded-lg p-6 max-w-md w-full shadow-2xl font-mono text-xs">
-            <h2 className="text-base font-bold text-[var(--ink)] font-sans">Record Incoming Payment</h2>
-            <p className="text-[11px] text-[var(--ink-40)] mt-0.5">
-              Reconciles directly against open invoice balance
-            </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop" onClick={() => setModalOpen(false)} />
+          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-3xl shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] overflow-hidden modal-panel p-8">
+            <div className="flex justify-between items-center pb-4 border-b border-black">
+              <h3 className="text-xl font-bold text-[#4A3043]">Record Payment Receipt</h3>
+              <button onClick={() => setModalOpen(false)} className="p-1.5 rounded-lg border border-black hover:bg-gray-100">
+                <X size={16} />
+              </button>
+            </div>
 
-            <form onSubmit={handleRecordPayment} className="mt-4 space-y-3">
+            <form onSubmit={handleRecordPayment} className="py-6 space-y-4 font-mono text-xs">
               <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">Select Open Invoice</label>
+                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Select Pending Invoice</label>
                 <select
                   value={selectedInvoiceId}
-                  onChange={e => {
-                    setSelectedInvoiceId(e.target.value)
-                    const inv = INVOICES.find(x => x.id === e.target.value)
-                    if (inv) {
-                      setPaymentAmountRupees(((inv.total - inv.amountPaid) / 100).toString())
-                    }
-                  }}
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
+                  onChange={e => setSelectedInvoiceId(e.target.value)}
+                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 >
-                  {INVOICES.filter(i => i.state !== 'PAID').map(inv => {
-                    const c = CUSTOMERS.find(x => x.id === inv.customerId)
-                    const bal = inv.total - inv.amountPaid
+                  {INVOICES.filter(i => i.state !== 'PAID').map(i => {
+                    const c = CUSTOMERS.find(x => x.id === i.customerId)
+                    const bal = i.total - i.amountPaid
                     return (
-                      <option key={inv.id} value={inv.id}>
-                        {inv.number} - {c?.company} (Bal: {formatPaise(bal)})
+                      <option key={i.id} value={i.id}>
+                        {i.number} — {c?.company} (Bal: {formatPaise(bal)})
                       </option>
                     )
                   })}
                 </select>
               </div>
 
-              <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">Payment Method</label>
-                <select
-                  value={method}
-                  onChange={e => setMethod(e.target.value as PaymentMethod)}
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
-                >
-                  <option value="UPI">UPI (Instant settlement)</option>
-                  <option value="BANK_TRANSFER">Bank Transfer (NEFT / RTGS / IMPS)</option>
-                  <option value="CARD">Corporate Card</option>
-                  <option value="CASH">Cash Deposit</option>
-                  <option value="OTHER">Other Rail</option>
-                </select>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Payment Method</label>
+                  <select
+                    value={method}
+                    onChange={e => setMethod(e.target.value as PaymentMethod)}
+                    className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  >
+                    <option value="UPI">UPI / Instant</option>
+                    <option value="BANK_TRANSFER">NEFT / RTGS</option>
+                    <option value="CARD">Credit / Debit Card</option>
+                    <option value="CASH">Cash</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Amount (₹ INR)</label>
+                  <input
+                    type="number"
+                    value={paymentAmountRupees}
+                    onChange={e => setPaymentAmountRupees(e.target.value)}
+                    placeholder={(outstandingBalancePaise / 100).toString()}
+                    required
+                    className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">
-                  Settlement Amount in ₹ (Outstanding: {formatPaise(outstandingBalancePaise)})
-                </label>
-                <input
-                  type="number"
-                  value={paymentAmountRupees}
-                  onChange={e => setPaymentAmountRupees(e.target.value)}
-                  required
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs font-bold"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">Banking Transaction Reference</label>
+                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Bank Reference / UTR</label>
                 <input
                   type="text"
                   value={refNote}
                   onChange={e => setRefNote(e.target.value)}
-                  placeholder="e.g. UTR / UPI Ref ID"
                   required
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
+                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-[var(--line)]">
+              <div className="p-4 bg-gray-50 border-[1.5px] border-black rounded-xl space-y-1">
+                <div className="flex justify-between">
+                  <span>Selected Invoice:</span>
+                  <span className="font-bold">{activeInvoice.number}</span>
+                </div>
+                <div className="flex justify-between text-red-600 font-bold">
+                  <span>Current Outstanding:</span>
+                  <span>{formatPaise(outstandingBalancePaise)}</span>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-black">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-3 py-1.5 border border-[var(--line)] rounded hover:bg-zinc-100"
+                  className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-[var(--ok)] text-white font-bold rounded hover:bg-green-700"
+                  className="btn-primary text-white text-xs font-bold px-5 py-2.5 rounded-xl"
                 >
-                  Post Payment & Reconcile
+                  Confirm & Post Payment
                 </button>
               </div>
             </form>
@@ -244,4 +239,3 @@ export default function PaymentsPage() {
     </div>
   )
 }
-

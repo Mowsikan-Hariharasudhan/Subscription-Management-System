@@ -1,74 +1,236 @@
 /* ============================================================
-   BRIGHTLOOP — Plum/Purple Corporate Structural Brutalism
+   PEOPLEPAY360 / BRIGHTLOOP — Premium Enterprise (90% Scale)
+   Neo-Brutalist Glassmorphism with Odoo Purple (#714B67)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-:root {
-  /* Plum/Purple Theme Tokens */
-  --bg:           #F7F5F7;
-  --surface:      #FFFFFF;
-  --primary-plum: #724B68;
-  --deep-plum:    #36283B;
-  --muted-plum:   #91768B;
-  --border:       #E4DEE3;
-  --text-main:    #29242B;
-  --text-muted:   #746F75;
-  --accent-info:  #D1ECF1;
-
-  /* Semantic Status Tokens */
-  --ok:           #16A34A;
-  --ok-bg:        #F0FDF4;
-  --warn:         #CA8A04;
-  --warn-bg:      #FEFCE8;
-  --bad:          #DC2626;
-  --bad-bg:       #FEF2F2;
-
-  /* Typography */
-  --font-sans:    'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono:    'JetBrains Mono', 'Cascadia Code', monospace;
-
-  /* Structural Rules */
-  --radius:       4px;
+@theme {
+  --color-odoo: #714B67;
+  --color-odoo-dark: #4A3043;
+  --color-odoo-light: #8E627F;
+  --color-odoo-mid: #5C3D54;
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* Global 90% Scale */
+html {
+  font-size: 90%;
 }
 
+/* Premium Typography & Base */
 body {
-  font-family: var(--font-sans);
-  background-color: var(--bg);
-  color: var(--text-main);
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  background-color: #f7f5f8;
+  color: #111827;
+  min-height: 100vh;
 }
+
+/* Layered Architectural Background */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(113, 75, 103, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(113, 75, 103, 0.04) 1px, transparent 1px);
+  pointer-events: none;
+}
+
+.bg-glow {
+  position: fixed;
+  top: 0;
+  left: 30%;
+  width: 70vw;
+  height: 70vh;
+  background: radial-gradient(circle, rgba(113, 75, 103, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 1. White Glass with Structural Black Border */
+.glass-panel {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1.5px solid #000000;
+  box-shadow:
+    0 4px 20px -5px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle shine overlay for white glass */
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-25deg);
+  transition: all 0.7s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.glass-panel:hover::before {
+  left: 200%;
+}
+
+/* 2. Deep Odoo Purple Glass */
+.glass-odoo {
+  background: linear-gradient(135deg, #714B67 0%, #5C3D54 50%, #4A3043 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid #000000;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    inset 0 -20px 40px rgba(0, 0, 0, 0.4),
+    0 10px 30px -5px rgba(113, 75, 103, 0.4);
+}
+
+/* 3. Shimmering Primary Button */
+.btn-primary {
+  background: linear-gradient(to bottom, #714B67, #5C3D54);
+  border: 1.5px solid #000000;
+  box-shadow: 0 4px 0 0 #000000, 0 8px 15px rgba(113, 75, 103, 0.3);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(to bottom, #855878, #714B67);
+  box-shadow: 0 6px 0 0 #000000, 0 12px 25px rgba(113, 75, 103, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(4px);
+  box-shadow: 0 0px 0 0 #000000, 0 2px 5px rgba(113, 75, 103, 0.3);
+}
+
+/* Button Shimmer Effect */
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: rotate(30deg) translateY(-100%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+
+.btn-primary:hover::after {
+  transform: rotate(30deg) translateY(100%);
+}
+
+/* Tactile Secondary Button */
+.btn-secondary {
+  background: #FFFFFF;
+  border: 1.5px solid #000000;
+  color: #4A3043;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 0 0 #000000;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #F9FAFB;
+  box-shadow: 0 4px 0 0 #000000;
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 0 #000000;
+}
+
+/* 4. Spring Physics Animations */
+.anim-spring {
+  animation: springIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+  transform: translateY(30px) scale(0.95);
+}
+
+@keyframes springIn {
+  0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.anim-fade { animation: fadeIn 0.5s ease-out forwards; }
+@keyframes fadeIn { to { opacity: 1; } }
+
+.stagger-1 { animation-delay: 100ms; }
+.stagger-2 { animation-delay: 200ms; }
+.stagger-3 { animation-delay: 300ms; }
+.stagger-4 { animation-delay: 400ms; }
+
+/* 5. Interactive Elements */
+.table-row {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 4px solid transparent;
+}
+
+.table-row:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-left: 4px solid #714B67;
+  padding-left: 20px;
+  box-shadow: 0 4px 15px -5px rgba(113, 75, 103, 0.1);
+}
+
+.input-focus {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.input-focus:focus {
+  outline: none;
+  border-color: #714B67;
+  box-shadow: 0 0 0 4px rgba(113, 75, 103, 0.15);
+  background: white;
+  transform: translateY(-1px);
+}
+
+/* Modal Pop */
+.modal-backdrop {
+  animation: backdropIn 0.3s ease-out forwards;
+}
+
+.modal-panel {
+  animation: modalSpringIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+  transform: scale(0.9) translateY(20px);
+}
+
+@keyframes backdropIn { to { opacity: 1; } }
+@keyframes modalSpringIn { to { opacity: 1; transform: scale(1) translateY(0); } }
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.font-mono {
-  font-family: var(--font-mono);
-}
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(113, 75, 103, 0.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(113, 75, 103, 0.6); }
 
-/* Custom crisp structural scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: var(--radius);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-plum);
-}
+/* Icon Bounce */
+.icon-bounce { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.group:hover .icon-bounce { transform: scale(1.15) rotate(5deg); }

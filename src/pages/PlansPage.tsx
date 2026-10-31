@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { PLANS, PRODUCTS, formatPaise, type Plan } from '../data/seed'
 import { Badge, Btn, FlagBadge, SearchInput } from '../components/ui'
-import { Plus, Lock, Calendar } from 'lucide-react'
+import { Plus, Lock } from 'lucide-react'
 import { useAuth } from '../auth'
 
 export default function PlansPage() {
@@ -32,35 +32,39 @@ export default function PlansPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--line-strong)]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-black/10 anim-spring stagger-1">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">Subscription Plans</h1>
-          <p className="text-xs font-mono text-[var(--ink-40)] uppercase tracking-wider mt-0.5">
-            Recurrence Schedules & Policy Flags · {isAdmin ? 'Full Administrator Access' : 'Staff Read-Only View'}
+          <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">Subscription Plans</h1>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mt-1">
+            Recurrence Schedules & Policy Flags · {isAdmin ? 'Administrator Access' : 'Staff Read-Only'}
           </p>
         </div>
 
         {isAdmin ? (
-          <Btn variant="primary" size="sm" className="font-mono text-xs">
-            <Plus size={13} /> Create Plan
+          <Btn variant="primary" size="md">
+            <Plus size={15} strokeWidth={2.5} /> Create Plan
           </Btn>
         ) : (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--line)] bg-[var(--surface-2)] text-[var(--ink-40)] text-xs font-mono rounded">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 border-[1.5px] border-black bg-white text-gray-500 text-xs font-mono rounded-xl shadow-xs">
             <Lock size={12} /> Staff Protected
           </div>
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
-        <div className="flex items-center gap-2">
+      {/* Filter and Search */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center anim-spring stagger-2">
+        <div className="flex items-center gap-3">
           <SearchInput value={search} onChange={setSearch} placeholder="Search plans..." />
-          <div className="flex border border-[var(--line)] rounded bg-white p-0.5 text-xs font-mono">
+          <div className="flex border-[1.5px] border-black rounded-xl bg-white p-1 text-xs font-mono shadow-[2px_2px_0_#000]">
             {(['ALL', 'D', 'W', 'M', 'Y'] as const).map(p => (
               <button
                 key={p}
                 onClick={() => setPeriodFilter(p)}
-                className={`px-2.5 py-1 rounded cursor-pointer ${
-                  periodFilter === p ? 'bg-[var(--line-strong)] text-white font-bold' : 'text-[var(--ink-60)]'
+                className={`px-3 py-1 rounded-lg cursor-pointer transition-colors ${
+                  periodFilter === p
+                    ? 'glass-odoo text-white font-bold'
+                    : 'text-gray-600 hover:text-black'
                 }`}
               >
                 {p === 'ALL' ? 'ALL' : p === 'D' ? 'DAILY' : p === 'W' ? 'WEEKLY' : p === 'M' ? 'MONTHLY' : 'ANNUAL'}
@@ -69,41 +73,41 @@ export default function PlansPage() {
           </div>
         </div>
 
-        <span className="text-xs font-mono text-[var(--ink-40)]">{filtered.length} active plans</span>
+        <span className="text-xs font-mono text-gray-500">{filtered.length} active plans</span>
       </div>
 
-      {/* Table with the 4 structural brutalist flag toggles */}
-      <div className="border border-[var(--line-strong)] bg-white overflow-x-auto">
-        <table className="w-full text-left text-xs font-mono">
-          <thead>
-            <tr className="border-b border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--ink-40)]">
-              <th className="px-4 py-3">CODE</th>
-              <th className="px-4 py-3">PLAN NAME</th>
-              <th className="px-4 py-3">ATTACHED PRODUCT</th>
-              <th className="px-4 py-3">CYCLE</th>
-              <th className="px-4 py-3 text-right">PRICE</th>
-              <th className="px-4 py-3 text-center">POLICY FLAGS (AUTOCLOSE · EARLYCLOSE · PAUSE · RENEW)</th>
-              <th className="px-4 py-3 text-right">STATUS</th>
+      {/* Table */}
+      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+        <table className="w-full text-left border-collapse">
+          <thead className="border-b-[1.5px] border-black bg-white/60">
+            <tr>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CODE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PLAN NAME</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PRODUCT</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CYCLE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">PRICE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-center">POLICY FLAGS</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">STATUS</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--line)]">
+          <tbody className="divide-y divide-black/10">
             {filtered.map(pl => {
               const prod = PRODUCTS.find(p => p.id === pl.productId)
               return (
-                <tr key={pl.id} className="hover:bg-[var(--surface-2)] transition-colors">
-                  <td className="px-4 py-3 font-bold text-[var(--ink)]">{pl.code}</td>
-                  <td className="px-4 py-3 font-sans font-semibold text-sm text-[var(--ink)]">{pl.name}</td>
-                  <td className="px-4 py-3 text-[var(--ink-60)]">{prod?.name || '—'}</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 border border-[var(--line)] rounded bg-[var(--surface-2)] font-semibold text-[10px]">
+                <tr key={pl.id} className="table-row">
+                  <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{pl.code}</td>
+                  <td className="px-6 py-4 font-bold text-sm text-[#4A3043]">{pl.name}</td>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{prod?.name || '—'}</td>
+                  <td className="px-6 py-4">
+                    <span className="px-2.5 py-1 border-[1.5px] border-black rounded-md bg-white font-bold text-[10px] font-mono shadow-[1px_1px_0_#000]">
                       {pl.billingPeriod === 'D' ? 'DAILY' : pl.billingPeriod === 'W' ? 'WEEKLY' : pl.billingPeriod === 'M' ? 'MONTHLY' : 'ANNUAL'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-sm text-[var(--ink)]">
+                  <td className="px-6 py-4 text-right font-bold text-sm font-mono text-[#4A3043]">
                     {formatPaise(pl.price)}
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="inline-flex items-center gap-1.5 bg-[var(--surface-2)] p-1 rounded border border-[var(--line)]">
+                  <td className="px-6 py-4 text-center">
+                    <div className="inline-flex items-center gap-1.5 p-1 rounded-xl bg-white/70 border-[1.5px] border-black">
                       <button
                         onClick={() => toggleFlag(pl.id, 'autoCloseOnEnd')}
                         disabled={!isAdmin}
@@ -138,7 +142,7 @@ export default function PlansPage() {
                       </button>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-6 py-4 text-right">
                     <Badge variant={pl.isActive ? 'ok' : 'neutral'}>
                       {pl.isActive ? 'ACTIVE' : 'ARCHIVED'}
                     </Badge>
@@ -152,4 +156,3 @@ export default function PlansPage() {
     </div>
   )
 }
-

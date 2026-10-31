@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { DISCOUNTS, formatPaise, type Discount } from '../data/seed'
 import { Badge, Btn } from '../components/ui'
-import { Plus, Percent } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 
 export default function DiscountsPage() {
   const [discountsList, setDiscountsList] = useState<Discount[]>(DISCOUNTS)
@@ -37,59 +37,60 @@ export default function DiscountsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--line-strong)]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-black/10 anim-spring stagger-1">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">Discount Rules & Promotions</h1>
-          <p className="text-xs font-mono text-[var(--ink-40)] uppercase tracking-wider mt-0.5">
-            Admin Only · Auto-Applied during Invoice Generation with Usage Caps
+          <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">Discount Promotions</h1>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mt-1">
+            Automated Discount Redemption · Server-Verified Redemption Quotas
           </p>
         </div>
-        <Btn variant="primary" size="sm" onClick={() => setModalOpen(true)} className="font-mono text-xs">
-          <Plus size={13} /> Add Discount Rule
+        <Btn variant="primary" size="md" onClick={() => setModalOpen(true)}>
+          <Plus size={15} strokeWidth={2.5} /> Add Discount Rule
         </Btn>
       </div>
 
       {/* Table */}
-      <div className="border border-[var(--line-strong)] bg-white overflow-x-auto">
-        <table className="w-full text-left text-xs font-mono">
-          <thead>
-            <tr className="border-b border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--ink-40)]">
-              <th className="px-4 py-3">RULE NAME</th>
-              <th className="px-4 py-3">TYPE</th>
-              <th className="px-4 py-3 text-right">BENEFIT</th>
-              <th className="px-4 py-3">SCOPE</th>
-              <th className="px-4 py-3">REDEMPTION PROGRESS (USED / CAP)</th>
-              <th className="px-4 py-3">VALIDITY WINDOW</th>
-              <th className="px-4 py-3 text-right">STATUS</th>
+      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-2">
+        <table className="w-full text-left border-collapse">
+          <thead className="border-b-[1.5px] border-black bg-white/60">
+            <tr>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">RULE NAME</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">TYPE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">BENEFIT</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">SCOPE</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">REDEMPTION PROGRESS</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">VALIDITY</th>
+              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">STATUS</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--line)]">
+          <tbody className="divide-y divide-black/10">
             {discountsList.map(d => {
               const progressPct = Math.min(100, Math.round((d.timesUsed / d.maxRedemptions) * 100))
               return (
-                <tr key={d.id} className="hover:bg-[var(--surface-2)] transition-colors">
-                  <td className="px-4 py-3 font-bold text-[var(--ink)]">{d.name}</td>
-                  <td className="px-4 py-3 text-[var(--ink-60)]">{d.type}</td>
-                  <td className="px-4 py-3 text-right font-bold text-[var(--ok)] text-sm">
+                <tr key={d.id} className="table-row">
+                  <td className="px-6 py-4 font-bold text-sm text-[#4A3043]">{d.name}</td>
+                  <td className="px-6 py-4 text-xs font-mono"><Badge variant="info">{d.type}</Badge></td>
+                  <td className="px-6 py-4 text-right font-bold font-mono text-emerald-700 text-sm">
                     {d.type === 'PERCENT' ? `${d.value}% OFF` : `-${formatPaise(d.value)}`}
                   </td>
-                  <td className="px-4 py-3 text-[var(--ink-40)]">{d.scope}</td>
-                  <td className="px-4 py-3">
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-[10px]">
-                        <span className="font-bold">{d.timesUsed} used</span>
-                        <span className="text-[var(--ink-40)]">{d.maxRedemptions} max</span>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-500">{d.scope}</td>
+                  <td className="px-6 py-4">
+                    <div className="space-y-1 w-36">
+                      <div className="flex justify-between text-[10px] font-mono">
+                        <span className="font-bold text-[#4A3043]">{d.timesUsed} used</span>
+                        <span className="text-gray-400">{d.maxRedemptions} cap</span>
                       </div>
-                      <div className="w-full h-1 bg-zinc-200 rounded-full overflow-hidden">
+                      <div className="w-full h-1.5 bg-gray-200 border border-black/20 rounded-full overflow-hidden">
                         <div
-                          className={`h-full ${progressPct >= 100 ? 'bg-red-500' : 'bg-[var(--accent)]'}`}
+                          className={`h-full ${progressPct >= 100 ? 'bg-red-500' : 'bg-[#714B67]'}`}
                           style={{ width: `${progressPct}%` }}
                         />
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-[var(--ink-40)]">{d.startsAt} → {d.endsAt}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-6 py-4 text-xs font-mono text-gray-500">{d.startsAt} → {d.endsAt}</td>
+                  <td className="px-6 py-4 text-right">
                     <Badge variant={d.isActive && progressPct < 100 ? 'ok' : 'neutral'}>
                       {d.isActive && progressPct < 100 ? 'ELIGIBLE' : 'EXHAUSTED'}
                     </Badge>
@@ -101,29 +102,37 @@ export default function DiscountsPage() {
         </table>
       </div>
 
+      {/* Creation Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white border border-[var(--line-strong)] rounded-lg p-6 max-w-md w-full shadow-2xl font-mono text-xs">
-            <h2 className="text-base font-bold text-[var(--ink)] font-sans">Create Promotional Discount</h2>
-            <form onSubmit={handleCreate} className="mt-4 space-y-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop" onClick={() => setModalOpen(false)} />
+          <div className="relative w-full max-w-md bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-3xl shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] overflow-hidden modal-panel p-8">
+            <div className="flex justify-between items-center pb-4 border-b border-black">
+              <h3 className="text-xl font-bold text-[#4A3043]">Deploy Discount Rule</h3>
+              <button onClick={() => setModalOpen(false)} className="p-1.5 rounded-lg border border-black hover:bg-gray-100">
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreate} className="py-6 space-y-4 font-mono text-xs">
               <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">Discount Name</label>
+                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Discount Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  placeholder="e.g. Q4 Growth Rebate"
+                  placeholder="e.g. Founder Early Access"
                   required
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
+                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">Calculation Type</label>
+                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Calculation Type</label>
                 <select
                   value={type}
                   onChange={e => setType(e.target.value as 'FIXED' | 'PERCENT')}
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
+                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 >
                   <option value="PERCENT">Percentage Discount (%)</option>
                   <option value="FIXED">Fixed Amount (₹)</option>
@@ -131,39 +140,39 @@ export default function DiscountsPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">
-                  Discount Value ({type === 'PERCENT' ? '%' : '₹'})
+                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">
+                  Discount Value ({type === 'PERCENT' ? '%' : '₹ INR'})
                 </label>
                 <input
                   type="number"
                   value={value}
                   onChange={e => setValue(e.target.value)}
                   required
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs font-bold"
+                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs font-bold"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] text-[var(--ink-60)] mb-1">Maximum Redemptions Cap</label>
+                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Max Redemptions Cap</label>
                 <input
                   type="number"
                   value={maxRedemptions}
                   onChange={e => setMaxRedemptions(parseInt(e.target.value) || 1)}
-                  className="w-full px-3 py-1.5 border border-[var(--line)] rounded bg-white text-xs"
+                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-[var(--line)]">
+              <div className="flex justify-end gap-3 pt-4 border-t border-black">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-3 py-1.5 border border-[var(--line)] rounded hover:bg-zinc-100"
+                  className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-[var(--accent)] text-white font-bold rounded hover:bg-blue-900"
+                  className="btn-primary text-white text-xs font-bold px-5 py-2.5 rounded-xl"
                 >
                   Deploy Rule
                 </button>
@@ -175,4 +184,3 @@ export default function DiscountsPage() {
     </div>
   )
 }
-
