@@ -100,3 +100,4 @@ router.post('/discounts', requireAuth, requireRole(['ADMIN']), async (req, res):
 });
 
 export default router;
+

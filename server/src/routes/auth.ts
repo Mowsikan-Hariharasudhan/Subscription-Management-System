@@ -168,3 +168,4 @@ router.post('/register', async (req, res): Promise<void> => {
 });
 
 export default router;
+

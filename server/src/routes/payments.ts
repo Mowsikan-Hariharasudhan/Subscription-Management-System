@@ -33,3 +33,4 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res): Promise<voi
 });
 
 export default router;
+

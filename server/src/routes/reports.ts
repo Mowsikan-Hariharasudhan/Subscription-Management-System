@@ -52,3 +52,4 @@ router.get('/financial', requireAuth, requireRole(['ADMIN', 'STAFF']), async (_r
 });
 
 export default router;
+

@@ -69,3 +69,4 @@ cron.schedule('0 0 * * *', async () => {
 app.listen(PORT, () => {
   console.log(`🚀 Brightloop Enterprise API server running on http://localhost:${PORT}`);
 });
+

@@ -81,3 +81,4 @@ router.put('/:id', requireAuth, requireRole(['ADMIN']), async (req, res): Promis
 });
 
 export default router;
+

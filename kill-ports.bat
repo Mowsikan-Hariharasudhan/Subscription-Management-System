@@ -23,3 +23,4 @@ echo.
 echo All Brightloop ports (5173, 4000, 3000, 5000) are clear!
 echo ========================================================
 pause
+
