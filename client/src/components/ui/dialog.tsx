@@ -40,25 +40,25 @@ export const Dialog: React.FC<DialogProps> = ({
       {/* Modal Dialog Content */}
       <div
         className={cn(
-          'relative w-full bg-white rounded-lg shadow-sm border border-border-main p-5 z-10 max-h-[90vh] flex flex-col',
+          'relative w-full bg-white rounded-2xl shadow-elevated border border-border-main p-6 z-10 max-h-[90vh] flex flex-col',
           maxWidths[maxWidth]
         )}
       >
-        <div className="flex items-center justify-between pb-3 border-b border-border-main">
+        <div className="flex items-center justify-between pb-3.5 border-b border-border-main">
           <div>
-            <h2 className="text-base font-semibold text-text-primary leading-tight">{title}</h2>
+            <h2 className="text-base font-bold text-text-primary leading-tight">{title}</h2>
             {description && <p className="text-xs text-text-secondary mt-0.5">{description}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-text-secondary hover:bg-surface-main hover:text-text-primary transition-colors cursor-pointer border border-transparent hover:border-border-main"
+            className="p-1.5 rounded-xl text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer border border-transparent hover:border-border-main"
             aria-label="Close dialog"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="mt-4 overflow-y-auto pr-1 flex-1">{children}</div>
+        <div className="overflow-y-auto mt-4 pr-1">{children}</div>
       </div>
     </div>
   );

@@ -59,21 +59,21 @@ export const Products: React.FC = () => {
 
   const columns: Column<Product>[] = [
     {
-      header: 'Product Name',
+      header: 'PRODUCT NAME',
       cell: (p) => (
-        <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-md bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center font-bold text-xs">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center font-bold text-xs shrink-0">
             <Package className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-semibold text-xs text-text-primary block">{p.name}</span>
+            <span className="font-bold text-xs text-text-primary block">{p.name}</span>
             {p.notes && <span className="text-[11px] text-text-secondary truncate max-w-xs block">{p.notes}</span>}
           </div>
         </div>
       ),
     },
     {
-      header: 'Type',
+      header: 'TYPE',
       cell: (p) => (
         <Badge variant={p.type === 'SOFTWARE' ? 'default' : 'secondary'}>
           {p.type}
@@ -81,15 +81,15 @@ export const Products: React.FC = () => {
       ),
     },
     {
-      header: 'Sales Price',
-      cell: (p) => <CurrencyDisplay amount={p.salesPrice} size="sm" className="font-semibold font-mono" />,
+      header: 'SALES PRICE',
+      cell: (p) => <CurrencyDisplay amount={p.salesPrice} size="sm" className="font-bold font-mono text-text-primary" />,
     },
     {
-      header: 'Cost Price',
+      header: 'COST PRICE',
       cell: (p) => <CurrencyDisplay amount={p.costPrice} size="sm" className="text-text-secondary font-mono" />,
     },
     {
-      header: 'Variants',
+      header: 'VARIANTS',
       cell: (p) => (
         <span className="inline-flex items-center space-x-1 text-xs text-text-secondary font-mono">
           <Layers className="w-3.5 h-3.5" />
@@ -98,7 +98,7 @@ export const Products: React.FC = () => {
       ),
     },
     {
-      header: 'Status',
+      header: 'STATUS',
       cell: (p) => (
         <Badge variant={p.isActive ? 'success' : 'danger'}>
           {p.isActive ? 'ACTIVE' : 'INACTIVE'}
@@ -108,19 +108,19 @@ export const Products: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <PageHeader
         title="Products & Services"
         description="Catalogue of billable software subscription tiers and standalone service packages"
         actions={
-          <Button onClick={() => setIsCreateOpen(true)} size="sm">
-            <Plus className="w-3.5 h-3.5 mr-1.5" /> Add Product
+          <Button onClick={() => setIsCreateOpen(true)} size="md">
+            <Plus className="w-4 h-4 mr-1.5" /> Add Product
           </Button>
         }
       />
 
-      <div className="bg-white p-3 rounded-lg border border-border-main shadow-subtle flex items-center justify-between gap-4">
-        <div className="relative w-full max-w-sm">
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 min-w-[240px] max-w-sm">
           <Input
             placeholder="Search products by title or description..."
             value={search}
@@ -128,9 +128,9 @@ export const Products: React.FC = () => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="pl-9 h-9 text-xs"
+            className="pl-9 h-10 text-xs rounded-xl"
           />
-          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-3" />
         </div>
       </div>
 
@@ -160,7 +160,7 @@ export const Products: React.FC = () => {
         title="Add New Billable Product"
         description="Define base catalog item and pricing"
       >
-        <form onSubmit={handleCreateSubmit} className="space-y-3.5">
+        <form onSubmit={handleCreateSubmit} className="space-y-4">
           <div>
             <Label htmlFor="prod-name" required>
               Product Name
@@ -171,6 +171,7 @@ export const Products: React.FC = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
+              className="rounded-xl"
             />
           </div>
 
@@ -182,7 +183,7 @@ export const Products: React.FC = () => {
               id="prod-type"
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="flex h-9 w-full rounded-md border border-border-main bg-white px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-plum-primary focus:ring-1 focus:ring-plum-primary"
+              className="flex h-10 w-full rounded-xl border border-border-main bg-white px-3.5 py-2 text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20 shadow-sm cursor-pointer"
             >
               <option value="SOFTWARE">SOFTWARE (Recurring License / SaaS)</option>
               <option value="SERVICE">SERVICE (One-time or Support Service)</option>
@@ -204,6 +205,7 @@ export const Products: React.FC = () => {
                 value={formData.salesPriceRupees}
                 onChange={(e) => setFormData({ ...formData, salesPriceRupees: e.target.value })}
                 required
+                className="rounded-xl font-mono"
               />
             </div>
 
@@ -217,6 +219,7 @@ export const Products: React.FC = () => {
                 placeholder="500.00"
                 value={formData.costPriceRupees}
                 onChange={(e) => setFormData({ ...formData, costPriceRupees: e.target.value })}
+                className="rounded-xl font-mono"
               />
             </div>
           </div>
@@ -228,6 +231,7 @@ export const Products: React.FC = () => {
               placeholder="Features, tier inclusions, support SLA..."
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              className="rounded-xl"
             />
           </div>
 

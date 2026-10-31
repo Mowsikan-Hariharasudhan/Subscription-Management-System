@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Repeat, Filter } from 'lucide-react';
+import { Plus, Search, Repeat } from 'lucide-react';
 import { subscriptionService } from '../../services/subscriptionService';
 import { Subscription, SubscriptionStatus } from '../../types';
 import { PageHeader } from '../../components/shared/PageHeader';
@@ -26,46 +26,58 @@ export const Subscriptions: React.FC = () => {
     queryFn: () => subscriptionService.list({ page, limit: 10, search, status: statusFilter || undefined }),
   });
 
+  const getInitials = (name?: string) => {
+    if (!name) return 'CU';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+  };
+
   const columns: Column<Subscription>[] = [
     {
-      header: 'Subscription #',
+      header: 'SUBSCRIPTION #',
       cell: (s) => (
-        <div className="flex items-center space-x-2">
-          <div className="w-7 h-7 rounded-md bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center">
-            <Repeat className="w-3.5 h-3.5" />
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center">
+            <Repeat className="w-4 h-4" />
           </div>
-          <span className="font-mono text-xs font-semibold text-plum-primary">{s.number}</span>
+          <span className="font-mono text-xs font-bold text-plum-primary">{s.number}</span>
         </div>
       ),
     },
     {
-      header: 'Customer',
+      header: 'CUSTOMER',
       cell: (s) => (
-        <div>
-          <p className="font-medium text-xs text-text-primary">{s.customer?.name}</p>
-          <p className="text-[11px] text-text-secondary">{s.customer?.companyName}</p>
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-full bg-[#F5E6EE] text-plum-primary font-bold text-xs flex items-center justify-center shrink-0 border border-plum-border">
+            {getInitials(s.customer?.name)}
+          </div>
+          <div>
+            <p className="font-bold text-xs text-text-primary">{s.customer?.name}</p>
+            <p className="text-[11px] text-text-secondary">{s.customer?.companyName || 'Individual'}</p>
+          </div>
         </div>
       ),
     },
     {
-      header: 'Plan',
+      header: 'PLAN',
       cell: (s) => (
         <div>
-          <p className="font-medium text-xs text-text-primary">{s.plan?.name}</p>
+          <p className="font-bold text-xs text-text-primary">{s.plan?.name}</p>
           <p className="text-[10px] text-text-secondary uppercase tracking-wider font-mono">{s.plan?.billingFrequency}</p>
         </div>
       ),
     },
     {
-      header: 'Status',
+      header: 'STATUS',
       cell: (s) => <StatusBadge status={s.status} />,
     },
     {
-      header: 'Start Date',
+      header: 'START DATE',
       cell: (s) => <span className="text-xs text-text-secondary font-mono">{formatDate(s.startDate)}</span>,
     },
     {
-      header: 'Next Billing',
+      header: 'NEXT BILLING',
       cell: (s) => (
         <span className="text-xs text-text-secondary font-mono">
           {s.nextBillingDate ? formatDate(s.nextBillingDate) : '—'}
@@ -73,39 +85,38 @@ export const Subscriptions: React.FC = () => {
       ),
     },
     {
-      header: 'Total',
-      cell: (s) => <CurrencyDisplay amount={s.total} size="sm" className="font-semibold font-mono" />,
+      header: 'TOTAL',
+      cell: (s) => <CurrencyDisplay amount={s.total} size="sm" className="font-bold font-mono text-text-primary" />,
     },
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <PageHeader
-        title="Subscriptions"
-        description="Manage the complete subscription lifecycle from draft to closure"
+        title="Active Subscriptions"
+        description="Manage the complete recurring contract lifecycle from draft proposals to active service fulfillment"
         actions={
-          <Button onClick={() => navigate('/quotations')} size="sm">
-            <Plus className="w-3.5 h-3.5 mr-1.5" /> New Subscription
+          <Button onClick={() => navigate('/quotations')} size="md">
+            <Plus className="w-4 h-4 mr-1.5" /> New Subscription
           </Button>
         }
       />
 
-      <div className="bg-white p-3 rounded-lg border border-border-main shadow-subtle flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px] max-w-xs">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[240px] max-w-sm">
           <Input
             placeholder="Search by number or customer..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="pl-9 h-9 text-xs"
+            className="pl-9 h-10 text-xs rounded-xl"
           />
-          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-3" />
         </div>
-        <div className="flex items-center space-x-2">
-          <Filter className="w-4 h-4 text-text-secondary" />
+        <div className="relative">
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-            className="h-9 rounded-md border border-border-main bg-white px-3 text-xs text-text-primary focus:outline-none focus:border-plum-primary focus:ring-1 focus:ring-plum-primary"
+            className="h-10 rounded-xl border border-border-main bg-white px-4 text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20 shadow-sm cursor-pointer"
           >
             <option value="">All Statuses</option>
             {STATUS_OPTIONS.map((s) => (

@@ -28,6 +28,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size }) => {
 
       case 'PAUSED':
       case 'EXPIRED':
+      case 'LATE':
         return 'warning';
 
       case 'CLOSED':
@@ -51,6 +52,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size }) => {
         return 'bg-plum-primary';
       case 'PAUSED':
       case 'EXPIRED':
+      case 'LATE':
         return 'bg-amber-500';
       case 'CLOSED':
       case 'CANCELLED':
@@ -61,14 +63,12 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size }) => {
     }
   };
 
-  const isLarge = size === 'lg';
-
   return (
     <Badge
       variant={getVariant()}
       className={cn(
-        'inline-flex items-center gap-1.5 font-medium tracking-wide uppercase font-mono text-[10px]',
-        isLarge && 'text-xs px-2.5 py-1'
+        'font-mono uppercase inline-flex items-center gap-1.5 shadow-xs',
+        size === 'lg' ? 'px-3 py-1 text-xs' : 'px-2.5 py-0.5 text-[11px]'
       )}
     >
       <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', getDotColor())} />

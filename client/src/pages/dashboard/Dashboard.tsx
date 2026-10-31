@@ -1,5 +1,5 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
   Users,
@@ -10,6 +10,8 @@ import {
   TrendingUp,
   ArrowRight,
   ShieldAlert,
+  RotateCw,
+  ChevronDown,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -32,6 +34,11 @@ import { LoadingSkeleton } from '../../components/shared/LoadingSkeleton';
 import { formatDate } from '../../lib/utils';
 
 export const Dashboard: React.FC = () => {
+  const queryClient = useQueryClient();
+  const [filterPlan, setFilterPlan] = useState('All Plans');
+  const [filterTime, setFilterTime] = useState('All Time');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const { data: kpis, isLoading: kpisLoading } = useQuery({
     queryKey: ['dashboard', 'kpis'],
     queryFn: dashboardService.getKpis,
@@ -57,155 +64,186 @@ export const Dashboard: React.FC = () => {
     queryFn: () => dashboardService.getRecentSubscriptions(5),
   });
 
-  const PIE_COLORS = ['#724B68', '#53364F', '#0F766E', '#BE123C', '#B45309'];
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    setTimeout(() => setIsRefreshing(false), 400);
+  };
+
+  const PIE_COLORS = ['#6A3D5B', '#8A5F7C', '#059669', '#DC2626', '#D97706'];
 
   if (kpisLoading) {
     return <LoadingSkeleton count={6} />;
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      {/* Page Header with Filters & Actions matching reference */}
       <PageHeader
-        title="Executive Overview"
-        description="Real-time operational metrics for subscriptions, billing throughput, and cash collections"
+        title="Subscription & Revenue Operations Dashboard"
+        description="Real-time aggregate data across subscription runs, recurring invoices, payments, and discounts"
+        actions={
+          <div className="flex items-center gap-2">
+            {/* Filter Dropdown 1 */}
+            <div className="relative">
+              <button
+                type="button"
+                className="h-9 px-3.5 rounded-xl border border-border-main bg-white text-xs font-medium text-text-primary flex items-center gap-2 hover:bg-surface-hover shadow-sm"
+              >
+                <span>{filterPlan}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-text-secondary" />
+              </button>
+            </div>
+
+            {/* Filter Dropdown 2 */}
+            <div className="relative">
+              <button
+                type="button"
+                className="h-9 px-3.5 rounded-xl border border-border-main bg-white text-xs font-medium text-text-primary flex items-center gap-2 hover:bg-surface-hover shadow-sm"
+              >
+                <span>{filterTime}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-text-secondary" />
+              </button>
+            </div>
+
+            {/* Refresh Button */}
+            <button
+              onClick={handleRefresh}
+              className="h-9 px-3.5 rounded-xl border border-border-main bg-white text-xs font-medium text-text-primary flex items-center gap-1.5 hover:bg-surface-hover shadow-sm transition-colors cursor-pointer"
+            >
+              <RotateCw className={`w-3.5 h-3.5 text-text-secondary ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
+            </button>
+          </div>
+        }
       />
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
-        {/* Active Subscriptions */}
-        <Card className="hover:border-plum-primary/40 transition-colors">
-          <CardContent className="p-3.5">
+      {/* KPI Cards Row (5 Cards matching reference layout) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        {/* Total Net Paid / Collected */}
+        <Card className="hover:border-plum-primary/50 transition-all">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">
-                Active Subs
+              <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                TOTAL NET PAID
               </span>
-              <div className="w-6 h-6 rounded-md bg-surface-subtle border border-border-main text-plum-primary flex items-center justify-center">
-                <Repeat className="w-3.5 h-3.5" />
+              <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center">
+                <DollarSign className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-2.5">
-              <span className="text-xl font-bold text-text-primary font-mono tracking-tight">
+              <CurrencyDisplay amount={kpis?.collectedRevenue} size="lg" className="font-bold text-text-primary font-mono tracking-tight" />
+            </div>
+            <p className="text-xs text-text-secondary mt-1">Processed subscription revenue</p>
+          </CardContent>
+        </Card>
+
+        {/* Invoices Generated */}
+        <Card className="hover:border-plum-primary/50 transition-all">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                INVOICES BILLED
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center">
+                <Receipt className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2.5">
+              <span className="text-2xl font-bold text-text-primary font-mono tracking-tight">
+                {kpis?.totalInvoiced ? `₹${(kpis.totalInvoiced / 100).toLocaleString('en-IN')}` : '₹0'}
+              </span>
+            </div>
+            <p className="text-xs text-text-secondary mt-1">Total recurring billing statements</p>
+          </CardContent>
+        </Card>
+
+        {/* Active Subscriptions */}
+        <Card className="hover:border-plum-primary/50 transition-all">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                ACTIVE SUBSCRIPTIONS
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center">
+                <Repeat className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2.5">
+              <span className="text-2xl font-bold text-text-primary font-mono tracking-tight">
                 {kpis?.activeSubscriptions ?? 0}
               </span>
             </div>
+            <p className="text-xs text-text-secondary mt-1">Active customer contract cycles</p>
           </CardContent>
         </Card>
 
-        {/* Total Customers */}
-        <Card className="hover:border-plum-primary/40 transition-colors">
-          <CardContent className="p-3.5">
+        {/* Outstanding Balance */}
+        <Card className="hover:border-plum-primary/50 transition-all">
+          <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">
-                Customers
+              <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                OUTSTANDING DUE
               </span>
-              <div className="w-6 h-6 rounded-md bg-surface-subtle border border-border-main text-plum-primary flex items-center justify-center">
-                <Users className="w-3.5 h-3.5" />
+              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-2.5">
-              <span className="text-xl font-bold text-text-primary font-mono tracking-tight">
+              <CurrencyDisplay amount={kpis?.outstandingAmount} size="lg" className="font-bold text-amber-800 font-mono tracking-tight" />
+            </div>
+            <p className="text-xs text-text-secondary mt-1">Awaiting customer clearance</p>
+          </CardContent>
+        </Card>
+
+        {/* Customers / Health Rate */}
+        <Card className="hover:border-plum-primary/50 transition-all">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+                CUSTOMER BASE
+              </span>
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
+                <Users className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2.5">
+              <span className="text-2xl font-bold text-text-primary font-mono tracking-tight">
                 {kpis?.totalCustomers ?? 0}
               </span>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Collected Revenue */}
-        <Card className="hover:border-emerald-400 transition-colors">
-          <CardContent className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">
-                Cash Collected
-              </span>
-              <div className="w-6 h-6 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center">
-                <DollarSign className="w-3.5 h-3.5" />
-              </div>
-            </div>
-            <div className="mt-2.5">
-              <CurrencyDisplay amount={kpis?.collectedRevenue} size="md" className="text-emerald-700 font-bold font-mono" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Total Invoiced */}
-        <Card className="hover:border-blue-400 transition-colors">
-          <CardContent className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">
-                Total Invoiced
-              </span>
-              <div className="w-6 h-6 rounded-md bg-sky-50 border border-sky-200 text-sky-700 flex items-center justify-center">
-                <Receipt className="w-3.5 h-3.5" />
-              </div>
-            </div>
-            <div className="mt-2.5">
-              <CurrencyDisplay amount={kpis?.totalInvoiced} size="md" className="font-bold font-mono text-text-primary" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Outstanding Amount */}
-        <Card className="hover:border-amber-400 transition-colors">
-          <CardContent className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">
-                Outstanding
-              </span>
-              <div className="w-6 h-6 rounded-md bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
-                <TrendingUp className="w-3.5 h-3.5" />
-              </div>
-            </div>
-            <div className="mt-2.5">
-              <CurrencyDisplay amount={kpis?.outstandingAmount} size="md" className="text-amber-800 font-bold font-mono" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Overdue Invoices */}
-        <Card className="border-rose-200 bg-rose-50/20 hover:border-rose-300 transition-colors">
-          <CardContent className="p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-rose-800 uppercase tracking-wider">
-                Overdue
-              </span>
-              <div className="w-6 h-6 rounded-md bg-rose-100 border border-rose-200 text-rose-700 flex items-center justify-center">
-                <AlertTriangle className="w-3.5 h-3.5" />
-              </div>
-            </div>
-            <div className="mt-2.5 flex items-baseline justify-between">
-              <span className="text-xl font-bold text-rose-700 font-mono">
-                {kpis?.overdueInvoices ?? 0}
-              </span>
-              <span className="text-[10px] text-rose-600 font-medium">Invoices</span>
-            </div>
+            <p className="text-xs text-emerald-600 font-medium mt-1">✓ Active enterprise accounts</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Analytics Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Monthly Revenue Chart */}
+        {/* Monthly Revenue Chart (2/3 width) */}
         <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between py-3 px-4 sm:px-5">
+          <CardHeader className="flex flex-row items-center justify-between py-4 px-6 border-b border-border-main">
             <div>
-              <CardTitle className="text-sm font-semibold">Revenue Inflow</CardTitle>
-              <p className="text-xs text-text-secondary">Cash collections by month for current fiscal period</p>
+              <CardTitle className="text-sm font-bold text-text-primary">Monthly Revenue Expenditure Trend</CardTitle>
+              <p className="text-xs text-text-secondary mt-0.5">Gross billings vs net collections over recent periods</p>
             </div>
+            <span className="text-[10px] font-bold text-plum-primary bg-plum-surface border border-plum-border px-2.5 py-1 rounded-full uppercase tracking-wider font-mono">
+              LIVE DATA
+            </span>
           </CardHeader>
-          <CardContent className="pt-4 px-4 sm:px-5 pb-5">
-            <div className="h-60 w-full">
+          <CardContent className="p-6">
+            <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#724B68" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#724B68" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#6A3D5B" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#6A3D5B" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="2 2" stroke="#E8E4E7" vertical={false} />
-                  <XAxis dataKey="month" stroke="#746F75" fontSize={11} tickLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EAE4E8" vertical={false} />
+                  <XAxis dataKey="month" stroke="#756C73" fontSize={11} tickLine={false} />
                   <YAxis
-                    stroke="#746F75"
+                    stroke="#756C73"
                     fontSize={11}
                     tickLine={false}
                     tickFormatter={(val) => `₹${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
@@ -213,18 +251,18 @@ export const Dashboard: React.FC = () => {
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#FFFFFF',
-                      borderColor: '#E8E4E7',
-                      borderRadius: '6px',
+                      borderColor: '#EAE4E8',
+                      borderRadius: '12px',
                       fontSize: '12px',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
                     }}
                     formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Collected Revenue']}
                   />
                   <Area
                     type="monotone"
                     dataKey="revenueRupees"
-                    stroke="#724B68"
-                    strokeWidth={2}
+                    stroke="#6A3D5B"
+                    strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#revenueGrad)"
                   />
@@ -234,14 +272,14 @@ export const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Invoice Status Distribution Chart */}
+        {/* Invoice Status Distribution Chart (1/3 width) */}
         <Card>
-          <CardHeader className="py-3 px-4 sm:px-5">
-            <CardTitle className="text-sm font-semibold">Invoice Status Breakdown</CardTitle>
-            <p className="text-xs text-text-secondary">Distribution across all billing states</p>
+          <CardHeader className="py-4 px-6 border-b border-border-main">
+            <CardTitle className="text-sm font-bold text-text-primary">Status Distribution</CardTitle>
+            <p className="text-xs text-text-secondary mt-0.5">Logged invoice states (current window)</p>
           </CardHeader>
-          <CardContent className="pt-2 px-4 sm:px-5 pb-5">
-            <div className="h-44 w-full flex items-center justify-center">
+          <CardContent className="p-6">
+            <div className="h-48 w-full flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -250,9 +288,9 @@ export const Dashboard: React.FC = () => {
                     nameKey="status"
                     cx="50%"
                     cy="50%"
-                    innerRadius={46}
-                    outerRadius={68}
-                    paddingAngle={2}
+                    innerRadius={50}
+                    outerRadius={74}
+                    paddingAngle={3}
                   >
                     {(distData || []).map((_, index) => (
                       <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
@@ -261,8 +299,8 @@ export const Dashboard: React.FC = () => {
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#FFFFFF',
-                      borderColor: '#E8E4E7',
-                      borderRadius: '6px',
+                      borderColor: '#EAE4E8',
+                      borderRadius: '12px',
                       fontSize: '11px',
                     }}
                     formatter={(value, name) => [`${value} invoices`, name]}
@@ -270,12 +308,12 @@ export const Dashboard: React.FC = () => {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-3 space-y-1.5 border-t border-border-main pt-2.5">
+            <div className="mt-4 space-y-2 border-t border-border-main pt-3">
               {(distData || []).map((item, idx) => (
                 <div key={item.status} className="flex items-center justify-between text-xs">
                   <div className="flex items-center space-x-2">
                     <span
-                      className="w-2 h-2 rounded-xs"
+                      className="w-2.5 h-2.5 rounded-full"
                       style={{ backgroundColor: PIE_COLORS[idx % PIE_COLORS.length] }}
                     />
                     <span className="text-text-secondary font-mono text-[11px]">{item.status}</span>
@@ -291,49 +329,49 @@ export const Dashboard: React.FC = () => {
       {/* Tables Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Overdue Invoices Alert Table */}
-        <Card className="border-rose-200">
-          <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 bg-rose-50/30">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between py-3.5 px-5 border-b border-border-main">
             <div className="flex items-center space-x-2">
               <ShieldAlert className="w-4 h-4 text-rose-600" />
-              <CardTitle className="text-xs sm:text-sm text-rose-950 font-semibold">Overdue Invoices Requiring Follow-Up</CardTitle>
+              <CardTitle className="text-sm font-bold text-text-primary">Overdue Invoices Requiring Follow-Up</CardTitle>
             </div>
-            <Link to="/invoices" className="text-xs text-rose-700 font-semibold hover:underline flex items-center">
+            <Link to="/invoices" className="text-xs text-plum-primary font-semibold hover:underline flex items-center">
               View All <ArrowRight className="w-3 h-3 ml-1" />
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-surface-subtle text-text-secondary uppercase border-b border-border-main font-semibold text-[10px] tracking-wider select-none">
+                <thead className="bg-[#FAF7F9] text-text-secondary uppercase border-b border-border-main font-semibold text-[10px] tracking-wider select-none">
                   <tr>
-                    <th className="px-3.5 py-2.5">Invoice #</th>
-                    <th className="px-3.5 py-2.5">Customer</th>
-                    <th className="px-3.5 py-2.5">Due Date</th>
-                    <th className="px-3.5 py-2.5 text-right">Outstanding</th>
+                    <th className="px-5 py-3">Invoice #</th>
+                    <th className="px-5 py-3">Customer</th>
+                    <th className="px-5 py-3">Due Date</th>
+                    <th className="px-5 py-3 text-right">Outstanding</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-main">
+                <tbody className="divide-y divide-border-main/70">
                   {(!overdueInvoices || overdueInvoices.length === 0) ? (
                     <tr>
-                      <td colSpan={4} className="px-4 py-6 text-center text-text-secondary text-xs">
+                      <td colSpan={4} className="px-5 py-6 text-center text-text-secondary text-xs">
                         No overdue invoices! All payments are up to date.
                       </td>
                     </tr>
                   ) : (
                     overdueInvoices.map((inv) => (
                       <tr key={inv.id} className="hover:bg-rose-50/20 transition-colors">
-                        <td className="px-3.5 py-2.5 font-mono font-semibold text-plum-primary">
+                        <td className="px-5 py-3 font-mono font-semibold text-plum-primary">
                           <Link to="/invoices" className="hover:underline">
                             {inv.number}
                           </Link>
                         </td>
-                        <td className="px-3.5 py-2.5 text-text-primary font-medium truncate max-w-[140px]">
+                        <td className="px-5 py-3 text-text-primary font-medium truncate max-w-[140px]">
                           {inv.customer.name}
                         </td>
-                        <td className="px-3.5 py-2.5 text-rose-700 font-semibold font-mono">
+                        <td className="px-5 py-3 text-rose-700 font-semibold font-mono">
                           {formatDate(inv.dueDate)}
                         </td>
-                        <td className="px-3.5 py-2.5 text-right">
+                        <td className="px-5 py-3 text-right">
                           <CurrencyDisplay amount={inv.outstanding} size="sm" className="text-rose-700 font-bold font-mono" />
                         </td>
                       </tr>
@@ -347,8 +385,8 @@ export const Dashboard: React.FC = () => {
 
         {/* Recent Subscriptions */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4">
-            <CardTitle className="text-xs sm:text-sm font-semibold">Active Subscriptions</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between py-3.5 px-5 border-b border-border-main">
+            <CardTitle className="text-sm font-bold text-text-primary">Active Subscriptions</CardTitle>
             <Link to="/subscriptions" className="text-xs text-plum-primary font-semibold hover:underline flex items-center">
               View All <ArrowRight className="w-3 h-3 ml-1" />
             </Link>
@@ -356,38 +394,38 @@ export const Dashboard: React.FC = () => {
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-surface-subtle text-text-secondary uppercase border-b border-border-main font-semibold text-[10px] tracking-wider select-none">
+                <thead className="bg-[#FAF7F9] text-text-secondary uppercase border-b border-border-main font-semibold text-[10px] tracking-wider select-none">
                   <tr>
-                    <th className="px-3.5 py-2.5">Subscription #</th>
-                    <th className="px-3.5 py-2.5">Customer</th>
-                    <th className="px-3.5 py-2.5">Plan</th>
-                    <th className="px-3.5 py-2.5">Status</th>
-                    <th className="px-3.5 py-2.5 text-right">Amount</th>
+                    <th className="px-5 py-3">Subscription #</th>
+                    <th className="px-5 py-3">Customer</th>
+                    <th className="px-5 py-3">Plan</th>
+                    <th className="px-5 py-3">Status</th>
+                    <th className="px-5 py-3 text-right">Amount</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-main">
+                <tbody className="divide-y divide-border-main/70">
                   {(!recentSubscriptions || recentSubscriptions.length === 0) ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-6 text-center text-text-secondary text-xs">
+                      <td colSpan={5} className="px-5 py-6 text-center text-text-secondary text-xs">
                         No subscriptions found.
                       </td>
                     </tr>
                   ) : (
                     recentSubscriptions.map((sub) => (
-                      <tr key={sub.id} className="hover:bg-surface-main/60 transition-colors">
-                        <td className="px-3.5 py-2.5 font-mono font-semibold text-plum-primary">
+                      <tr key={sub.id} className="hover:bg-surface-hover/60 transition-colors">
+                        <td className="px-5 py-3 font-mono font-semibold text-plum-primary">
                           <Link to={`/subscriptions/${sub.id}`} className="hover:underline">
                             {sub.number}
                           </Link>
                         </td>
-                        <td className="px-3.5 py-2.5 text-text-primary font-medium truncate max-w-[120px]">
+                        <td className="px-5 py-3 text-text-primary font-medium truncate max-w-[120px]">
                           {sub.customer.name}
                         </td>
-                        <td className="px-3.5 py-2.5 text-text-secondary truncate max-w-[100px]">{sub.plan.name}</td>
-                        <td className="px-3.5 py-2.5">
+                        <td className="px-5 py-3 text-text-secondary truncate max-w-[100px]">{sub.plan.name}</td>
+                        <td className="px-5 py-3">
                           <StatusBadge status={sub.status} />
                         </td>
-                        <td className="px-3.5 py-2.5 text-right font-mono">
+                        <td className="px-5 py-3 text-right font-mono">
                           <CurrencyDisplay amount={sub.total} size="sm" />
                         </td>
                       </tr>

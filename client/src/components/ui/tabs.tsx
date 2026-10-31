@@ -28,7 +28,7 @@ export const TabsList: React.FC<{
 }> = ({ className, children }) => (
   <div
     className={cn(
-      'inline-flex items-center gap-1 p-0.5 bg-surface-subtle rounded-md border border-border-main',
+      'inline-flex items-center gap-1 p-1 bg-surface-subtle rounded-xl border border-border-main',
       className
     )}
   >
@@ -51,10 +51,10 @@ export const TabsTrigger: React.FC<{
       type="button"
       onClick={() => ctx.setActiveTab(value)}
       className={cn(
-        'px-3 py-1.5 text-xs font-medium rounded-xs transition-all cursor-pointer',
+        'px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer',
         isActive
-          ? 'bg-white text-plum-primary font-semibold shadow-xs border border-border-main'
-          : 'text-text-secondary hover:text-text-primary hover:bg-white/40',
+          ? 'bg-white text-text-primary font-semibold shadow-sm border border-border-main/60'
+          : 'text-text-secondary hover:text-text-primary hover:bg-white/50',
         className
       )}
     >
@@ -73,5 +73,5 @@ export const TabsContent: React.FC<{
 
   if (ctx.activeTab !== value) return null;
 
-  return <div className={cn('mt-4', className)}>{children}</div>;
+  return <div className={cn('mt-2 animate-in fade-in-50 duration-150', className)}>{children}</div>;
 };

@@ -29,18 +29,27 @@ export const Payments: React.FC = () => {
     queryFn: () => paymentService.list({ page, limit: 15, search }),
   });
 
+  const getInitials = (name?: string) => {
+    if (!name) return 'CU';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+  };
+
   const columns: Column<Payment>[] = [
     {
-      header: 'Payment ID',
+      header: 'PAYMENT ID',
       cell: (p) => (
-        <span className="font-mono text-xs text-text-secondary">{p.id.slice(0, 8).toUpperCase()}…</span>
+        <span className="font-mono text-xs font-bold text-text-primary">
+          PAY-{p.id.slice(0, 6).toUpperCase()}
+        </span>
       ),
     },
     {
-      header: 'Invoice #',
+      header: 'INVOICE #',
       cell: (p) => (
         <button
-          className="font-mono text-xs font-semibold text-plum-primary hover:underline cursor-pointer"
+          className="font-mono text-xs font-bold text-plum-primary hover:underline cursor-pointer"
           onClick={(e) => { e.stopPropagation(); navigate(`/invoices/${p.invoiceId}`); }}
         >
           {(p as any).invoice?.number || p.invoiceId.slice(0, 8)}
@@ -48,55 +57,60 @@ export const Payments: React.FC = () => {
       ),
     },
     {
-      header: 'Customer',
+      header: 'CUSTOMER',
       cell: (p) => (
-        <span className="text-xs font-medium text-text-primary">{(p as any).invoice?.customer?.name || '—'}</span>
+        <div className="flex items-center space-x-2.5">
+          <div className="w-7 h-7 rounded-full bg-[#F5E6EE] text-plum-primary font-bold text-[11px] flex items-center justify-center shrink-0 border border-plum-border">
+            {getInitials((p as any).invoice?.customer?.name)}
+          </div>
+          <span className="text-xs font-bold text-text-primary">{(p as any).invoice?.customer?.name || '—'}</span>
+        </div>
       ),
     },
     {
-      header: 'Method',
+      header: 'METHOD',
       cell: (p) => (
-        <span className={`inline-flex px-2 py-0.5 rounded text-[11px] font-semibold border font-mono ${METHOD_COLORS[p.method] || METHOD_COLORS.OTHER}`}>
+        <span className={`inline-flex px-2.5 py-0.5 rounded-lg text-[11px] font-bold border font-mono ${METHOD_COLORS[p.method] || METHOD_COLORS.OTHER}`}>
           {p.method.replace('_', ' ')}
         </span>
       ),
     },
     {
-      header: 'Amount',
-      cell: (p) => <CurrencyDisplay amount={p.amount} size="sm" className="font-semibold text-emerald-600 font-mono" />,
+      header: 'AMOUNT',
+      cell: (p) => <CurrencyDisplay amount={p.amount} size="sm" className="font-bold text-emerald-600 font-mono" />,
     },
     {
-      header: 'Payment Date',
+      header: 'PAYMENT DATE',
       cell: (p) => <span className="text-xs text-text-secondary font-mono">{formatDate(p.paymentDate)}</span>,
     },
     {
-      header: 'Recorded By',
+      header: 'RECORDED BY',
       cell: (p) => (
-        <span className="text-xs text-text-secondary">{p.createdBy?.email || '—'}</span>
+        <span className="text-xs text-text-secondary font-mono">{p.createdBy?.email?.split('@')[0] || '—'}</span>
       ),
     },
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <PageHeader
-        title="Payment History"
-        description="All recorded payments against confirmed invoices"
+        title="Payment Ledger"
+        description="Audit trail of all settled transactions and recorded receipts against confirmed invoices"
       />
 
-      <div className="bg-white p-3 rounded-lg border border-border-main shadow-subtle flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px] max-w-xs">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[240px] max-w-sm">
           <Input
-            placeholder="Search payments..."
+            placeholder="Search payments by invoice or customer..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="pl-9 h-9 text-xs"
+            className="pl-9 h-10 text-xs rounded-xl"
           />
-          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-3" />
         </div>
         <div className="ml-auto flex items-center space-x-1.5 text-xs text-text-secondary font-mono">
-          <CreditCard className="w-4 h-4" />
-          <span>{data?.pagination?.total ?? 0} payments</span>
+          <CreditCard className="w-4 h-4 text-plum-primary" />
+          <span>{data?.pagination?.total ?? 0} payments recorded</span>
         </div>
       </div>
 

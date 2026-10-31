@@ -10,22 +10,22 @@ export interface ButtonProps
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading = false, children, disabled, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-md transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-plum-primary disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none';
+    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum-primary/20 disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none';
 
     const variants = {
-      primary: 'bg-plum-primary text-white border border-[#53364F] hover:bg-plum-deep shadow-xs active:translate-y-[0.5px]',
-      secondary: 'bg-plum-light text-plum-primary border border-plum-muted/20 hover:bg-[#ebdce7] hover:border-plum-muted/40',
-      outline: 'border border-border-main bg-white hover:bg-surface-main hover:border-text-secondary text-text-primary shadow-xs active:bg-surface-subtle',
-      ghost: 'hover:bg-surface-main hover:text-text-primary text-text-secondary',
-      danger: 'bg-rose-600 text-white border border-rose-700 hover:bg-rose-700 shadow-xs active:translate-y-[0.5px]',
+      primary: 'bg-plum-primary text-white hover:bg-plum-hover shadow-sm active:translate-y-[0.5px]',
+      secondary: 'bg-plum-surface text-plum-primary border border-plum-border hover:bg-[#F2E5EE]',
+      outline: 'border border-border-main bg-white hover:bg-surface-hover text-text-primary shadow-sm active:bg-surface-subtle',
+      ghost: 'hover:bg-surface-hover hover:text-text-primary text-text-secondary',
+      danger: 'bg-rose-600 text-white hover:bg-rose-700 shadow-sm active:translate-y-[0.5px]',
       link: 'text-plum-primary underline-offset-4 hover:underline p-0 h-auto font-medium',
     };
 
     const sizes = {
-      sm: 'h-8 px-2.5 text-xs gap-1.5',
-      md: 'h-9 px-3.5 text-xs sm:text-sm gap-2',
+      sm: 'h-8 px-3 text-xs gap-1.5',
+      md: 'h-9 px-4 text-xs sm:text-sm gap-2',
       lg: 'h-10 px-5 text-sm gap-2.5',
-      icon: 'h-8 w-8 p-0',
+      icon: 'h-9 w-9 p-0',
     };
 
     return (

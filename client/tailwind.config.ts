@@ -1,60 +1,62 @@
 import type { Config } from 'tailwindcss';
 
-const config: Config = {
-  content: [
-    './index.html',
-    './src/**/*.{js,ts,jsx,tsx}',
-  ],
+export default {
+  darkMode: ['class'],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
         plum: {
-          primary: '#724B68',
-          deep:    '#53364F',
-          dark:    '#36283B',
-          muted:   '#91768B',
-          light:   '#F5EEF3',
-          surface: '#FAF2F7',
+          primary: '#6A3D5B',    // Primary Brand Plum from reference
+          hover: '#552F48',      // Darker plum on button hover
+          deep: '#3E2134',       // Deep plum for gradients / hero
+          muted: '#8A5F7C',      // Muted plum text / secondary
+          surface: '#F8F0F5',    // Light plum tint for icon boxes & active pills
+          border: '#EAE0E7',     // Soft plum border
         },
         surface: {
-          main:  '#FAF8F7',
-          white: '#FFFFFF',
-          card:  '#FFFFFF',
-          subtle:'#F5F3F4',
+          main: '#FAF7F5',       // Warm porcelain background from reference
+          card: '#FFFFFF',       // Pure white card background
+          subtle: '#F6F3F5',     // Subtle row & table header background
+          hover: '#F8F2F6',      // Hover row / button background
         },
         border: {
-          main:  '#E8E4E7',
-          dark:  '#242424',
-          subtle:'#EFECEE',
+          main: '#EAE4E8',       // Crisp 1px border matching reference
+          light: '#F2EDF0',
+          focus: '#6A3D5B',
         },
         text: {
-          primary:   '#242424',
-          secondary: '#746F75',
-          muted:     '#9E999F',
+          primary: '#1F1A1E',    // Dark charcoal primary text
+          secondary: '#756C73',  // Refined slate secondary text
+          muted: '#9E949B',      // Placeholder / subtle text
         },
         accent: {
-          info: '#D1ECF1',
+          emerald: '#059669',
+          amber: '#D97706',
+          rose: '#DC2626',
+          cyan: '#0891B2',
+          indigo: '#4F46E5',
         },
       },
-      fontFamily: {
-        sans: ['Inter', 'Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+      borderRadius: {
+        '2xl': '16px',
+        '3xl': '24px',
+        xl: '12px',
+        lg: '10px',
+        md: '8px',
+        sm: '6px',
       },
       boxShadow: {
-        'brutal-xs': '1px 1px 0px rgba(36,36,36,0.08)',
-        'brutal-sm': '2px 2px 0px rgba(36,36,36,0.12)',
-        'brutal-plum': '2px 2px 0px #724B68',
-        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        sm: '0 1px 3px rgba(45, 30, 40, 0.04)',
+        card: '0 2px 8px rgba(45, 30, 40, 0.03), 0 1px 3px rgba(45, 30, 40, 0.05)',
+        elevated: '0 10px 25px -5px rgba(45, 30, 40, 0.07), 0 8px 10px -6px rgba(45, 30, 40, 0.05)',
+        subtle: '0 1px 2px rgba(0, 0, 0, 0.03)',
       },
-      borderRadius: {
-        'xs': '4px',
-        'sm': '6px',
-        'md': '8px',
-        'lg': '10px',
+      fontFamily: {
+        sans: ['Inter', 'Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
       },
     },
   },
   plugins: [],
-};
-
-export default config;
+} satisfies Config;

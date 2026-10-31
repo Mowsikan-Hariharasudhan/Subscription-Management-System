@@ -27,26 +27,26 @@ export const Settings: React.FC = () => {
   ].filter((item) => !item.adminOnly || role === 'ADMIN');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <PageHeader
         title="Settings"
         description="Configure system-wide settings, tax rules, and team management"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {settingsItems.map((item) => (
           <Card
             key={item.href}
-            className="cursor-pointer hover:border-plum-primary transition-colors brutal-card-interactive"
+            className="cursor-pointer hover:border-plum-primary transition-all reference-card-interactive"
             onClick={() => navigate(item.href)}
           >
-            <CardContent className="p-4 flex items-center space-x-3.5">
-              <div className="w-10 h-10 rounded-md bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center shrink-0">
+            <CardContent className="p-5 flex items-center space-x-4">
+              <div className="w-10 h-10 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center shrink-0">
                 {item.icon}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-xs text-text-primary">{item.title}</p>
-                <p className="text-[11px] text-text-secondary mt-0.5">{item.description}</p>
+                <p className="font-bold text-sm text-text-primary">{item.title}</p>
+                <p className="text-xs text-text-secondary mt-0.5">{item.description}</p>
               </div>
               <ChevronRight className="w-4 h-4 text-text-secondary shrink-0" />
             </CardContent>
@@ -55,27 +55,27 @@ export const Settings: React.FC = () => {
       </div>
 
       <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-2.5 mb-3">
+        <CardContent className="p-5">
+          <div className="flex items-center space-x-2.5 mb-4">
             <Shield className="w-4 h-4 text-plum-primary" />
-            <h3 className="font-semibold text-xs text-text-primary uppercase tracking-wider">System Information</h3>
+            <h3 className="font-bold text-xs text-text-primary uppercase tracking-wider">System Information</h3>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-            <div className="p-2.5 bg-surface-subtle rounded-md border border-border-main">
-              <p className="text-text-secondary text-[10px] uppercase font-semibold mb-0.5">Application</p>
-              <p className="font-mono font-semibold text-text-primary">Brightloop v1.0</p>
+            <div className="p-3 bg-surface-main rounded-xl border border-border-main">
+              <p className="text-text-secondary text-[10px] uppercase font-bold mb-1">Application</p>
+              <p className="font-mono font-bold text-text-primary">Brightloop v1.0</p>
             </div>
-            <div className="p-2.5 bg-surface-subtle rounded-md border border-border-main">
-              <p className="text-text-secondary text-[10px] uppercase font-semibold mb-0.5">Database</p>
-              <p className="font-mono font-semibold text-text-primary">SQLite (Prisma 7)</p>
+            <div className="p-3 bg-surface-main rounded-xl border border-border-main">
+              <p className="text-text-secondary text-[10px] uppercase font-bold mb-1">Database</p>
+              <p className="font-mono font-bold text-text-primary">SQLite (Prisma 7)</p>
             </div>
-            <div className="p-2.5 bg-surface-subtle rounded-md border border-border-main">
-              <p className="text-text-secondary text-[10px] uppercase font-semibold mb-0.5">Currency</p>
-              <p className="font-mono font-semibold text-text-primary">INR (₹)</p>
+            <div className="p-3 bg-surface-main rounded-xl border border-border-main">
+              <p className="text-text-secondary text-[10px] uppercase font-bold mb-1">Currency</p>
+              <p className="font-mono font-bold text-text-primary">INR (₹)</p>
             </div>
-            <div className="p-2.5 bg-surface-subtle rounded-md border border-border-main">
-              <p className="text-text-secondary text-[10px] uppercase font-semibold mb-0.5">Billing Engine</p>
-              <p className="font-mono font-semibold text-text-primary">node-cron (Daily 00:01)</p>
+            <div className="p-3 bg-surface-main rounded-xl border border-border-main">
+              <p className="text-text-secondary text-[10px] uppercase font-bold mb-1">Billing Engine</p>
+              <p className="font-mono font-bold text-text-primary">node-cron (Daily 00:01)</p>
             </div>
           </div>
         </CardContent>

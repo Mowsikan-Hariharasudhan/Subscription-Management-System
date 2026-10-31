@@ -90,68 +90,80 @@ export const Quotations: React.FC = () => {
     createMutation.mutate(formData);
   };
 
+  const getInitials = (name?: string) => {
+    if (!name) return 'CU';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+  };
+
   const columns: Column<Quotation>[] = [
     {
-      header: 'Quotation #',
+      header: 'QUOTATION #',
       cell: (q) => (
-        <span className="font-mono text-xs font-semibold text-plum-primary hover:underline">
+        <span className="font-mono text-xs font-bold text-plum-primary hover:underline">
           {q.number}
         </span>
       ),
     },
     {
-      header: 'Customer',
+      header: 'CUSTOMER',
       cell: (q) => (
-        <div>
-          <span className="font-semibold text-xs text-text-primary block">{q.customer?.name}</span>
-          {q.customer?.companyName && (
-            <span className="text-[11px] text-text-secondary">{q.customer.companyName}</span>
-          )}
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-full bg-[#F5E6EE] text-plum-primary font-bold text-xs flex items-center justify-center shrink-0 border border-plum-border">
+            {getInitials(q.customer?.name)}
+          </div>
+          <div>
+            <span className="font-bold text-xs text-text-primary block">{q.customer?.name}</span>
+            {q.customer?.companyName && (
+              <span className="text-[11px] text-text-secondary">{q.customer.companyName}</span>
+            )}
+          </div>
         </div>
       ),
     },
     {
-      header: 'Subscription Plan',
+      header: 'SUBSCRIPTION PLAN',
       cell: (q) => (
-        <span className="text-xs text-text-secondary">{q.plan?.name || 'Manual'}</span>
+        <span className="text-xs text-text-secondary font-medium">{q.plan?.name || 'Manual'}</span>
       ),
     },
     {
-      header: 'Status',
+      header: 'STATUS',
       cell: (q) => <StatusBadge status={q.status} />,
     },
     {
-      header: 'Total Amount',
+      header: 'TOTAL AMOUNT',
       cell: (q) => <CurrencyDisplay amount={q.total} size="sm" className="font-bold text-text-primary font-mono" />,
     },
     {
-      header: 'Date',
+      header: 'DATE',
       cell: (q) => <span className="text-xs text-text-secondary font-mono">{formatDate(q.createdAt)}</span>,
     },
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <PageHeader
         title="Quotations"
         description="Draft and manage client pricing proposals and convert accepted quotes to active subscriptions"
         actions={
           <div className="flex items-center space-x-2">
             <Link to="/quotations/templates">
-              <Button variant="outline" size="sm">
-                <LayoutTemplate className="w-3.5 h-3.5 mr-1.5" /> Templates
+              <Button variant="outline" size="md">
+                <LayoutTemplate className="w-4 h-4 mr-1.5" /> Templates
               </Button>
             </Link>
-            <Button onClick={() => setIsCreateOpen(true)} size="sm">
-              <Plus className="w-3.5 h-3.5 mr-1.5" /> New Quotation
+            <Button onClick={() => setIsCreateOpen(true)} size="md">
+              <Plus className="w-4 h-4 mr-1.5" /> New Quotation
             </Button>
           </div>
         }
       />
 
-      {/* Filter Bar */}
-      <div className="bg-white p-3 rounded-lg border border-border-main shadow-subtle flex flex-wrap items-center justify-between gap-3">
-        <div className="relative w-full max-w-xs">
+      {/* Filter Bar matching reference */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="relative flex-1 min-w-[240px] max-w-sm">
           <Input
             placeholder="Search quotation # or customer..."
             value={search}
@@ -159,13 +171,13 @@ export const Quotations: React.FC = () => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="pl-9 h-9 text-xs"
+            className="pl-9 h-10 text-xs rounded-xl"
           />
-          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-3" />
         </div>
 
         {/* Status filter pills */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto text-xs">
+        <div className="flex items-center space-x-1.5 overflow-x-auto text-xs p-1 bg-white border border-border-main rounded-xl shadow-sm">
           {['', 'DRAFT', 'SENT', 'ACCEPTED', 'EXPIRED', 'DECLINED'].map((st) => (
             <button
               key={st}
@@ -173,10 +185,10 @@ export const Quotations: React.FC = () => {
                 setStatusFilter(st);
                 setPage(1);
               }}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors border cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 statusFilter === st
-                  ? 'bg-plum-primary text-white border-plum-primary font-semibold'
-                  : 'bg-surface-subtle text-text-secondary border-border-main hover:bg-white'
+                  ? 'bg-plum-primary text-white shadow-xs font-semibold'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover'
               }`}
             >
               {st || 'All Statuses'}
@@ -212,8 +224,8 @@ export const Quotations: React.FC = () => {
         description="Select a customer, plan, and initial product"
         maxWidth="lg"
       >
-        <form onSubmit={handleCreateSubmit} className="space-y-3.5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <form onSubmit={handleCreateSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
               <Label htmlFor="q-customer" required>
                 Target Customer
@@ -223,7 +235,7 @@ export const Quotations: React.FC = () => {
                 value={formData.customerId}
                 onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
                 required
-                className="flex h-9 w-full rounded-md border border-border-main bg-white px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-plum-primary focus:ring-1 focus:ring-plum-primary"
+                className="flex h-10 w-full rounded-xl border border-border-main bg-white px-3.5 py-2 text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20 shadow-sm cursor-pointer"
               >
                 <option value="">Select customer...</option>
                 {(customers?.data || []).map((c: any) => (
@@ -240,7 +252,7 @@ export const Quotations: React.FC = () => {
                 id="q-plan"
                 value={formData.planId}
                 onChange={(e) => setFormData({ ...formData, planId: e.target.value })}
-                className="flex h-9 w-full rounded-md border border-border-main bg-white px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-plum-primary focus:ring-1 focus:ring-plum-primary"
+                className="flex h-10 w-full rounded-xl border border-border-main bg-white px-3.5 py-2 text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20 shadow-sm cursor-pointer"
               >
                 <option value="">Select plan cadence...</option>
                 {(plans || []).map((p: any) => (
@@ -252,8 +264,8 @@ export const Quotations: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-3 bg-surface-subtle rounded-md border border-border-main space-y-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-secondary block">
+          <div className="p-4 bg-surface-main rounded-2xl border border-border-main space-y-3.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-text-secondary block">
               Primary Line Item
             </span>
 
@@ -273,7 +285,7 @@ export const Quotations: React.FC = () => {
                   });
                 }}
                 required
-                className="flex h-9 w-full rounded-md border border-border-main bg-white px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-plum-primary focus:ring-1 focus:ring-plum-primary"
+                className="flex h-10 w-full rounded-xl border border-border-main bg-white px-3.5 py-2 text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20 shadow-sm cursor-pointer"
               >
                 <option value="">Select product...</option>
                 {(products?.data || []).map((p: any) => (
@@ -296,6 +308,7 @@ export const Quotations: React.FC = () => {
                   value={formData.quantity}
                   onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value, 10) || 1 })}
                   required
+                  className="rounded-xl"
                 />
               </div>
 
@@ -310,6 +323,7 @@ export const Quotations: React.FC = () => {
                   value={formData.unitPriceRupees}
                   onChange={(e) => setFormData({ ...formData, unitPriceRupees: e.target.value })}
                   required
+                  className="rounded-xl font-mono"
                 />
               </div>
 
@@ -319,7 +333,7 @@ export const Quotations: React.FC = () => {
                   id="q-tax"
                   value={formData.taxRuleId}
                   onChange={(e) => setFormData({ ...formData, taxRuleId: e.target.value })}
-                  className="flex h-9 w-full rounded-md border border-border-main bg-white px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-plum-primary focus:ring-1 focus:ring-plum-primary"
+                  className="flex h-10 w-full rounded-xl border border-border-main bg-white px-3.5 py-2 text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20 shadow-sm cursor-pointer"
                 >
                   <option value="">No tax (0%)</option>
                   {(taxes || []).map((t: any) => (
@@ -338,6 +352,7 @@ export const Quotations: React.FC = () => {
               id="q-terms"
               value={formData.paymentTerms}
               onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
+              className="rounded-xl"
             />
           </div>
 

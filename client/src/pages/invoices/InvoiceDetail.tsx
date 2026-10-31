@@ -85,52 +85,52 @@ export const InvoiceDetail: React.FC = () => {
   const canRecordPayment = inv.status === 'CONFIRMED' && inv.outstanding > 0;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center space-x-2.5">
-        <button onClick={() => navigate('/invoices')} className="p-1.5 rounded-md hover:bg-surface-subtle transition-colors cursor-pointer border border-border-main bg-white">
+    <div className="space-y-5">
+      <div className="flex items-center space-x-3">
+        <button onClick={() => navigate('/invoices')} className="p-2 rounded-xl hover:bg-surface-hover transition-colors cursor-pointer border border-border-main bg-white shadow-sm">
           <ArrowLeft className="w-4 h-4 text-text-secondary" />
         </button>
         <PageHeader title={`Invoice ${inv.number}`} description={`${inv.customer?.name} · Period: ${formatDate(inv.periodStart)} – ${formatDate(inv.periodEnd)}`} />
       </div>
 
-      {/* Action bar */}
-      <div className="bg-white border border-border-main rounded-lg shadow-subtle p-3 flex flex-wrap items-center justify-between gap-3">
+      {/* Action bar matching reference banner */}
+      <div className="bg-white border border-border-main rounded-2xl shadow-card p-5 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
           <StatusBadge status={inv.status} size="lg" />
           {inv.status === 'CONFIRMED' && inv.outstanding > 0 && new Date(inv.dueDate) < new Date() && (
-            <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 font-mono">
+            <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 font-mono">
               ⚠️ OVERDUE
             </span>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2.5">
           {canConfirm && (
-            <Button size="sm" onClick={() => confirmMutation.mutate()} isLoading={confirmMutation.isPending}>
-              <CheckCircle className="w-3.5 h-3.5 mr-1.5" /> Confirm Invoice
+            <Button size="md" onClick={() => confirmMutation.mutate()} isLoading={confirmMutation.isPending}>
+              <CheckCircle className="w-4 h-4 mr-1.5" /> Confirm Invoice
             </Button>
           )}
           {canRecordPayment && (
-            <Button size="sm" variant="outline" onClick={() => setPaymentOpen(true)}>
-              <CreditCard className="w-3.5 h-3.5 mr-1.5" /> Record Payment
+            <Button size="md" variant="outline" onClick={() => setPaymentOpen(true)}>
+              <CreditCard className="w-4 h-4 mr-1.5" /> Record Payment
             </Button>
           )}
           {canCancel && (role === 'ADMIN' || role === 'STAFF') && (
-            <Button size="sm" variant="danger" onClick={() => setConfirmCancel(true)}>
-              <XCircle className="w-3.5 h-3.5 mr-1.5" /> Cancel
+            <Button size="md" variant="danger" onClick={() => setConfirmCancel(true)}>
+              <XCircle className="w-4 h-4 mr-1.5" /> Cancel
             </Button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Invoice Details */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-5">
           <Card>
-            <CardHeader className="py-3 px-4 border-b border-border-main">
-              <CardTitle className="text-sm font-semibold">Invoice Details</CardTitle>
+            <CardHeader className="py-4 px-6 border-b border-border-main">
+              <CardTitle className="text-sm font-bold text-text-primary">Invoice Details</CardTitle>
             </CardHeader>
-            <CardContent className="p-4">
-              <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-xs mb-1">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3.5 text-xs">
                 <InfoRow label="Invoice #" value={inv.number} isMono />
                 <InfoRow label="Issue Date" value={formatDate(inv.issueDate)} isMono />
                 <InfoRow label="Due Date" value={formatDate(inv.dueDate)} isMono />
@@ -143,32 +143,32 @@ export const InvoiceDetail: React.FC = () => {
 
           {/* Line Items */}
           <Card>
-            <CardHeader className="py-3 px-4 border-b border-border-main">
-              <CardTitle className="text-sm font-semibold">Line Items</CardTitle>
+            <CardHeader className="py-4 px-6 border-b border-border-main">
+              <CardTitle className="text-sm font-bold text-text-primary">Line Items</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-border-main bg-surface-subtle">
-                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Product</th>
-                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Qty</th>
-                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Unit Price</th>
-                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Tax</th>
-                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Total</th>
+                  <tr className="border-b border-border-main bg-[#FAF7F9]">
+                    <th className="text-left px-5 py-3 text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Product</th>
+                    <th className="text-right px-5 py-3 text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Qty</th>
+                    <th className="text-right px-5 py-3 text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Unit Price</th>
+                    <th className="text-right px-5 py-3 text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Tax</th>
+                    <th className="text-right px-5 py-3 text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Total</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-main">
+                <tbody className="divide-y divide-border-main/70">
                   {inv.lines?.map((line) => (
-                    <tr key={line.id} className="hover:bg-surface-subtle/50 transition-colors">
-                      <td className="px-4 py-2.5">
-                        <p className="font-medium text-text-primary">{line.product?.name}</p>
+                    <tr key={line.id} className="hover:bg-surface-hover/60 transition-colors">
+                      <td className="px-5 py-3.5">
+                        <p className="font-bold text-text-primary text-xs">{line.product?.name}</p>
                         {line.variant && <p className="text-[11px] text-text-secondary">{line.variant.name}</p>}
                         {line.description && <p className="text-[11px] text-text-secondary">{line.description}</p>}
                       </td>
-                      <td className="px-4 py-2.5 text-right font-mono">{line.quantity}</td>
-                      <td className="px-4 py-2.5 text-right"><CurrencyDisplay amount={line.unitPrice + line.variantPrice} size="sm" /></td>
-                      <td className="px-4 py-2.5 text-right text-text-secondary"><CurrencyDisplay amount={line.taxAmount} size="sm" /></td>
-                      <td className="px-4 py-2.5 text-right font-semibold"><CurrencyDisplay amount={line.lineTotal} size="sm" /></td>
+                      <td className="px-5 py-3.5 text-right font-mono">{line.quantity}</td>
+                      <td className="px-5 py-3.5 text-right font-mono"><CurrencyDisplay amount={line.unitPrice + line.variantPrice} size="sm" /></td>
+                      <td className="px-5 py-3.5 text-right text-text-secondary font-mono"><CurrencyDisplay amount={line.taxAmount} size="sm" /></td>
+                      <td className="px-5 py-3.5 text-right font-bold font-mono"><CurrencyDisplay amount={line.lineTotal} size="sm" /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -178,61 +178,61 @@ export const InvoiceDetail: React.FC = () => {
         </div>
 
         {/* Totals + Payments */}
-        <div className="space-y-4">
+        <div className="space-y-5">
           <Card>
-            <CardHeader className="py-3 px-4 border-b border-border-main">
-              <CardTitle className="text-sm font-semibold">Amount Summary</CardTitle>
+            <CardHeader className="py-4 px-6 border-b border-border-main">
+              <CardTitle className="text-sm font-bold text-text-primary">Amount Summary</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 p-4 text-xs">
+            <CardContent className="p-6 space-y-2.5 text-xs">
               <div className="flex justify-between py-1">
                 <span className="text-text-secondary">Subtotal</span>
-                <CurrencyDisplay amount={inv.subtotal} size="sm" />
+                <CurrencyDisplay amount={inv.subtotal} size="sm" className="font-mono" />
               </div>
               {inv.discountAmt > 0 && (
-                <div className="flex justify-between py-1 text-emerald-600">
+                <div className="flex justify-between py-1 text-emerald-600 font-medium">
                   <span>Discount</span>
-                  <span>- <CurrencyDisplay amount={inv.discountAmt} size="sm" className="inline" /></span>
+                  <span>- <CurrencyDisplay amount={inv.discountAmt} size="sm" className="inline font-mono" /></span>
                 </div>
               )}
               <div className="flex justify-between py-1">
                 <span className="text-text-secondary">Tax</span>
-                <CurrencyDisplay amount={inv.taxAmount} size="sm" />
+                <CurrencyDisplay amount={inv.taxAmount} size="sm" className="font-mono" />
               </div>
-              <div className="flex justify-between py-2 border-t border-border-main font-bold text-sm">
-                <span>Total</span>
-                <CurrencyDisplay amount={inv.total} size="md" className="font-bold" />
+              <div className="flex justify-between py-2.5 border-t border-border-main font-bold text-sm">
+                <span className="text-text-primary">Total</span>
+                <CurrencyDisplay amount={inv.total} size="md" className="font-bold font-mono text-text-primary" />
               </div>
-              <div className="flex justify-between py-1 text-emerald-600">
+              <div className="flex justify-between py-1 text-emerald-600 font-medium">
                 <span>Amount Paid</span>
-                <CurrencyDisplay amount={inv.amountPaid} size="sm" />
+                <CurrencyDisplay amount={inv.amountPaid} size="sm" className="font-mono" />
               </div>
-              <div className={`flex justify-between py-2 border-t border-border-main font-semibold ${inv.outstanding > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+              <div className={`flex justify-between py-2 border-t border-border-main font-bold ${inv.outstanding > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 <span>Outstanding</span>
-                <CurrencyDisplay amount={inv.outstanding} size="sm" className="font-semibold" />
+                <CurrencyDisplay amount={inv.outstanding} size="sm" className="font-bold font-mono" />
               </div>
             </CardContent>
           </Card>
 
           {/* Payment history */}
           <Card>
-            <CardHeader className="py-3 px-4 border-b border-border-main">
-              <CardTitle className="text-sm font-semibold">Payments ({inv.payments?.length ?? 0})</CardTitle>
+            <CardHeader className="py-4 px-6 border-b border-border-main">
+              <CardTitle className="text-sm font-bold text-text-primary">Payments ({inv.payments?.length ?? 0})</CardTitle>
             </CardHeader>
-            <CardContent className="p-4">
+            <CardContent className="p-6">
               {inv.payments && inv.payments.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {inv.payments.map((p) => (
-                    <div key={p.id} className="flex justify-between items-center py-1.5 border-b border-border-main last:border-0">
+                    <div key={p.id} className="flex justify-between items-center py-2 border-b border-border-main/70 last:border-0">
                       <div>
-                        <p className="text-xs font-semibold text-text-primary">{p.method}</p>
+                        <p className="text-xs font-bold text-text-primary">{p.method}</p>
                         <p className="text-[11px] text-text-secondary font-mono">{formatDate(p.paymentDate)}</p>
                       </div>
-                      <CurrencyDisplay amount={p.amount} size="sm" className="font-semibold text-emerald-600" />
+                      <CurrencyDisplay amount={p.amount} size="sm" className="font-bold text-emerald-600 font-mono" />
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-text-secondary text-center py-2 font-mono">No payments recorded</p>
+                <p className="text-xs text-text-secondary text-center py-3 font-mono">No payments recorded</p>
               )}
             </CardContent>
           </Card>
@@ -241,7 +241,7 @@ export const InvoiceDetail: React.FC = () => {
 
       {/* Record Payment Dialog */}
       <Dialog isOpen={paymentOpen} onClose={() => setPaymentOpen(false)} title="Record Payment" description={`Outstanding: ₹${(inv.outstanding / 100).toFixed(2)}`}>
-        <form onSubmit={handleRecordPayment} className="space-y-3.5">
+        <form onSubmit={handleRecordPayment} className="space-y-4">
           <div>
             <Label htmlFor="pay-amount" required>Amount (₹)</Label>
             <Input
@@ -254,6 +254,7 @@ export const InvoiceDetail: React.FC = () => {
               value={paymentForm.amount}
               onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
               required
+              className="rounded-xl font-mono"
             />
           </div>
           <div>
@@ -262,7 +263,7 @@ export const InvoiceDetail: React.FC = () => {
               id="pay-method"
               value={paymentForm.method}
               onChange={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })}
-              className="flex h-9 w-full rounded-md border border-border-main bg-white px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-plum-primary focus:ring-1 focus:ring-plum-primary"
+              className="flex h-10 w-full rounded-xl border border-border-main bg-white px-3.5 py-2 text-xs font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20 shadow-sm cursor-pointer"
             >
               {PAYMENT_METHODS.map((m) => <option key={m} value={m}>{m.replace('_', ' ')}</option>)}
             </select>
@@ -275,6 +276,7 @@ export const InvoiceDetail: React.FC = () => {
               value={paymentForm.paymentDate}
               onChange={(e) => setPaymentForm({ ...paymentForm, paymentDate: e.target.value })}
               required
+              className="rounded-xl font-mono"
             />
           </div>
           <div>
@@ -284,6 +286,7 @@ export const InvoiceDetail: React.FC = () => {
               placeholder="Reference number, remarks..."
               value={paymentForm.notes}
               onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
+              className="rounded-xl"
             />
           </div>
           <div className="flex justify-end space-x-2 pt-3 border-t border-border-main">
@@ -309,8 +312,8 @@ export const InvoiceDetail: React.FC = () => {
 };
 
 const InfoRow: React.FC<{ label: string; value?: string | null; isMono?: boolean }> = ({ label, value, isMono }) => (
-  <div className="flex justify-between py-1">
+  <div className="flex justify-between py-1.5 border-b border-border-main/50 last:border-0">
     <span className="text-text-secondary">{label}</span>
-    <span className={`font-medium text-text-primary ${isMono ? 'font-mono' : ''}`}>{value || '—'}</span>
+    <span className={`font-bold text-text-primary ${isMono ? 'font-mono' : ''}`}>{value || '—'}</span>
   </div>
 );
