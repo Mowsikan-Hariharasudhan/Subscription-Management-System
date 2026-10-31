@@ -1,6 +1,5 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '../ui/button';
 
 interface PaginationProps {
   page: number;
@@ -21,39 +20,36 @@ export const Pagination: React.FC<PaginationProps> = ({
   const end = Math.min(page * limit, total);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 py-4">
-      <div className="text-xs text-text-secondary">
-        Showing <span className="font-semibold text-text-primary">{start}</span> to{' '}
-        <span className="font-semibold text-text-primary">{end}</span> of{' '}
-        <span className="font-semibold text-text-primary">{total}</span> entries
+    <div className="border-t-[1.5px] border-black bg-[#f8f6f8] px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="text-[0.8125rem] font-medium text-gray-500">
+        Showing <span className="font-bold text-odoo-dark">{start}</span> to{' '}
+        <span className="font-bold text-odoo-dark">{end}</span> of{' '}
+        <span className="font-bold text-odoo-dark">{total}</span> entries
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
+          className="px-4 py-2 bg-white border-[1.5px] border-black text-odoo-dark font-bold text-[0.8125rem] rounded-lg transition-all hover:bg-gray-50 hover:shadow-[0_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none cursor-pointer flex items-center"
         >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Previous
-        </Button>
+          <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+        </button>
 
-        <span className="text-xs font-medium px-2 text-text-primary">
+        <div className="text-[0.8125rem] font-bold text-odoo-dark px-2">
           Page {page} of {Math.max(1, totalPages)}
-        </span>
+        </div>
 
-        <Button
-          variant="outline"
-          size="sm"
+        <button
+          type="button"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
+          className="px-4 py-2 bg-white border-[1.5px] border-black text-odoo-dark font-bold text-[0.8125rem] rounded-lg transition-all hover:bg-gray-50 hover:shadow-[0_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none cursor-pointer flex items-center"
         >
-          Next
-          <ChevronRight className="w-4 h-4 ml-1" />
-        </Button>
+          Next <ChevronRight className="w-4 h-4 ml-1" />
+        </button>
       </div>
     </div>
   );
 };
-

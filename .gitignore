@@ -10,8 +10,10 @@ yarn-error.log*
 server/prisma/*.db*
 server/prisma/dev.db
 server/prisma/dev.db-journal
-server/prisma/dev.db-shm
-server/prisma/dev.db-wal
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
 server/dist/
 client/dist/
 client/.vite/
