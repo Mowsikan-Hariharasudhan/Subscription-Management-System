@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 @layer base {
-  /* Global 90% Scale */
+  /* Clean Natural Scale */
   html {
-    font-size: 90%;
+    font-size: 100%;
   }
 
   body {

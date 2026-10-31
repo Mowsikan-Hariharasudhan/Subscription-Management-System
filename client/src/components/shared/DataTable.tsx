@@ -38,9 +38,9 @@ export function DataTable<T extends { id?: string | number }>({
   }
 
   return (
-    <div className={cn('glass-panel rounded-xl overflow-hidden anim-slide-up flex flex-col flex-1', className)}>
+    <div className={cn('glass-panel rounded-xl overflow-hidden anim-slide-up flex flex-col flex-1 shadow-sm', className)}>
       <div className="overflow-x-auto flex-1">
-        <table className="w-full text-left border-separate border-spacing-0 min-w-[900px]">
+        <table className="w-full text-left border-separate border-spacing-0 min-w-[950px]">
           <thead className="bg-odoo text-white">
             <tr>
               {columns.map((col, idx) => (
@@ -48,7 +48,7 @@ export function DataTable<T extends { id?: string | number }>({
                   key={idx}
                   scope="col"
                   className={cn(
-                    'px-6 py-4 text-[0.6875rem] font-bold text-white uppercase tracking-widest border-b-[1.5px] border-black',
+                    'px-8 py-4.5 text-[0.75rem] font-bold text-white uppercase tracking-widest border-b-[1.5px] border-black',
                     idx === 0 && 'rounded-tl-[10px]',
                     idx === columns.length - 1 && 'rounded-tr-[10px]',
                     col.className
@@ -65,7 +65,7 @@ export function DataTable<T extends { id?: string | number }>({
                 key={item.id ? String(item.id) : rowIdx}
                 onClick={() => onRowClick && onRowClick(item)}
                 className={cn(
-                  'table-row bg-white group',
+                  'table-row bg-white group transition-colors duration-150',
                   onRowClick && 'cursor-pointer'
                 )}
               >
@@ -73,7 +73,7 @@ export function DataTable<T extends { id?: string | number }>({
                   <td
                     key={colIdx}
                     className={cn(
-                      'px-6 py-4.5 border-b-[1.5px] border-black group-last:border-b-0',
+                      'px-8 py-5 border-b-[1.5px] border-black/15 group-last:border-b-0',
                       colIdx === 0 && 'group-last:rounded-bl-[10px]',
                       colIdx === columns.length - 1 && 'group-last:rounded-br-[10px]',
                       col.className

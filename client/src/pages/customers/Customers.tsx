@@ -58,16 +58,16 @@ export const Customers: React.FC = () => {
       header: 'Customer',
       className: 'w-[28%]',
       cell: (c) => (
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-odoo to-odoo-dark text-white border-[1.5px] border-black font-bold flex items-center justify-center text-[0.8125rem] shadow-[2px_2px_0_#000] shrink-0">
+        <div className="flex items-center gap-4 py-1">
+          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-odoo to-odoo-dark text-white border-[1.5px] border-black font-bold flex items-center justify-center text-[0.875rem] shadow-[2px_2px_0_#000] shrink-0">
             {getInitials(c.companyName || c.name)}
           </div>
           <div className="min-w-0">
-            <div className="text-[0.875rem] font-bold text-odoo-dark group-hover:text-odoo transition-colors truncate">
+            <div className="text-[0.9375rem] font-bold text-odoo-dark group-hover:text-odoo transition-colors truncate">
               {c.name}
             </div>
             {c.companyName && (
-              <div className="text-[0.75rem] text-gray-500 font-medium flex items-center gap-1.5 mt-0.5 truncate">
+              <div className="text-[0.8125rem] text-gray-500 font-medium flex items-center gap-1.5 mt-0.5 truncate">
                 <Building2 className="w-3.5 h-3.5 opacity-60 shrink-0" />
                 <span className="truncate">{c.companyName}</span>
               </div>
@@ -80,7 +80,7 @@ export const Customers: React.FC = () => {
       header: 'Contact Details',
       className: 'w-[28%]',
       cell: (c) => (
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {c.user?.email && (
             <div className="text-[0.8125rem] text-gray-700 font-medium flex items-center gap-2 truncate">
               <Mail className="w-3.5 h-3.5 text-odoo opacity-60 shrink-0" />
@@ -101,7 +101,7 @@ export const Customers: React.FC = () => {
       className: 'text-center',
       cell: (c) => (
         <div className="flex flex-col items-center justify-center">
-          <span className="text-[1.125rem] font-bold font-mono text-odoo-dark leading-none">
+          <span className="text-[1.25rem] font-bold font-sans text-odoo-dark leading-none">
             {c._count?.subscriptions || 0}
           </span>
           <span className="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest mt-1">
@@ -115,7 +115,7 @@ export const Customers: React.FC = () => {
       className: 'text-center',
       cell: (c) => (
         <div className="flex flex-col items-center justify-center">
-          <span className="text-[1.125rem] font-bold font-mono text-odoo-dark leading-none">
+          <span className="text-[1.25rem] font-bold font-sans text-odoo-dark leading-none">
             {c._count?.invoices || 0}
           </span>
           <span className="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest mt-1">
@@ -131,7 +131,7 @@ export const Customers: React.FC = () => {
         <div className="text-center">
           <span
             className={cn(
-              'inline-flex items-center px-3 py-1 rounded border-[1.5px] border-black text-[0.6875rem] font-bold uppercase tracking-widest shadow-xs',
+              'inline-flex items-center px-3.5 py-1 rounded-full border-[1.5px] border-black text-[0.6875rem] font-bold uppercase tracking-wider',
               c.isActive ? 'bg-[#d1fae5] text-[#047857]' : 'bg-[#fee2e2] text-[#b91c1c]'
             )}
           >

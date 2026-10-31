@@ -58,14 +58,16 @@ export const Products: React.FC = () => {
       header: 'Product Name',
       className: 'w-[32%]',
       cell: (p) => (
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-odoo/10 text-odoo font-bold flex items-center justify-center text-[0.75rem] border border-odoo/20 group-hover:bg-odoo group-hover:text-white transition-colors shrink-0">
-            <Package className="w-4 h-4" />
+        <div className="flex items-center gap-4 py-1">
+          <div className="w-11 h-11 rounded-xl bg-odoo/10 text-odoo font-bold flex items-center justify-center text-[0.875rem] border border-odoo/20 group-hover:bg-odoo group-hover:text-white transition-all shadow-xs shrink-0">
+            <Package className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-[0.875rem] font-bold text-odoo-dark truncate">{p.name}</div>
+            <div className="text-[0.9375rem] font-bold text-odoo-dark group-hover:text-odoo transition-colors truncate">
+              {p.name}
+            </div>
             {p.notes && (
-              <div className="text-[0.75rem] text-gray-500 font-medium truncate mt-0.5 max-w-xs">
+              <div className="text-[0.8125rem] text-gray-500 font-medium truncate mt-1 max-w-sm leading-normal">
                 {p.notes}
               </div>
             )}
@@ -75,10 +77,17 @@ export const Products: React.FC = () => {
     },
     {
       header: 'Type',
-      className: 'text-center',
+      className: 'w-[13%] text-center',
       cell: (p) => (
         <div className="text-center">
-          <span className="inline-flex items-center px-2.5 py-1 rounded bg-odoo/10 border border-odoo/20 text-[0.75rem] font-bold text-odoo-dark font-mono uppercase">
+          <span
+            className={cn(
+              'inline-flex items-center px-3 py-1 rounded-full text-[0.6875rem] font-bold uppercase tracking-wider border',
+              p.type === 'SOFTWARE'
+                ? 'bg-purple-50 text-purple-700 border-purple-200'
+                : 'bg-blue-50 text-blue-700 border-blue-200'
+            )}
+          >
             {p.type}
           </span>
         </div>
@@ -86,29 +95,29 @@ export const Products: React.FC = () => {
     },
     {
       header: 'Sales Price',
-      className: 'font-mono',
+      className: 'w-[15%] text-right pr-6',
       cell: (p) => (
-        <div className="font-mono font-bold text-[0.875rem] text-odoo-dark">
-          <CurrencyDisplay amount={p.salesPrice} size="sm" />
+        <div className="text-right pr-6">
+          <CurrencyDisplay amount={p.salesPrice} size="sm" className="text-[0.9375rem] font-bold text-odoo-dark" />
         </div>
       ),
     },
     {
       header: 'Cost Price',
-      className: 'font-mono',
+      className: 'w-[14%] text-right pr-6',
       cell: (p) => (
-        <div className="font-mono text-[0.8125rem] text-gray-500">
-          <CurrencyDisplay amount={p.costPrice} size="sm" />
+        <div className="text-right pr-6">
+          <CurrencyDisplay amount={p.costPrice} size="sm" className="text-[0.875rem] font-medium text-gray-500" />
         </div>
       ),
     },
     {
       header: 'Variants',
-      className: 'text-center',
+      className: 'w-[13%] text-center',
       cell: (p) => (
         <div className="text-center">
-          <span className="inline-flex items-center justify-center px-2.5 py-1 rounded bg-gray-100 border border-gray-200 text-[0.75rem] font-bold text-gray-600 font-mono gap-1">
-            <Layers className="w-3.5 h-3.5 opacity-60" />
+          <span className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 border border-gray-200 text-[0.75rem] font-semibold text-gray-600">
+            <Layers className="w-3.5 h-3.5 text-gray-400" />
             <span>{p.variants?.length || 0} tier(s)</span>
           </span>
         </div>
@@ -116,12 +125,12 @@ export const Products: React.FC = () => {
     },
     {
       header: 'Status',
-      className: 'text-center',
+      className: 'w-[13%] text-center',
       cell: (p) => (
         <div className="text-center">
           <span
             className={cn(
-              'inline-flex items-center px-2.5 py-1 rounded border-[1.5px] border-black text-[0.625rem] font-bold uppercase tracking-widest shadow-[2px_2px_0_#000]',
+              'inline-flex items-center px-3.5 py-1 rounded-full border-[1.5px] border-black text-[0.6875rem] font-bold uppercase tracking-wider',
               p.isActive ? 'bg-[#d1fae5] text-[#047857]' : 'bg-[#fee2e2] text-[#b91c1c]'
             )}
           >
