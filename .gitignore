@@ -9,7 +9,10 @@ yarn-debug.log*
 yarn-error.log*
 server/prisma/dev.db
 server/prisma/dev.db-journal
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
 server/dist/
 client/dist/
 .DS_Store
-
