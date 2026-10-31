@@ -33,27 +33,28 @@ export const Dialog: React.FC<DialogProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-plum-deep/40 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
       {/* Modal Dialog Content */}
       <div
         className={cn(
-          'relative w-full bg-white rounded-xl shadow-2xl border border-border-main p-6 z-10 max-h-[90vh] flex flex-col',
+          'relative w-full bg-white rounded-lg shadow-sm border border-border-main p-5 z-10 max-h-[90vh] flex flex-col',
           maxWidths[maxWidth]
         )}
       >
-        <div className="flex items-center justify-between pb-3 border-b border-border-main/60">
+        <div className="flex items-center justify-between pb-3 border-b border-border-main">
           <div>
-            <h2 className="text-lg font-bold text-text-primary">{title}</h2>
+            <h2 className="text-base font-semibold text-text-primary leading-tight">{title}</h2>
             {description && <p className="text-xs text-text-secondary mt-0.5">{description}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-text-secondary hover:bg-surface-main hover:text-text-primary transition-colors cursor-pointer"
+            className="p-1 rounded-md text-text-secondary hover:bg-surface-main hover:text-text-primary transition-colors cursor-pointer border border-transparent hover:border-border-main"
+            aria-label="Close dialog"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -62,4 +63,3 @@ export const Dialog: React.FC<DialogProps> = ({
     </div>
   );
 };
-

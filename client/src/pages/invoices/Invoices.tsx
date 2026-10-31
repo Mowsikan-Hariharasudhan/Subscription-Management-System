@@ -51,15 +51,15 @@ export const Invoices: React.FC = () => {
       header: 'Customer',
       cell: (inv) => (
         <div>
-          <p className="font-medium text-sm text-text-primary">{inv.customer?.name}</p>
-          <p className="text-xs text-text-secondary font-mono">{inv.subscription?.number}</p>
+          <p className="font-medium text-xs text-text-primary">{inv.customer?.name}</p>
+          <p className="text-[11px] text-text-secondary font-mono">{inv.subscription?.number}</p>
         </div>
       ),
     },
     {
       header: 'Period',
       cell: (inv) => (
-        <span className="text-xs text-text-secondary">
+        <span className="text-xs text-text-secondary font-mono">
           {formatDate(inv.periodStart)} – {formatDate(inv.periodEnd)}
         </span>
       ),
@@ -70,7 +70,7 @@ export const Invoices: React.FC = () => {
     },
     {
       header: 'Total',
-      cell: (inv) => <CurrencyDisplay amount={inv.total} size="sm" className="font-semibold" />,
+      cell: (inv) => <CurrencyDisplay amount={inv.total} size="sm" className="font-semibold font-mono" />,
     },
     {
       header: 'Outstanding',
@@ -78,7 +78,7 @@ export const Invoices: React.FC = () => {
         <CurrencyDisplay
           amount={inv.outstanding}
           size="sm"
-          className={inv.outstanding > 0 && inv.status === 'CONFIRMED' ? 'text-rose-600 font-semibold' : ''}
+          className={`font-mono ${inv.outstanding > 0 && inv.status === 'CONFIRMED' ? 'text-rose-600 font-semibold' : ''}`}
         />
       ),
     },
@@ -87,7 +87,7 @@ export const Invoices: React.FC = () => {
       cell: (inv) => {
         const isOverdue = inv.status === 'CONFIRMED' && inv.outstanding > 0 && new Date(inv.dueDate) < new Date();
         return (
-          <span className={`text-xs ${isOverdue ? 'text-rose-600 font-semibold' : 'text-text-secondary'}`}>
+          <span className={`text-xs font-mono ${isOverdue ? 'text-rose-600 font-semibold' : 'text-text-secondary'}`}>
             {formatDate(inv.dueDate)}
             {isOverdue && ' ⚠️'}
           </span>
@@ -109,13 +109,13 @@ export const Invoices: React.FC = () => {
               onClick={() => billingMutation.mutate()}
               isLoading={billingMutation.isPending}
             >
-              <Zap className="w-4 h-4 mr-1 text-amber-500" /> Run Billing Now
+              <Zap className="w-3.5 h-3.5 mr-1.5 text-amber-500" /> Run Billing Now
             </Button>
           ) : undefined
         }
       />
 
-      <div className="bg-white p-3.5 rounded-xl border border-border-main flex flex-wrap items-center gap-3">
+      <div className="bg-white p-3 rounded-lg border border-border-main shadow-subtle flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px] max-w-xs">
           <Input
             placeholder="Search by invoice # or customer..."
@@ -130,7 +130,7 @@ export const Invoices: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-border-main bg-white px-3 text-xs text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20"
+            className="h-9 rounded-md border border-border-main bg-white px-3 text-xs text-text-primary focus:outline-none focus:border-plum-primary focus:ring-1 focus:ring-plum-primary"
           >
             <option value="">All Statuses</option>
             {STATUS_OPTIONS.map((s) => (
@@ -138,7 +138,7 @@ export const Invoices: React.FC = () => {
             ))}
           </select>
         </div>
-        <div className="ml-auto flex items-center space-x-2 text-xs text-text-secondary">
+        <div className="ml-auto flex items-center space-x-1.5 text-xs text-text-secondary font-mono">
           <Receipt className="w-4 h-4" />
           <span>{data?.pagination?.total ?? 0} total invoices</span>
         </div>

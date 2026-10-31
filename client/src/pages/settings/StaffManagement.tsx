@@ -98,7 +98,7 @@ export const StaffManagement: React.FC = () => {
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-plum-primary text-white font-bold text-sm flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-md bg-plum-primary text-white font-bold text-sm flex items-center justify-center font-mono">
                       {staff.email.substring(0, 2).toUpperCase()}
                     </div>
                     <div>

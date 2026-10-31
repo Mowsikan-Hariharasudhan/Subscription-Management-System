@@ -6,12 +6,12 @@ export const LoadingSkeleton: React.FC<{ count?: number; className?: string }> =
   className,
 }) => {
   return (
-    <div className="w-full space-y-3 p-4 bg-white rounded-xl border border-border-main">
+    <div className="w-full space-y-3 p-4 bg-white rounded-lg border border-border-main shadow-subtle">
       {Array.from({ length: count }).map((_, idx) => (
         <div
           key={idx}
           className={cn(
-            'h-10 bg-surface-main rounded-lg animate-pulse',
+            'h-10 bg-surface-main rounded-md animate-pulse',
             idx === 0 && 'w-3/4',
             idx === 1 && 'w-full',
             idx === 2 && 'w-5/6',
@@ -22,4 +22,3 @@ export const LoadingSkeleton: React.FC<{ count?: number; className?: string }> =
     </div>
   );
 };
-

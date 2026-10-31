@@ -38,29 +38,29 @@ export function DataTable<T extends { id?: string | number }>({
   }
 
   return (
-    <div className={cn('w-full overflow-x-auto rounded-xl border border-border-main bg-white shadow-xs', className)}>
-      <table className="w-full text-left text-sm text-text-primary">
-        <thead className="bg-surface-main text-xs uppercase tracking-wider text-text-secondary border-b border-border-main font-semibold">
+    <div className={cn('w-full overflow-x-auto rounded-lg border border-border-main bg-white shadow-subtle', className)}>
+      <table className="w-full text-left text-sm text-text-primary border-collapse">
+        <thead className="bg-surface-subtle text-[11px] uppercase tracking-wider text-text-secondary border-b border-border-main font-semibold select-none">
           <tr>
             {columns.map((col, idx) => (
-              <th key={idx} scope="col" className={cn('px-5 py-3.5', col.className)}>
+              <th key={idx} scope="col" className={cn('px-4 py-3', col.className)}>
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-border-main/60">
+        <tbody className="divide-y divide-border-main">
           {data.map((item, rowIdx) => (
             <tr
               key={item.id ? String(item.id) : rowIdx}
               onClick={() => onRowClick && onRowClick(item)}
               className={cn(
-                'transition-colors hover:bg-surface-main/60',
+                'transition-colors hover:bg-surface-main/80',
                 onRowClick && 'cursor-pointer'
               )}
             >
               {columns.map((col, colIdx) => (
-                <td key={colIdx} className={cn('px-5 py-4 whitespace-nowrap', col.className)}>
+                <td key={colIdx} className={cn('px-4 py-3 text-xs sm:text-sm whitespace-nowrap', col.className)}>
                   {col.cell
                     ? col.cell(item)
                     : col.accessorKey
@@ -75,4 +75,3 @@ export function DataTable<T extends { id?: string | number }>({
     </div>
   );
 }
-

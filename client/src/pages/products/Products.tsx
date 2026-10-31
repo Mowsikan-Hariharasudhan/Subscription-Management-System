@@ -13,7 +13,6 @@ import { Label } from '../../components/ui/label';
 import { Dialog } from '../../components/ui/dialog';
 import { Badge } from '../../components/ui/badge';
 import { CurrencyDisplay } from '../../components/shared/CurrencyDisplay';
-import { rupeesToPaise } from '../../lib/utils';
 
 export const Products: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -63,12 +62,12 @@ export const Products: React.FC = () => {
       header: 'Product Name',
       cell: (p) => (
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-plum-light text-plum-primary flex items-center justify-center font-bold text-xs">
+          <div className="w-8 h-8 rounded-md bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center font-bold text-xs">
             <Package className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-semibold text-text-primary block">{p.name}</span>
-            {p.notes && <span className="text-xs text-text-secondary truncate max-w-xs block">{p.notes}</span>}
+            <span className="font-semibold text-xs text-text-primary block">{p.name}</span>
+            {p.notes && <span className="text-[11px] text-text-secondary truncate max-w-xs block">{p.notes}</span>}
           </div>
         </div>
       ),
@@ -83,16 +82,16 @@ export const Products: React.FC = () => {
     },
     {
       header: 'Sales Price',
-      cell: (p) => <CurrencyDisplay amount={p.salesPrice} size="sm" className="font-semibold" />,
+      cell: (p) => <CurrencyDisplay amount={p.salesPrice} size="sm" className="font-semibold font-mono" />,
     },
     {
       header: 'Cost Price',
-      cell: (p) => <CurrencyDisplay amount={p.costPrice} size="sm" className="text-text-secondary" />,
+      cell: (p) => <CurrencyDisplay amount={p.costPrice} size="sm" className="text-text-secondary font-mono" />,
     },
     {
       header: 'Variants',
       cell: (p) => (
-        <span className="inline-flex items-center space-x-1 text-xs text-text-secondary">
+        <span className="inline-flex items-center space-x-1 text-xs text-text-secondary font-mono">
           <Layers className="w-3.5 h-3.5" />
           <span>{p.variants?.length || 0} tier(s)</span>
         </span>
@@ -115,12 +114,12 @@ export const Products: React.FC = () => {
         description="Catalogue of billable software subscription tiers and standalone service packages"
         actions={
           <Button onClick={() => setIsCreateOpen(true)} size="sm">
-            <Plus className="w-4 h-4 mr-1" /> Add Product
+            <Plus className="w-3.5 h-3.5 mr-1.5" /> Add Product
           </Button>
         }
       />
 
-      <div className="bg-white p-3.5 rounded-xl border border-border-main flex items-center justify-between gap-4">
+      <div className="bg-white p-3 rounded-lg border border-border-main shadow-subtle flex items-center justify-between gap-4">
         <div className="relative w-full max-w-sm">
           <Input
             placeholder="Search products by title or description..."
@@ -183,7 +182,7 @@ export const Products: React.FC = () => {
               id="prod-type"
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="flex h-10 w-full rounded-lg border border-border-main bg-white px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20"
+              className="flex h-9 w-full rounded-md border border-border-main bg-white px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-plum-primary focus:ring-1 focus:ring-plum-primary"
             >
               <option value="SOFTWARE">SOFTWARE (Recurring License / SaaS)</option>
               <option value="SERVICE">SERVICE (One-time or Support Service)</option>
@@ -232,7 +231,7 @@ export const Products: React.FC = () => {
             />
           </div>
 
-          <div className="mt-5 flex justify-end space-x-2 pt-2 border-t border-border-main/60">
+          <div className="mt-5 flex justify-end space-x-2 pt-3 border-t border-border-main">
             <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)}>
               Cancel
             </Button>
@@ -245,4 +244,3 @@ export const Products: React.FC = () => {
     </div>
   );
 };
-

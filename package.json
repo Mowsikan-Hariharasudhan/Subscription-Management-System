@@ -12,7 +12,7 @@
     "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
     "build": "cd client && npm run build && cd ../server && npm run build",
     "seed": "cd server && npx prisma db seed",
-    "test": "cd server && npm test"
+    "test": "npm test --prefix server"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

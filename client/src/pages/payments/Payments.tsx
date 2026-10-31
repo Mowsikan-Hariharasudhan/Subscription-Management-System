@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Search, Filter } from 'lucide-react';
+import { CreditCard, Search } from 'lucide-react';
 import { paymentService } from '../../services/paymentService';
 import { Payment } from '../../types';
 import { PageHeader } from '../../components/shared/PageHeader';
@@ -9,15 +9,14 @@ import { DataTable, Column } from '../../components/shared/DataTable';
 import { Pagination } from '../../components/shared/Pagination';
 import { CurrencyDisplay } from '../../components/shared/CurrencyDisplay';
 import { Input } from '../../components/ui/input';
-import { Badge } from '../../components/ui/badge';
 import { formatDate } from '../../lib/utils';
 
 const METHOD_COLORS: Record<string, string> = {
-  CASH: 'bg-emerald-50 text-emerald-700',
-  BANK_TRANSFER: 'bg-blue-50 text-blue-700',
-  UPI: 'bg-violet-50 text-violet-700',
-  CARD: 'bg-amber-50 text-amber-700',
-  OTHER: 'bg-surface-main text-text-secondary',
+  CASH: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  BANK_TRANSFER: 'bg-blue-50 text-blue-700 border-blue-200',
+  UPI: 'bg-violet-50 text-violet-700 border-violet-200',
+  CARD: 'bg-amber-50 text-amber-700 border-amber-200',
+  OTHER: 'bg-surface-subtle text-text-secondary border-border-main',
 };
 
 export const Payments: React.FC = () => {
@@ -51,24 +50,24 @@ export const Payments: React.FC = () => {
     {
       header: 'Customer',
       cell: (p) => (
-        <span className="text-sm text-text-primary">{(p as any).invoice?.customer?.name || '—'}</span>
+        <span className="text-xs font-medium text-text-primary">{(p as any).invoice?.customer?.name || '—'}</span>
       ),
     },
     {
       header: 'Method',
       cell: (p) => (
-        <span className={`inline-flex px-2 py-0.5 rounded text-xs font-semibold ${METHOD_COLORS[p.method] || METHOD_COLORS.OTHER}`}>
+        <span className={`inline-flex px-2 py-0.5 rounded text-[11px] font-semibold border font-mono ${METHOD_COLORS[p.method] || METHOD_COLORS.OTHER}`}>
           {p.method.replace('_', ' ')}
         </span>
       ),
     },
     {
       header: 'Amount',
-      cell: (p) => <CurrencyDisplay amount={p.amount} size="sm" className="font-semibold text-emerald-600" />,
+      cell: (p) => <CurrencyDisplay amount={p.amount} size="sm" className="font-semibold text-emerald-600 font-mono" />,
     },
     {
       header: 'Payment Date',
-      cell: (p) => <span className="text-xs text-text-secondary">{formatDate(p.paymentDate)}</span>,
+      cell: (p) => <span className="text-xs text-text-secondary font-mono">{formatDate(p.paymentDate)}</span>,
     },
     {
       header: 'Recorded By',
@@ -85,7 +84,7 @@ export const Payments: React.FC = () => {
         description="All recorded payments against confirmed invoices"
       />
 
-      <div className="bg-white p-3.5 rounded-xl border border-border-main flex flex-wrap items-center gap-3">
+      <div className="bg-white p-3 rounded-lg border border-border-main shadow-subtle flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px] max-w-xs">
           <Input
             placeholder="Search payments..."
@@ -95,7 +94,7 @@ export const Payments: React.FC = () => {
           />
           <Search className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
         </div>
-        <div className="ml-auto flex items-center space-x-2 text-xs text-text-secondary">
+        <div className="ml-auto flex items-center space-x-1.5 text-xs text-text-secondary font-mono">
           <CreditCard className="w-4 h-4" />
           <span>{data?.pagination?.total ?? 0} payments</span>
         </div>

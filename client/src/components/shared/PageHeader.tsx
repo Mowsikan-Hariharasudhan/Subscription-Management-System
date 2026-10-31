@@ -21,13 +21,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   actions,
 }) => {
   return (
-    <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-border-main/60">
+    <div className="mb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-4 border-b border-border-main">
       <div>
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <nav className="flex items-center space-x-1.5 text-xs text-text-secondary mb-1">
+          <nav className="flex items-center space-x-1 text-[11px] text-text-secondary mb-1">
             {breadcrumbs.map((item, index) => (
               <React.Fragment key={index}>
-                {index > 0 && <ChevronRight className="w-3.5 h-3.5 text-border-main" />}
+                {index > 0 && <ChevronRight className="w-3 h-3 text-border-main shrink-0" />}
                 {item.href ? (
                   <Link to={item.href} className="hover:text-plum-primary transition-colors">
                     {item.label}
@@ -39,14 +39,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             ))}
           </nav>
         )}
-        <h1 className="text-2xl font-bold text-text-primary tracking-tight font-serif sm:font-sans">
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight font-sans">
           {title}
         </h1>
-        {description && <p className="text-sm text-text-secondary mt-0.5">{description}</p>}
+        {description && <p className="text-xs sm:text-sm text-text-secondary mt-0.5">{description}</p>}
       </div>
 
-      {actions && <div className="flex items-center gap-2.5 flex-wrap">{actions}</div>}
+      {actions && <div className="flex items-center gap-2 flex-wrap shrink-0">{actions}</div>}
     </div>
   );
 };
-

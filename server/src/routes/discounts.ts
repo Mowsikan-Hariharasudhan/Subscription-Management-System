@@ -9,10 +9,12 @@ const router = Router();
 
 router.use(authenticate);
 
+// View discount rules: ADMIN and STAFF
 router.get('/', authorize('ADMIN', 'STAFF'), DiscountController.list);
 router.get('/:id', authorize('ADMIN', 'STAFF'), DiscountController.getById);
 router.get('/:id/redemptions', authorize('ADMIN', 'STAFF'), DiscountController.getRedemptions);
 
+// Mutate discount rules: ADMIN ONLY
 router.post('/', authorize('ADMIN'), validate(discountRuleSchema), DiscountController.create);
 router.patch('/:id', authorize('ADMIN'), validate(updateDiscountRuleSchema), DiscountController.update);
 router.delete('/:id', authorize('ADMIN'), DiscountController.delete);

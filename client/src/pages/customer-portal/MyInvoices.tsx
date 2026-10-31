@@ -20,8 +20,8 @@ export const MyInvoices: React.FC = () => {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-text-primary">My Invoices</h1>
-        <p className="text-sm text-text-secondary mt-0.5">Your billing history and outstanding invoices</p>
+        <h1 className="text-lg font-bold text-text-primary">My Invoices</h1>
+        <p className="text-xs text-text-secondary mt-0.5">Your billing history and outstanding invoices</p>
       </div>
 
       {!invoices || invoices.length === 0 ? (
@@ -29,28 +29,28 @@ export const MyInvoices: React.FC = () => {
       ) : (
         <Card>
           <CardContent className="p-0">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-border-main bg-surface-main">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-text-secondary uppercase">Invoice #</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-text-secondary uppercase">Billing Period</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-text-secondary uppercase">Status</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-text-secondary uppercase">Due Date</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-text-secondary uppercase">Total</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-text-secondary uppercase">Outstanding</th>
+                <tr className="border-b border-border-main bg-surface-subtle">
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Invoice #</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Billing Period</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Status</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Due Date</th>
+                  <th className="text-right px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Total</th>
+                  <th className="text-right px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">Outstanding</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border-main">
                 {invoices.map((inv) => {
                   const isOverdue = inv.status === 'CONFIRMED' && inv.outstanding > 0 && new Date(inv.dueDate) < new Date();
                   return (
-                    <tr key={inv.id} className="border-b border-border-main/60 hover:bg-surface-main/50">
-                      <td className="px-4 py-3 font-mono text-xs font-semibold text-plum-primary">{inv.number}</td>
-                      <td className="px-4 py-3 text-xs text-text-secondary">
+                    <tr key={inv.id} className="hover:bg-surface-subtle/50 transition-colors">
+                      <td className="px-4 py-2.5 font-mono text-xs font-semibold text-plum-primary">{inv.number}</td>
+                      <td className="px-4 py-2.5 text-xs text-text-secondary font-mono">
                         {formatDate(inv.periodStart)} – {formatDate(inv.periodEnd)}
                       </td>
-                      <td className="px-4 py-3"><StatusBadge status={inv.status} /></td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-2.5"><StatusBadge status={inv.status} /></td>
+                      <td className="px-4 py-2.5 font-mono">
                         <span className={`text-xs ${isOverdue ? 'text-rose-600 font-semibold' : 'text-text-secondary'}`}>
                           {formatDate(inv.dueDate)}
                           {isOverdue && (
@@ -60,12 +60,12 @@ export const MyInvoices: React.FC = () => {
                           )}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right"><CurrencyDisplay amount={inv.total} size="sm" className="font-semibold" /></td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-2.5 text-right"><CurrencyDisplay amount={inv.total} size="sm" className="font-semibold font-mono" /></td>
+                      <td className="px-4 py-2.5 text-right">
                         <CurrencyDisplay
                           amount={inv.outstanding}
                           size="sm"
-                          className={inv.outstanding > 0 ? 'text-rose-600 font-semibold' : 'text-emerald-600'}
+                          className={`font-mono ${inv.outstanding > 0 ? 'text-rose-600 font-semibold' : 'text-emerald-600'}`}
                         />
                       </td>
                     </tr>

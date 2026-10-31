@@ -88,7 +88,7 @@ export const Customers: React.FC = () => {
     {
       header: 'Subscriptions',
       cell: (c) => (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-plum-light text-plum-deep">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium font-mono bg-plum-surface text-plum-primary border border-plum-border">
           {c._count?.subscriptions || 0} active
         </span>
       ),
@@ -96,7 +96,7 @@ export const Customers: React.FC = () => {
     {
       header: 'Invoices',
       cell: (c) => (
-        <span className="text-xs font-medium text-text-secondary">
+        <span className="text-xs font-mono text-text-secondary">
           {c._count?.invoices || 0} total
         </span>
       ),
@@ -111,7 +111,7 @@ export const Customers: React.FC = () => {
     },
     {
       header: 'Joined',
-      cell: (c) => <span className="text-xs text-text-secondary">{formatDate(c.createdAt)}</span>,
+      cell: (c) => <span className="text-xs text-text-secondary font-mono">{formatDate(c.createdAt)}</span>,
     },
   ];
 
@@ -122,13 +122,13 @@ export const Customers: React.FC = () => {
         description="Manage customer enterprise profiles, subscriptions, and billing accounts"
         actions={
           <Button onClick={() => setIsCreateOpen(true)} size="sm">
-            <Plus className="w-4 h-4 mr-1" /> Add Customer
+            <Plus className="w-3.5 h-3.5 mr-1.5" /> Add Customer
           </Button>
         }
       />
 
       {/* Filter / Search Bar */}
-      <div className="bg-white p-3.5 rounded-xl border border-border-main flex items-center justify-between gap-4">
+      <div className="bg-white p-3 rounded-lg border border-border-main shadow-subtle flex items-center justify-between gap-4">
         <div className="relative w-full max-w-sm">
           <Input
             placeholder="Search by name, company, phone or email..."
@@ -230,7 +230,7 @@ export const Customers: React.FC = () => {
             />
           </div>
 
-          <div className="mt-5 flex justify-end space-x-2 pt-2 border-t border-border-main/60">
+          <div className="mt-5 flex justify-end space-x-2 pt-3 border-t border-border-main">
             <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)}>
               Cancel
             </Button>
@@ -243,4 +243,3 @@ export const Customers: React.FC = () => {
     </div>
   );
 };
-
