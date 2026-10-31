@@ -48,7 +48,7 @@ const RequireAuth: React.FC<{ children: React.ReactNode; roles?: string[] }> = (
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface-main">
         <div className="flex flex-col items-center space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-plum-deep text-white font-bold text-xl flex items-center justify-center animate-pulse">B</div>
+          <div className="w-10 h-10 rounded-md bg-plum-deep text-white font-bold text-xl flex items-center justify-center animate-pulse">B</div>
           <p className="text-xs text-text-secondary">Loading Brightloop...</p>
         </div>
       </div>

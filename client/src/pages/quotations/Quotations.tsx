@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
-import { Plus, Search, FileText, LayoutTemplate } from 'lucide-react';
+import { Plus, Search, LayoutTemplate } from 'lucide-react';
 import { quotationService } from '../../services/quotationService';
 import { customerService } from '../../services/customerService';
 import { planService } from '../../services/planService';

@@ -14,6 +14,8 @@ import {
   ShieldCheck,
   ChevronLeft,
   X,
+  Sparkles,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
@@ -37,17 +39,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
     { label: 'Customers', icon: Users, href: '/customers' },
-    { label: 'Products', icon: Package, href: '/products' },
-    { label: 'Plans', icon: Layers, href: '/plans' },
+    { label: 'Products & Tiers', icon: Package, href: '/products' },
+    { label: 'Subscription Plans', icon: Layers, href: '/plans' },
     { label: 'Quotations', icon: FileText, href: '/quotations' },
     { label: 'Subscriptions', icon: Repeat, href: '/subscriptions' },
     { label: 'Invoices', icon: Receipt, href: '/invoices' },
-    { label: 'Payments', icon: CreditCard, href: '/payments' },
-    { label: 'Discounts', icon: Tag, href: '/discounts' },
+    { label: 'Payment Ledger', icon: CreditCard, href: '/payments' },
+    { label: 'Discount Rules', icon: Tag, href: '/discounts' },
   ];
 
   const adminItems = [
-    { label: 'Tax Rules', icon: Settings, href: '/settings/taxes' },
+    { label: 'Tax Configuration', icon: Settings, href: '/settings/taxes' },
     { label: 'Staff Management', icon: ShieldCheck, href: '/settings/staff' },
   ];
 

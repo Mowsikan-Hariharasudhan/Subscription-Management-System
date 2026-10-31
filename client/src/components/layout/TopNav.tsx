@@ -52,7 +52,7 @@ export const TopNav: React.FC<TopNavProps> = ({ onOpenSidebar }) => {
           onClick={onOpenSidebar}
           className="lg:hidden p-2 rounded-xl bg-white border-[1.5px] border-black text-odoo-dark hover:bg-gray-50 shadow-[2px_2px_0_#000] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
         >
-          <Menu className="w-5 h-5" />
+          <Menu className="w-4 h-4" />
         </button>
 
         <div className="flex items-center gap-2 text-[0.8125rem] font-medium text-gray-500">
@@ -131,7 +131,7 @@ export const TopNav: React.FC<TopNavProps> = ({ onOpenSidebar }) => {
                   }}
                   className="w-full text-left px-4 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl flex items-center space-x-2 transition-colors cursor-pointer"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-3.5 h-3.5" />
                   <span>Sign out</span>
                 </button>
               </div>

@@ -48,35 +48,35 @@ export const Register: React.FC = () => {
     <div className="min-h-screen bg-surface-main flex flex-col justify-center items-center p-4 py-8">
       <div className="w-full max-w-lg">
         <div className="text-center mb-6">
-          <div className="inline-flex w-10 h-10 rounded-xl bg-plum-deep text-white font-bold text-xl items-center justify-center shadow-md mb-2">
+          <div className="inline-flex w-10 h-10 rounded-md bg-plum-dark text-white font-bold text-xl items-center justify-center border border-plum-deep shadow-xs mb-2">
             B
           </div>
-          <h1 className="text-2xl font-extrabold text-plum-deep tracking-tight font-serif">
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight font-sans">
             Create Customer Account
           </h1>
-          <p className="text-xs text-text-secondary mt-1">
+          <p className="text-xs text-text-secondary mt-0.5">
             Join the Brightloop platform to access self-service subscriptions and invoices
           </p>
         </div>
 
-        <Card className="shadow-lg border-border-main">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Register Organization</CardTitle>
-            <CardDescription>
+        <Card className="shadow-subtle border border-border-main rounded-lg">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold">Register Organization</CardTitle>
+            <CardDescription className="text-xs">
               All fields marked with an asterisk (*) are mandatory
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="pt-4">
             {error && (
-              <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center space-x-2">
-                <ShieldAlert className="w-4 h-4 shrink-0" />
+              <div className="mb-4 p-2.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center space-x-2">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-rose-600" />
                 <span>{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <Label htmlFor="name" required>
                     Contact Name
@@ -103,7 +103,7 @@ export const Register: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <Label htmlFor="email" required>
                     Email Address
@@ -133,7 +133,7 @@ export const Register: React.FC = () => {
 
               <div>
                 <Label htmlFor="password" required>
-                  Password (min 8 characters)
+                  Password (min 9 chars, upper, lower, special)
                 </Label>
                 <Input
                   id="password"
@@ -157,12 +157,12 @@ export const Register: React.FC = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full mt-4" isLoading={loading}>
+              <Button type="submit" className="w-full mt-3" isLoading={loading}>
                 Complete Registration <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             </form>
 
-            <div className="mt-6 text-center text-xs text-text-secondary">
+            <div className="mt-5 text-center text-xs text-text-secondary">
               Already have an account?{' '}
               <Link to="/login" className="font-semibold text-plum-primary hover:underline">
                 Sign in here
@@ -174,4 +174,3 @@ export const Register: React.FC = () => {
     </div>
   );
 };
-

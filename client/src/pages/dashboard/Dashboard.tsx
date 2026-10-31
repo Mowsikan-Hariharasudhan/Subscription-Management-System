@@ -215,17 +215,17 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Analytics Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Monthly Revenue Chart */}
         <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardHeader className="flex flex-row items-center justify-between py-3 px-4 sm:px-5">
             <div>
               <CardTitle className="text-base">Revenue Inflow</CardTitle>
               <p className="text-xs text-gray-500">Monthly cash collections for current fiscal period</p>
             </div>
           </CardHeader>
-          <CardContent className="pt-4">
-            <div className="h-64 w-full">
+          <CardContent className="pt-4 px-4 sm:px-5 pb-5">
+            <div className="h-60 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenueData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
@@ -243,7 +243,14 @@ export const Dashboard: React.FC = () => {
                     tickFormatter={(val) => `₹${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
                   />
                   <Tooltip
-                    formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Revenue']}
+                    contentStyle={{
+                      backgroundColor: '#FFFFFF',
+                      borderColor: '#E8E4E7',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    }}
+                    formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Collected Revenue']}
                   />
                   <Area
                     type="monotone"
@@ -265,8 +272,8 @@ export const Dashboard: React.FC = () => {
             <CardTitle className="text-base">Invoice Status Breakdown</CardTitle>
             <p className="text-xs text-gray-500">Distribution across all lifecycle states</p>
           </CardHeader>
-          <CardContent className="pt-2">
-            <div className="h-48 w-full flex items-center justify-center">
+          <CardContent className="pt-2 px-4 sm:px-5 pb-5">
+            <div className="h-44 w-full flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -283,7 +290,15 @@ export const Dashboard: React.FC = () => {
                       <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value, name) => [`${value} invoices`, name]} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#FFFFFF',
+                      borderColor: '#E8E4E7',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                    }}
+                    formatter={(value, name) => [`${value} invoices`, name]}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -292,7 +307,7 @@ export const Dashboard: React.FC = () => {
                 <div key={item.status} className="flex items-center justify-between text-xs">
                   <div className="flex items-center space-x-2">
                     <span
-                      className="w-2.5 h-2.5 rounded-full"
+                      className="w-2 h-2 rounded-xs"
                       style={{ backgroundColor: PIE_COLORS[idx % PIE_COLORS.length] }}
                     />
                     <span className="text-gray-600 font-medium">{item.status}</span>

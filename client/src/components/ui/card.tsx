@@ -18,7 +18,7 @@ export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement
 );
 
 export const CardContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <div className={cn('p-6', className)} {...props} />
+  <div className={cn('p-4 sm:p-5', className)} {...props} />
 );
 
 export const CardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (

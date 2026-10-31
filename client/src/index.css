@@ -16,6 +16,33 @@
     color: #29242b;
     min-height: 100vh;
   }
+
+  ::selection {
+    background-color: #F5EEF3;
+    color: #724B68;
+  }
+}
+
+/* Structural Neo-Brutalist Micro-interactions */
+.brutal-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E8E4E7;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+}
+
+.brutal-card-interactive {
+  background-color: #FFFFFF;
+  border: 1px solid #E8E4E7;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  transition: all 0.15s ease-in-out;
+}
+
+.brutal-card-interactive:hover {
+  border-color: #724B68;
+  box-shadow: 2px 2px 0px rgba(114, 75, 104, 0.15);
+  transform: translateY(-1px);
 }
 
 /* Layered Architectural Background */
