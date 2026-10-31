@@ -113,7 +113,7 @@ export const MySubscriptions: React.FC = () => {
         <EmptyState
           title="No subscriptions active"
           description="You don't have any active subscriptions yet. Browse our applications to get started."
-          icon={<Repeat className="w-8 h-8" />}
+          icon={<Repeat className="w-8 h-8 text-plum-deep" />}
           action={
             <Link
               to="/portal/explore"
@@ -134,8 +134,8 @@ export const MySubscriptions: React.FC = () => {
               {/* Card Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-border-main gap-3">
                 <div className="flex items-center space-x-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center font-bold text-base shadow-xs shrink-0">
-                    <Repeat className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-xl bg-plum-surface border border-plum-border flex items-center justify-center font-bold text-base shadow-xs shrink-0">
+                    <Repeat className="w-5 h-5 text-plum-deep stroke-[2.5]" />
                   </div>
                   <div>
                     <span className="font-mono text-sm font-bold text-plum-primary tracking-tight block">

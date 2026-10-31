@@ -108,6 +108,7 @@ export const App: React.FC = () => {
       <Route path="/portal" element={<RequireAuth roles={['CUSTOMER']}><PortalShell /></RequireAuth>}>
         <Route index element={<CustomerDashboard />} />
         <Route path="explore" element={<ExplorePlans />} />
+        <Route path="catalog" element={<ExplorePlans />} />
         <Route path="subscriptions" element={<MySubscriptions />} />
         <Route path="invoices" element={<MyInvoices />} />
         <Route path="payments" element={<MyPayments />} />

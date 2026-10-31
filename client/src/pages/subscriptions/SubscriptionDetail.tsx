@@ -98,8 +98,8 @@ export const SubscriptionDetail: React.FC = () => {
       {/* Status + Actions Bar matching reference */}
       <div className="bg-white border border-border-main rounded-2xl shadow-card p-5 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center">
-            <Repeat className="w-4 h-4" />
+          <div className="w-9 h-9 rounded-xl bg-plum-surface border border-plum-border flex items-center justify-center">
+            <Repeat className="w-4 h-4 text-plum-deep stroke-[2.2]" />
           </div>
           <div>
             <p className="font-mono text-[10px] uppercase text-text-secondary font-bold">Subscription ID</p>

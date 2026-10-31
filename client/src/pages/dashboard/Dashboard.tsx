@@ -267,8 +267,8 @@ export const Dashboard: React.FC = () => {
               <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
                 ACTIVE SUBSCRIPTIONS
               </span>
-              <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center">
-                <Repeat className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-xl bg-plum-surface border border-plum-border flex items-center justify-center">
+                <Repeat className="w-4 h-4 text-plum-deep stroke-[2.2]" />
               </div>
             </div>
             <div className="mt-2.5">

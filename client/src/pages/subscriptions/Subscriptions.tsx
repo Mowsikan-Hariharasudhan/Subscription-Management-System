@@ -38,8 +38,8 @@ export const Subscriptions: React.FC = () => {
       header: 'SUBSCRIPTION #',
       cell: (s) => (
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary border border-plum-border flex items-center justify-center">
-            <Repeat className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-xl bg-plum-surface border border-plum-border flex items-center justify-center">
+            <Repeat className="w-4 h-4 text-plum-deep stroke-[2.2]" />
           </div>
           <span className="font-mono text-xs font-bold text-plum-primary">{s.number}</span>
         </div>
