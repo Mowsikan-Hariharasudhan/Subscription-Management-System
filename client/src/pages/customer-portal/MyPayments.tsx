@@ -1,18 +1,12 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, CheckCircle2 } from 'lucide-react';
 import { portalService } from '../../services/portalService';
 import { formatDate } from '../../lib/utils';
 import { CurrencyDisplay } from '../../components/shared/CurrencyDisplay';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { LoadingSkeleton } from '../../components/shared/LoadingSkeleton';
-
-const METHOD_BADGES: Record<string, string> = {
-  CREDIT_CARD: 'bg-indigo-50 text-indigo-700 border border-indigo-200',
-  BANK_TRANSFER: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-  UPI: 'bg-purple-50 text-purple-700 border border-purple-200',
-  OTHER: 'bg-gray-50 text-gray-700 border border-gray-200',
-};
+import { Badge } from '../../components/ui/badge';
 
 export const MyPayments: React.FC = () => {
   const { data: payments, isLoading } = useQuery({
@@ -22,12 +16,12 @@ export const MyPayments: React.FC = () => {
 
   return (
     <div className="space-y-6 flex flex-col flex-1 pb-10">
-      <div className="anim-slide-up">
-        <h1 className="text-[2.25rem] font-bold tracking-tight text-odoo-dark leading-tight">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary leading-tight">
           Payment History
         </h1>
-        <p className="text-[0.9375rem] text-gray-500 font-medium mt-1">
-          Complete ledger of recorded settlements and receipts
+        <p className="text-xs sm:text-sm text-text-secondary mt-1">
+          Complete ledger of recorded settlements, transaction dates, and official receipts
         </p>
       </div>
 
@@ -40,51 +34,59 @@ export const MyPayments: React.FC = () => {
           icon={<CreditCard className="w-8 h-8" />}
         />
       ) : (
-        <div className="w-full bg-white border-[1.5px] border-black rounded-2xl shadow-sm overflow-hidden anim-slide-up flex flex-col flex-1" style={{ animationDelay: '50ms' }}>
-          <div className="overflow-x-auto flex-1 px-8 pb-8 pt-2">
+        <div className="w-full bg-white border border-border-main rounded-2xl shadow-card overflow-hidden flex flex-col flex-1">
+          <div className="overflow-x-auto flex-1 px-6 pb-6 pt-2">
             <table className="w-full text-left border-collapse min-w-[700px]">
-              <thead>
+              <thead className="border-b border-border-main/80 select-none">
                 <tr>
-                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest w-[25%]">
+                  <th className="py-4 px-3 text-[11px] font-bold text-text-secondary uppercase tracking-wider">
                     Payment Date
                   </th>
-                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest w-[25%]">
+                  <th className="py-4 px-3 text-[11px] font-bold text-text-secondary uppercase tracking-wider">
                     Invoice #
                   </th>
-                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest text-center">
+                  <th className="py-4 px-3 text-[11px] font-bold text-text-secondary uppercase tracking-wider text-center">
                     Method
                   </th>
-                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest text-right">
-                    Amount Paid
+                  <th className="py-4 px-3 text-[11px] font-bold text-text-secondary uppercase tracking-wider text-center">
+                    Status
+                  </th>
+                  <th className="py-4 px-3 text-[11px] font-bold text-text-secondary uppercase tracking-wider text-right">
+                    Amount Settled
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border-main/60">
                 {payments.map((p: any) => (
-                  <tr key={p.id} className="border-t border-gray-100 group hover:bg-gray-50/50 transition-colors cursor-pointer">
-                    <td className="py-4 text-xs text-gray-600 font-mono font-medium">
+                  <tr
+                    key={p.id}
+                    className="group hover:bg-surface-hover/50 transition-colors"
+                  >
+                    <td className="py-3.5 px-3 text-xs text-text-secondary font-mono font-medium">
                       {formatDate(p.paymentDate)}
                     </td>
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-odoo/10 text-odoo font-bold flex items-center justify-center text-xs border border-odoo/20 group-hover:bg-odoo group-hover:text-white transition-colors shrink-0">
-                          <CreditCard className="w-3.5 h-3.5" />
+                    <td className="py-3.5 px-3">
+                      <div className="flex items-center space-x-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary border border-plum-border font-bold flex items-center justify-center shrink-0">
+                          <CreditCard className="w-4 h-4" />
                         </div>
-                        <span className="font-mono text-xs font-bold text-odoo tracking-tight">
-                          {(p as any).invoice?.number || p.invoiceId.slice(0, 8)}
+                        <span className="font-mono text-xs font-bold text-plum-primary">
+                          {p.invoice?.number || p.invoiceId.slice(0, 8)}
                         </span>
                       </div>
                     </td>
-                    <td className="py-4 text-center">
-                      <span
-                        className={`inline-flex px-3 py-1 rounded-full text-[0.6875rem] font-bold uppercase tracking-wider ${
-                          METHOD_BADGES[p.method] || METHOD_BADGES.OTHER
-                        }`}
-                      >
+                    <td className="py-3.5 px-3 text-center">
+                      <Badge variant="outline" className="font-mono text-[10px]">
                         {p.method.replace('_', ' ')}
+                      </Badge>
+                    </td>
+                    <td className="py-3.5 px-3 text-center">
+                      <span className="inline-flex items-center space-x-1 text-xs text-emerald-700 font-semibold font-mono">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>SETTLED</span>
                       </span>
                     </td>
-                    <td className="py-4 text-right font-mono font-bold text-emerald-700 text-sm">
+                    <td className="py-3.5 px-3 text-right font-mono font-bold text-xs text-emerald-700">
                       <CurrencyDisplay amount={p.amount} size="sm" className="font-bold text-emerald-700" />
                     </td>
                   </tr>

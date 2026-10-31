@@ -15,6 +15,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
+  User,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
@@ -34,8 +36,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { role } = useAuth();
   const isAdmin = role === 'ADMIN';
+  const isCustomer = role === 'CUSTOMER';
 
-  const navItems = [
+  const staffNavItems = [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
     { label: 'Customers', icon: Users, href: '/customers' },
     { label: 'Products & Tiers', icon: Package, href: '/products' },
@@ -47,10 +50,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { label: 'Discount Rules', icon: Tag, href: '/discounts' },
   ];
 
+  const customerNavItems = [
+    { label: 'Overview', icon: LayoutDashboard, href: '/portal', end: true },
+    { label: 'Explore & Buy Apps', icon: Sparkles, href: '/portal/explore' },
+    { label: 'My Subscriptions', icon: Repeat, href: '/portal/subscriptions' },
+    { label: 'My Invoices', icon: Receipt, href: '/portal/invoices' },
+    { label: 'Payment History', icon: CreditCard, href: '/portal/payments' },
+    { label: 'Account Profile', icon: User, href: '/portal/account' },
+  ];
+
   const adminItems = [
     { label: 'Tax Configuration', icon: Settings, href: '/settings/taxes' },
     { label: 'Staff Management', icon: ShieldCheck, href: '/settings/staff' },
   ];
+
+  const displayedNavItems = isCustomer ? customerNavItems : staffNavItems;
 
   return (
     <>
@@ -85,8 +99,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="text-sm font-bold tracking-tight text-text-primary block leading-tight truncate">
                   Brightloop
                 </span>
-                <span className="text-[10px] text-text-secondary leading-tight block mt-0.5 font-medium truncate uppercase tracking-wider">
-                  Subscription Ops
+                <span className="text-[10px] text-text-secondary leading-tight block mt-0.5 font-medium truncate uppercase tracking-wider font-mono">
+                  {isCustomer ? 'Subscriber Portal' : 'Subscription Ops'}
                 </span>
               </div>
             )}
@@ -120,10 +134,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Navigation links */}
         <div className="flex-1 overflow-y-auto py-3 px-2.5 space-y-4">
           <nav className="space-y-1">
-            {navItems.map((item) => (
+            {displayedNavItems.map((item) => (
               <NavLink
                 key={item.href}
                 to={item.href}
+                end={(item as any).end}
                 onClick={() => onClose()}
                 title={isCollapsed ? item.label : undefined}
                 className={({ isActive }) =>

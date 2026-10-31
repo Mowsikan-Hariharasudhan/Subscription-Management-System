@@ -17,7 +17,7 @@ export class PortalService {
   static async getOverview(userId: string) {
     const customerId = await this.getCustomerIdForUser(userId);
 
-    const [customer, activeSubscriptions, unpaidInvoices, recentPayments] = await Promise.all([
+    const [customer, activeSubscriptions, unpaidInvoices, recentInvoices, totalInvoices, recentPayments] = await Promise.all([
       prisma.customer.findUnique({
         where: { id: customerId },
         include: { user: { select: { email: true, createdAt: true } } },
@@ -34,6 +34,15 @@ export class PortalService {
         where: { customerId, status: 'CONFIRMED' },
         include: { subscription: { include: { plan: true } } },
         orderBy: { dueDate: 'asc' },
+      }),
+      prisma.invoice.findMany({
+        where: { customerId },
+        take: 5,
+        orderBy: { issueDate: 'desc' },
+        include: { subscription: { include: { plan: true } } },
+      }),
+      prisma.invoice.count({
+        where: { customerId },
       }),
       prisma.payment.findMany({
         where: { invoice: { customerId } },
@@ -54,8 +63,11 @@ export class PortalService {
         totalOutstanding,
         recentPaymentsTotal: totalPaid,
       },
+      outstandingAmount: totalOutstanding,
+      totalInvoices,
       activeSubscriptions,
       unpaidInvoices,
+      recentInvoices,
       recentPayments,
     };
   }
