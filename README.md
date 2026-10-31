@@ -30,8 +30,6 @@
 
 Explore the complete subscription management platform, including the admin dashboard, subscription lifecycle, automated billing, invoice management, payment tracking, and customer self-service portal.
 
-Refer to the [Demo Credentials](#-pre-seeded-demo-credentials) section to access the application.
-
 ---
 
 ## 🌟 Executive Summary
