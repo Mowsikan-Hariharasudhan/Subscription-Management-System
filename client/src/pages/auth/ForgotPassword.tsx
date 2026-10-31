@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../..
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Button } from '../../components/ui/button';
-import { ArrowLeft, CheckCircle2, Mail } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Mail, ShieldAlert } from 'lucide-react';
 
 export const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -19,10 +19,10 @@ export const ForgotPassword: React.FC = () => {
     try {
       const res = await authService.forgotPassword(email);
       setSubmitted(true);
-      setMessage(res.message || 'If that email address exists, a password reset link has been sent.');
+      setMessage(res.message || 'If an account exists for that email, recovery instructions have been dispatched.');
     } catch (err: any) {
       setSubmitted(true);
-      setMessage('If that email address exists, a password reset link has been sent.');
+      setMessage('If an account exists for that email, recovery instructions have been dispatched.');
     } finally {
       setLoading(false);
     }
@@ -31,26 +31,41 @@ export const ForgotPassword: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface-main flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md">
-        <Card className="shadow-lg border-border-main">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Enter your email to receive recovery instructions
+        {/* Brand Header */}
+        <div className="text-center mb-6">
+          <div className="inline-flex w-10 h-10 rounded-md bg-plum-deep text-white font-bold text-lg items-center justify-center shadow-sm border border-white/20 mb-2">
+            B
+          </div>
+          <h1 className="text-2xl font-extrabold text-plum-deep tracking-tight font-serif">
+            BRIGHTLOOP
+          </h1>
+          <p className="text-xs text-text-secondary mt-1">
+            Enterprise Password Recovery & Account Verification
+          </p>
+        </div>
+
+        <Card className="border-border-main shadow-lg rounded-xl overflow-hidden bg-white">
+          <CardHeader className="bg-surface-main/50 border-b border-border-main/60 py-4 px-6 text-center">
+            <CardTitle className="text-base font-bold text-text-primary">
+              Password Recovery
+            </CardTitle>
+            <CardDescription className="text-xs text-text-secondary">
+              Enter your work email address to receive secure reset credentials.
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="p-6">
             {submitted ? (
-              <div className="text-center py-4">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+              <div className="text-center py-4 space-y-3">
+                <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h4 className="text-sm font-semibold text-text-primary">Instructions Sent</h4>
-                <p className="text-xs text-text-secondary mt-1 max-w-xs mx-auto">{message}</p>
-                <div className="mt-6">
+                <h4 className="text-sm font-bold text-text-primary">Recovery Link Dispatched</h4>
+                <p className="text-xs text-text-secondary max-w-xs mx-auto leading-relaxed">{message}</p>
+                <div className="pt-4">
                   <Link to="/login">
-                    <Button variant="outline" size="sm">
-                      <ArrowLeft className="w-4 h-4 mr-1" /> Back to Sign In
+                    <Button variant="outline" size="sm" className="w-full">
+                      <ArrowLeft className="w-4 h-4 mr-1.5" /> Return to Sign In
                     </Button>
                   </Link>
                 </div>
@@ -58,29 +73,36 @@ export const ForgotPassword: React.FC = () => {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="email" required>
-                    Email Address
+                  <Label htmlFor="forgot-email" required className="text-xs font-semibold">
+                    Registered Work Email
                   </Label>
-                  <div className="relative">
+                  <div className="relative mt-1">
                     <Input
-                      id="email"
+                      id="forgot-email"
                       type="email"
                       placeholder="name@company.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="pl-9"
+                      className="pl-9 h-10 text-xs"
                     />
                     <Mail className="w-4 h-4 text-text-secondary absolute left-3 top-3" />
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full mt-2" isLoading={loading}>
-                  Send Recovery Link
+                <Button
+                  type="submit"
+                  className="w-full h-10 bg-plum-deep hover:bg-plum-primary text-white font-semibold text-xs tracking-wide transition-colors"
+                  isLoading={loading}
+                >
+                  Send Password Reset Link
                 </Button>
 
-                <div className="mt-4 text-center">
-                  <Link to="/login" className="text-xs text-text-secondary hover:text-text-primary flex items-center justify-center space-x-1">
+                <div className="pt-2 text-center">
+                  <Link
+                    to="/login"
+                    className="text-xs text-text-secondary hover:text-text-primary inline-flex items-center space-x-1"
+                  >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Back to Sign In</span>
                   </Link>
@@ -93,4 +115,3 @@ export const ForgotPassword: React.FC = () => {
     </div>
   );
 };
-
