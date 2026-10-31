@@ -9,13 +9,13 @@ import {
   AlertTriangle,
   TrendingUp,
   ArrowRight,
-  ExternalLink,
+  Calculator,
+  Activity,
+  Calendar,
 } from 'lucide-react';
 import {
   AreaChart,
   Area,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
@@ -30,7 +30,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/ca
 import { PageHeader } from '../../components/shared/PageHeader';
 import { StatusBadge } from '../../components/shared/StatusBadge';
 import { CurrencyDisplay } from '../../components/shared/CurrencyDisplay';
-import { LoadingSkeleton } from '../../components/shared/LoadingSkeleton';
+import { CardSkeleton } from '../../components/shared/LoadingSkeleton';
 import { formatDate } from '../../lib/utils';
 
 export const Dashboard: React.FC = () => {
@@ -44,19 +44,9 @@ export const Dashboard: React.FC = () => {
     queryFn: () => dashboardService.getMonthlyRevenue(),
   });
 
-  const { data: growthData } = useQuery({
-    queryKey: ['dashboard', 'growth'],
-    queryFn: dashboardService.getSubscriptionGrowth,
-  });
-
   const { data: distData } = useQuery({
     queryKey: ['dashboard', 'distribution'],
     queryFn: dashboardService.getPaymentDistribution,
-  });
-
-  const { data: recentInvoices } = useQuery({
-    queryKey: ['dashboard', 'recent-invoices'],
-    queryFn: () => dashboardService.getRecentInvoices(5),
   });
 
   const { data: overdueInvoices } = useQuery({
@@ -69,129 +59,159 @@ export const Dashboard: React.FC = () => {
     queryFn: () => dashboardService.getRecentSubscriptions(5),
   });
 
-  const PIE_COLORS = ['#724B68', '#36283B', '#10B981', '#EF4444', '#F59E0B'];
+  const PIE_COLORS = ['#714B67', '#4A3043', '#10B981', '#EF4444', '#F59E0B'];
 
   if (kpisLoading) {
-    return <LoadingSkeleton count={6} />;
+    return (
+      <div className="space-y-8">
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <div className="skeleton h-8 w-64" />
+            <div className="skeleton h-4 w-96" />
+          </div>
+          <div className="skeleton h-12 w-44" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-12">
       <PageHeader
-        title="Executive Dashboard"
-        description="Comprehensive real-time metrics for recurring billing, revenue, and subscriptions"
+        title="Subscription Operations & Revenue"
+        description="Real-time aggregate data across subscription contracts, recurring billing, GST invoices, and collections"
+        actions={
+          <div className="flex items-center gap-3">
+            <Link
+              to="/subscriptions"
+              className="px-5 py-2.5 bg-white border-[1.5px] border-black text-odoo-dark font-bold text-xs rounded-xl hover:bg-gray-50 transition-all hover:shadow-[0_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
+            >
+              Browse Subscriptions →
+            </Link>
+          </div>
+        }
       />
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
         {/* Active Subscriptions */}
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                Active Subs
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-plum-light text-plum-primary flex items-center justify-center">
-                <Repeat className="w-4 h-4" />
-              </div>
+        <div className="glass-panel rounded-2xl p-6 anim-spring stagger-1 cursor-default">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-widest">
+              ACTIVE SUBS
             </div>
-            <div className="mt-3">
-              <span className="text-2xl font-bold text-text-primary">
-                {kpis?.activeSubscriptions ?? 0}
-              </span>
+            <div className="w-9 h-9 rounded-lg bg-odoo/10 border border-odoo/20 flex items-center justify-center text-odoo transition-transform hover:rotate-12">
+              <Repeat className="w-5 h-5" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-[2rem] font-bold text-odoo-dark leading-none tabular-nums tracking-tight">
+            {kpis?.activeSubscriptions ?? 0}
+          </div>
+          <div className="text-[0.8125rem] text-gray-500 font-medium mt-3 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            Live contracts
+          </div>
+        </div>
 
         {/* Total Customers */}
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                Customers
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-plum-light text-plum-primary flex items-center justify-center">
-                <Users className="w-4 h-4" />
-              </div>
+        <div className="glass-panel rounded-2xl p-6 anim-spring stagger-2 cursor-default">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-widest">
+              CUSTOMERS
             </div>
-            <div className="mt-3">
-              <span className="text-2xl font-bold text-text-primary">
-                {kpis?.totalCustomers ?? 0}
-              </span>
+            <div className="w-9 h-9 rounded-lg bg-odoo/10 border border-odoo/20 flex items-center justify-center text-odoo transition-transform hover:rotate-12">
+              <Users className="w-5 h-5" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-[2rem] font-bold text-odoo-dark leading-none tabular-nums tracking-tight">
+            {kpis?.totalCustomers ?? 0}
+          </div>
+          <div className="text-[0.8125rem] text-gray-500 font-medium mt-3 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-500" />
+            Verified accounts
+          </div>
+        </div>
 
         {/* Collected Revenue */}
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                Collected
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <DollarSign className="w-4 h-4" />
-              </div>
+        <div className="glass-panel rounded-2xl p-6 anim-spring stagger-3 cursor-default">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-widest">
+              COLLECTED
             </div>
-            <div className="mt-3">
-              <CurrencyDisplay amount={kpis?.collectedRevenue} size="lg" className="text-emerald-700" />
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 transition-transform hover:rotate-12">
+              <DollarSign className="w-5 h-5" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-[1.75rem] font-bold text-emerald-700 leading-none tabular-nums tracking-tight">
+            <CurrencyDisplay amount={kpis?.collectedRevenue} size="lg" className="text-emerald-700" />
+          </div>
+          <div className="text-[0.8125rem] text-gray-500 font-medium mt-3 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            Settled payments
+          </div>
+        </div>
 
         {/* Total Invoiced */}
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                Invoiced
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                <Receipt className="w-4 h-4" />
-              </div>
+        <div className="glass-panel rounded-2xl p-6 anim-spring stagger-3 cursor-default">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-widest">
+              INVOICED
             </div>
-            <div className="mt-3">
-              <CurrencyDisplay amount={kpis?.totalInvoiced} size="lg" />
+            <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 transition-transform hover:rotate-12">
+              <Receipt className="w-5 h-5" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-[1.75rem] font-bold text-odoo-dark leading-none tabular-nums tracking-tight">
+            <CurrencyDisplay amount={kpis?.totalInvoiced} size="lg" />
+          </div>
+          <div className="text-[0.8125rem] text-gray-500 font-medium mt-3 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-500" />
+            GST total billed
+          </div>
+        </div>
 
         {/* Outstanding Amount */}
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                Outstanding
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4" />
-              </div>
+        <div className="glass-panel rounded-2xl p-6 anim-spring stagger-4 cursor-default">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-widest">
+              OUTSTANDING
             </div>
-            <div className="mt-3">
-              <CurrencyDisplay amount={kpis?.outstandingAmount} size="lg" className="text-amber-700" />
+            <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 transition-transform hover:rotate-12">
+              <TrendingUp className="w-5 h-5" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-[1.75rem] font-bold text-amber-700 leading-none tabular-nums tracking-tight">
+            <CurrencyDisplay amount={kpis?.outstandingAmount} size="lg" className="text-amber-700" />
+          </div>
+          <div className="text-[0.8125rem] text-gray-500 font-medium mt-3 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-500" />
+            Awaiting clearance
+          </div>
+        </div>
 
         {/* Overdue Invoices */}
-        <Card className="hover:shadow-md transition-shadow border-rose-200 bg-rose-50/30">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-rose-700 uppercase tracking-wider">
-                Overdue
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center">
-                <AlertTriangle className="w-4 h-4" />
-              </div>
+        <div className="glass-panel rounded-2xl p-6 anim-spring stagger-4 cursor-default border-rose-600">
+          <div className="flex justify-between items-start mb-4">
+            <div className="text-[0.6875rem] font-bold text-rose-700 uppercase tracking-widest">
+              OVERDUE
             </div>
-            <div className="mt-3 flex items-baseline justify-between">
-              <span className="text-2xl font-bold text-rose-700">
-                {kpis?.overdueInvoices ?? 0}
-              </span>
-              <span className="text-[10px] text-rose-600 font-medium">Invoices</span>
+            <div className="w-9 h-9 rounded-lg bg-rose-100 border border-rose-300 flex items-center justify-center text-rose-700 transition-transform hover:rotate-12">
+              <AlertTriangle className="w-5 h-5" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-[2rem] font-bold text-rose-700 leading-none tabular-nums tracking-tight">
+            {kpis?.overdueInvoices ?? 0}
+          </div>
+          <div className="text-[0.8125rem] text-rose-600 font-bold mt-3 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
+            Action required
+          </div>
+        </div>
       </div>
 
       {/* Analytics Charts Row */}
@@ -201,7 +221,7 @@ export const Dashboard: React.FC = () => {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-base">Revenue Inflow</CardTitle>
-              <p className="text-xs text-text-secondary">Cash collections by month for current fiscal year</p>
+              <p className="text-xs text-gray-500">Monthly cash collections for current fiscal period</p>
             </div>
           </CardHeader>
           <CardContent className="pt-4">
@@ -210,11 +230,11 @@ export const Dashboard: React.FC = () => {
                 <AreaChart data={revenueData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#724B68" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#724B68" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#714B67" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#714B67" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E4DEE3" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#000000" strokeOpacity={0.08} vertical={false} />
                   <XAxis dataKey="month" stroke="#746F75" fontSize={11} tickLine={false} />
                   <YAxis
                     stroke="#746F75"
@@ -228,7 +248,7 @@ export const Dashboard: React.FC = () => {
                   <Area
                     type="monotone"
                     dataKey="revenueRupees"
-                    stroke="#724B68"
+                    stroke="#714B67"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#revenueGrad)"
@@ -243,7 +263,7 @@ export const Dashboard: React.FC = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Invoice Status Breakdown</CardTitle>
-            <p className="text-xs text-text-secondary">Distribution across all billing states</p>
+            <p className="text-xs text-gray-500">Distribution across all lifecycle states</p>
           </CardHeader>
           <CardContent className="pt-2">
             <div className="h-48 w-full flex items-center justify-center">
@@ -255,8 +275,8 @@ export const Dashboard: React.FC = () => {
                     nameKey="status"
                     cx="50%"
                     cy="50%"
-                    innerRadius={50}
-                    outerRadius={75}
+                    innerRadius={48}
+                    outerRadius={72}
                     paddingAngle={3}
                   >
                     {(distData || []).map((_, index) => (
@@ -267,7 +287,7 @@ export const Dashboard: React.FC = () => {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-2 space-y-1.5">
+            <div className="mt-3 space-y-1.5">
               {(distData || []).map((item, idx) => (
                 <div key={item.status} className="flex items-center justify-between text-xs">
                   <div className="flex items-center space-x-2">
@@ -275,9 +295,9 @@ export const Dashboard: React.FC = () => {
                       className="w-2.5 h-2.5 rounded-full"
                       style={{ backgroundColor: PIE_COLORS[idx % PIE_COLORS.length] }}
                     />
-                    <span className="text-text-secondary">{item.status}</span>
+                    <span className="text-gray-600 font-medium">{item.status}</span>
                   </div>
-                  <span className="font-semibold text-text-primary">{item.count}</span>
+                  <span className="font-bold text-odoo-dark font-mono">{item.count}</span>
                 </div>
               ))}
             </div>
@@ -285,52 +305,52 @@ export const Dashboard: React.FC = () => {
         </Card>
       </div>
 
-      {/* Tables Row */}
+      {/* Tables Row with .table-row hover treatment */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Overdue Invoices Alert Table */}
-        <Card className="border-rose-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 bg-rose-50/30">
+        <Card className="border-rose-400">
+          <CardHeader className="flex flex-row items-center justify-between pb-3 bg-rose-50/40">
             <div className="flex items-center space-x-2">
-              <AlertTriangle className="w-4 h-4 text-rose-600" />
+              <AlertTriangle className="w-5 h-5 text-rose-600" />
               <CardTitle className="text-base text-rose-950">Overdue Invoices Requiring Follow-Up</CardTitle>
             </div>
-            <Link to="/invoices" className="text-xs text-rose-700 font-semibold hover:underline flex items-center">
+            <Link to="/invoices" className="text-xs text-rose-700 font-bold hover:underline flex items-center">
               View All <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-surface-main text-text-secondary uppercase border-b border-border-main font-semibold">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead className="bg-white/50 text-gray-700 uppercase border-b-[1.5px] border-black/10 font-bold">
                   <tr>
-                    <th className="px-4 py-3">Invoice #</th>
-                    <th className="px-4 py-3">Customer</th>
-                    <th className="px-4 py-3">Due Date</th>
-                    <th className="px-4 py-3 text-right">Outstanding</th>
+                    <th className="px-5 py-3">Invoice #</th>
+                    <th className="px-5 py-3">Customer</th>
+                    <th className="px-5 py-3">Due Date</th>
+                    <th className="px-5 py-3 text-right">Outstanding</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-main/50">
+                <tbody className="divide-y divide-black/10">
                   {(!overdueInvoices || overdueInvoices.length === 0) ? (
                     <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-text-secondary">
-                        No overdue invoices! All payments are up to date.
+                      <td colSpan={4} className="px-5 py-8 text-center text-gray-500 font-medium">
+                        No overdue invoices! All accounts are settled.
                       </td>
                     </tr>
                   ) : (
                     overdueInvoices.map((inv) => (
-                      <tr key={inv.id} className="hover:bg-rose-50/20 transition-colors">
-                        <td className="px-4 py-3 font-semibold text-plum-primary">
-                          <Link to={`/invoices`} className="hover:underline">
+                      <tr key={inv.id} className="table-row cursor-pointer">
+                        <td className="px-5 py-3.5 font-bold text-odoo">
+                          <Link to="/invoices" className="hover:underline">
                             {inv.number}
                           </Link>
                         </td>
-                        <td className="px-4 py-3 text-text-primary font-medium truncate max-w-[150px]">
+                        <td className="px-5 py-3.5 text-odoo-dark font-semibold truncate max-w-[150px]">
                           {inv.customer.name}
                         </td>
-                        <td className="px-4 py-3 text-rose-600 font-semibold">
+                        <td className="px-5 py-3.5 text-rose-600 font-bold">
                           {formatDate(inv.dueDate)}
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-5 py-3.5 text-right font-mono">
                           <CurrencyDisplay amount={inv.outstanding} size="sm" className="text-rose-700 font-bold" />
                         </td>
                       </tr>
@@ -346,45 +366,45 @@ export const Dashboard: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-base">Active Subscriptions</CardTitle>
-            <Link to="/subscriptions" className="text-xs text-plum-primary font-semibold hover:underline flex items-center">
+            <Link to="/subscriptions" className="text-xs text-odoo font-bold hover:underline flex items-center">
               View All <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-surface-main text-text-secondary uppercase border-b border-border-main font-semibold">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead className="bg-white/50 text-gray-700 uppercase border-b-[1.5px] border-black/10 font-bold">
                   <tr>
-                    <th className="px-4 py-3">Subscription #</th>
-                    <th className="px-4 py-3">Customer</th>
-                    <th className="px-4 py-3">Plan</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3 text-right">Amount</th>
+                    <th className="px-5 py-3">Subscription #</th>
+                    <th className="px-5 py-3">Customer</th>
+                    <th className="px-5 py-3">Plan</th>
+                    <th className="px-5 py-3">Status</th>
+                    <th className="px-5 py-3 text-right">Amount</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-main/50">
+                <tbody className="divide-y divide-black/10">
                   {(!recentSubscriptions || recentSubscriptions.length === 0) ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-text-secondary">
+                      <td colSpan={5} className="px-5 py-8 text-center text-gray-500 font-medium">
                         No subscriptions found.
                       </td>
                     </tr>
                   ) : (
                     recentSubscriptions.map((sub) => (
-                      <tr key={sub.id} className="hover:bg-surface-main/50 transition-colors">
-                        <td className="px-4 py-3 font-semibold text-plum-primary">
+                      <tr key={sub.id} className="table-row cursor-pointer">
+                        <td className="px-5 py-3.5 font-bold text-odoo">
                           <Link to={`/subscriptions/${sub.id}`} className="hover:underline">
                             {sub.number}
                           </Link>
                         </td>
-                        <td className="px-4 py-3 text-text-primary font-medium truncate max-w-[130px]">
+                        <td className="px-5 py-3.5 text-odoo-dark font-semibold truncate max-w-[130px]">
                           {sub.customer.name}
                         </td>
-                        <td className="px-4 py-3 text-text-secondary">{sub.plan.name}</td>
-                        <td className="px-4 py-3">
+                        <td className="px-5 py-3.5 text-gray-600 font-medium">{sub.plan.name}</td>
+                        <td className="px-5 py-3.5">
                           <StatusBadge status={sub.status} />
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-5 py-3.5 text-right font-mono font-bold">
                           <CurrencyDisplay amount={sub.total} size="sm" />
                         </td>
                       </tr>
@@ -399,4 +419,3 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
-

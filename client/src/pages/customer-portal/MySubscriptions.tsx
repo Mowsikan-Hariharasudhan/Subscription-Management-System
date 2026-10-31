@@ -6,8 +6,6 @@ import { StatusBadge } from '../../components/shared/StatusBadge';
 import { CurrencyDisplay } from '../../components/shared/CurrencyDisplay';
 import { LoadingSkeleton } from '../../components/shared/LoadingSkeleton';
 import { EmptyState } from '../../components/shared/EmptyState';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
 import { formatDate } from '../../lib/utils';
 
 export const MySubscriptions: React.FC = () => {
@@ -19,83 +17,108 @@ export const MySubscriptions: React.FC = () => {
   if (isLoading) return <LoadingSkeleton count={3} />;
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-xl font-bold text-text-primary">My Subscriptions</h1>
-        <p className="text-sm text-text-secondary mt-0.5">View your current and past subscriptions</p>
+    <div className="space-y-6 flex flex-col flex-1 pb-10">
+      <div className="anim-slide-up">
+        <h1 className="text-[2.25rem] font-bold tracking-tight text-odoo-dark leading-tight">
+          My Subscriptions
+        </h1>
+        <p className="text-[0.9375rem] text-gray-500 font-medium mt-1">
+          Active contracts, recurring intervals, renewal dates, and line entitlements
+        </p>
       </div>
 
       {!subscriptions || subscriptions.length === 0 ? (
-        <EmptyState title="No subscriptions" description="You don't have any active subscriptions yet." icon={<Repeat className="w-8 h-8" />} />
+        <EmptyState
+          title="No subscriptions"
+          description="You don't have any active subscriptions yet."
+          icon={<Repeat className="w-8 h-8" />}
+        />
       ) : (
-        <div className="space-y-4">
-          {subscriptions.map((sub) => (
-            <Card key={sub.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-9 h-9 rounded-lg bg-plum-light text-plum-primary flex items-center justify-center">
-                      <Repeat className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="font-mono text-sm font-semibold text-plum-primary">{sub.number}</p>
-                      <p className="text-xs text-text-secondary">{sub.plan?.name}</p>
-                    </div>
+        <div className="space-y-5">
+          {subscriptions.map((sub, idx) => (
+            <div
+              key={sub.id}
+              className="glass-panel rounded-2xl p-6 anim-spring"
+              style={{ animationDelay: `${idx * 60}ms` }}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-[1.5px] border-black/10 gap-3">
+                <div className="flex items-center space-x-3.5">
+                  <div className="w-10 h-10 rounded-xl glass-odoo text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0">
+                    <Repeat className="w-5 h-5" />
                   </div>
+                  <div>
+                    <span className="font-mono text-sm font-bold text-odoo tracking-tight block">
+                      {sub.number}
+                    </span>
+                    <span className="text-xs font-semibold text-gray-600 block mt-0.5">
+                      {sub.plan?.name}
+                    </span>
+                  </div>
+                </div>
+                <div>
                   <StatusBadge status={sub.status} />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <p className="text-xs text-text-secondary mb-1">Billing Cycle</p>
-                    <Badge variant="secondary" className="text-xs">{sub.plan?.billingFrequency}</Badge>
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-secondary mb-1">Start Date</p>
-                    <p className="font-medium text-text-primary flex items-center">
-                      <Calendar className="w-3.5 h-3.5 mr-1 text-text-secondary" />
-                      {formatDate(sub.startDate)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-secondary mb-1">Expiry Date</p>
-                    <p className="font-medium text-text-primary">
-                      {sub.expiryDate ? formatDate(sub.expiryDate) : 'No expiry'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-secondary mb-1">Next Billing</p>
-                    <p className={`font-medium flex items-center ${sub.nextBillingDate ? 'text-text-primary' : 'text-text-secondary'}`}>
-                      <RefreshCw className="w-3.5 h-3.5 mr-1 text-text-secondary" />
-                      {sub.nextBillingDate ? formatDate(sub.nextBillingDate) : '—'}
-                    </p>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mt-5">
+                <div>
+                  <p className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    Billing Cycle
+                  </p>
+                  <span className="inline-block px-2.5 py-1 rounded bg-odoo/10 border border-odoo/20 text-xs font-bold text-odoo-dark font-mono uppercase">
+                    {sub.plan?.billingFrequency}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    Start Date
+                  </p>
+                  <p className="font-semibold text-odoo-dark flex items-center font-mono text-xs">
+                    <Calendar className="w-3.5 h-3.5 mr-1 text-odoo opacity-60" />
+                    {formatDate(sub.startDate)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    Expiry Date
+                  </p>
+                  <p className="font-semibold text-odoo-dark font-mono text-xs">
+                    {sub.expiryDate ? formatDate(sub.expiryDate) : 'Perpetual renewal'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    Next Billing
+                  </p>
+                  <p className="font-bold font-mono text-xs flex items-center text-odoo">
+                    <RefreshCw className="w-3.5 h-3.5 mr-1 opacity-70" />
+                    {sub.nextBillingDate ? formatDate(sub.nextBillingDate) : '—'}
+                  </p>
+                </div>
+              </div>
+
+              {sub.lines && sub.lines.length > 0 && (
+                <div className="mt-5 pt-4 border-t-[1.5px] border-black/10">
+                  <p className="text-[0.6875rem] font-bold text-gray-500 uppercase tracking-wider mb-3">
+                    Contract Entitlements & Lines
+                  </p>
+                  <div className="space-y-2">
+                    {sub.lines.map((line) => (
+                      <div
+                        key={line.id}
+                        className="flex items-center justify-between text-xs py-2 px-3 rounded-lg bg-white/60 border border-black/10"
+                      >
+                        <span className="font-semibold text-odoo-dark">{line.product?.name}</span>
+                        <div className="flex items-center gap-4 font-mono font-bold">
+                          <span className="text-gray-500">Qty: {line.quantity}</span>
+                          <CurrencyDisplay amount={line.lineTotal} size="sm" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-
-                {sub.lines && sub.lines.length > 0 && (
-                  <div className="mt-4 pt-3 border-t border-border-main/40">
-                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-2">Included Items</p>
-                    <div className="space-y-1">
-                      {sub.lines.map((line) => (
-                        <div key={line.id} className="flex justify-between items-center text-sm">
-                          <span className="text-text-secondary">
-                            {line.product?.name}
-                            {line.variant && <span className="text-xs ml-1 text-plum-muted">({line.variant.name})</span>}
-                            <span className="text-xs ml-1">× {line.quantity}</span>
-                          </span>
-                          <CurrencyDisplay amount={line.lineTotal} size="sm" className="font-medium" />
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-border-main/40 font-semibold">
-                      <span className="text-sm">Per Billing Period</span>
-                      <CurrencyDisplay amount={sub.total} size="sm" className="font-bold text-plum-primary" />
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              )}
+            </div>
           ))}
         </div>
       )}

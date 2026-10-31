@@ -4,15 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Building2, Phone, Mail } from 'lucide-react';
 import { customerService } from '../../services/customerService';
 import { Customer } from '../../types';
-import { PageHeader } from '../../components/shared/PageHeader';
 import { DataTable, Column } from '../../components/shared/DataTable';
 import { Pagination } from '../../components/shared/Pagination';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
 import { Dialog } from '../../components/ui/dialog';
-import { Badge } from '../../components/ui/badge';
-import { formatDate } from '../../lib/utils';
+import { formatDate, cn } from '../../lib/utils';
 
 export const Customers: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -49,36 +44,50 @@ export const Customers: React.FC = () => {
     createMutation.mutate(formData);
   };
 
+  const getInitials = (name?: string) => {
+    if (!name) return 'CU';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
   const columns: Column<Customer>[] = [
     {
       header: 'Customer',
+      className: 'w-[28%]',
       cell: (c) => (
-        <div>
-          <span className="font-semibold text-text-primary hover:text-plum-primary transition-colors block">
-            {c.name}
-          </span>
-          {c.companyName && (
-            <span className="text-xs text-text-secondary flex items-center space-x-1 mt-0.5">
-              <Building2 className="w-3 h-3 text-text-secondary/70" />
-              <span>{c.companyName}</span>
-            </span>
-          )}
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-odoo/10 text-odoo font-bold flex items-center justify-center text-[0.75rem] border border-odoo/20 group-hover:bg-odoo group-hover:text-white transition-colors shrink-0">
+            {getInitials(c.companyName || c.name)}
+          </div>
+          <div className="min-w-0">
+            <div className="text-[0.875rem] font-bold text-odoo-dark truncate">{c.name}</div>
+            {c.companyName && (
+              <div className="text-[0.75rem] text-gray-500 font-medium flex items-center gap-1 mt-0.5 truncate">
+                <Building2 className="w-3 h-3 opacity-60 shrink-0" />
+                <span className="truncate">{c.companyName}</span>
+              </div>
+            )}
+          </div>
         </div>
       ),
     },
     {
-      header: 'Contact',
+      header: 'Contact Details',
+      className: 'w-[28%]',
       cell: (c) => (
-        <div className="space-y-0.5 text-xs text-text-secondary">
+        <div className="space-y-1">
           {c.user?.email && (
-            <div className="flex items-center space-x-1.5">
-              <Mail className="w-3 h-3 text-plum-primary" />
-              <span>{c.user.email}</span>
+            <div className="text-[0.8125rem] text-gray-700 font-medium flex items-center gap-2 truncate">
+              <Mail className="w-3.5 h-3.5 text-odoo opacity-60 shrink-0" />
+              <span className="truncate">{c.user.email}</span>
             </div>
           )}
           {c.phone && (
-            <div className="flex items-center space-x-1.5">
-              <Phone className="w-3 h-3 text-text-secondary/60" />
+            <div className="text-[0.8125rem] text-gray-500 font-medium flex items-center gap-2">
+              <Phone className="w-3.5 h-3.5 text-odoo opacity-60 shrink-0" />
               <span>{c.phone}</span>
             </div>
           )}
@@ -87,160 +96,220 @@ export const Customers: React.FC = () => {
     },
     {
       header: 'Subscriptions',
-      cell: (c) => (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-plum-light text-plum-deep">
-          {c._count?.subscriptions || 0} active
-        </span>
-      ),
+      className: 'text-center',
+      cell: (c) => {
+        const count = c._count?.subscriptions || 0;
+        return (
+          <div className="text-center">
+            <span
+              className={cn(
+                'inline-flex items-center justify-center px-2.5 py-1 rounded text-[0.75rem] font-bold font-mono',
+                count > 0
+                  ? 'bg-odoo/10 border border-odoo/20 text-odoo-dark'
+                  : 'bg-gray-100 border border-gray-200 text-gray-500'
+              )}
+            >
+              <span className={cn('mr-1', count === 0 ? 'text-gray-900' : 'text-odoo font-bold')}>{count}</span> ACTIVE
+            </span>
+          </div>
+        );
+      },
     },
     {
       header: 'Invoices',
+      className: 'text-center',
       cell: (c) => (
-        <span className="text-xs font-medium text-text-secondary">
-          {c._count?.invoices || 0} total
-        </span>
+        <div className="text-center">
+          <span className="inline-flex items-center justify-center px-2.5 py-1 rounded bg-gray-100 border border-gray-200 text-[0.75rem] font-bold text-gray-500 font-mono">
+            <span className="text-gray-900 mr-1">{c._count?.invoices || 0}</span> TOTAL
+          </span>
+        </div>
       ),
     },
     {
       header: 'Status',
+      className: 'text-center',
       cell: (c) => (
-        <Badge variant={c.isActive ? 'success' : 'danger'}>
-          {c.isActive ? 'ACTIVE' : 'INACTIVE'}
-        </Badge>
+        <div className="text-center">
+          <span
+            className={cn(
+              'inline-flex items-center px-2.5 py-1 rounded border-[1.5px] border-black text-[0.625rem] font-bold uppercase tracking-widest shadow-[2px_2px_0_#000]',
+              c.isActive ? 'bg-[#d1fae5] text-[#047857]' : 'bg-[#fee2e2] text-[#b91c1c]'
+            )}
+          >
+            {c.isActive ? 'ACTIVE' : 'INACTIVE'}
+          </span>
+        </div>
       ),
     },
     {
       header: 'Joined',
-      cell: (c) => <span className="text-xs text-text-secondary">{formatDate(c.createdAt)}</span>,
+      className: 'text-right',
+      cell: (c) => (
+        <div className="text-right text-[0.8125rem] font-medium text-gray-500">
+          {formatDate(c.createdAt)}
+        </div>
+      ),
     },
   ];
 
   return (
-    <div className="space-y-4">
-      <PageHeader
-        title="Customers"
-        description="Manage customer enterprise profiles, subscriptions, and billing accounts"
-        actions={
-          <Button onClick={() => setIsCreateOpen(true)} size="sm">
-            <Plus className="w-4 h-4 mr-1" /> Add Customer
-          </Button>
-        }
-      />
+    <div className="space-y-6 flex flex-col flex-1 pb-10">
+      {/* Page Header */}
+      <div className="flex justify-between items-end anim-slide-up">
+        <div>
+          <h1 className="text-[2.25rem] font-bold tracking-tight text-odoo-dark leading-tight">
+            Customers
+          </h1>
+          <p className="text-[0.9375rem] text-gray-500 font-medium mt-1">
+            Manage customer enterprise profiles, subscriptions, and billing accounts
+          </p>
+        </div>
+      </div>
 
-      {/* Filter / Search Bar */}
-      <div className="bg-white p-3.5 rounded-xl border border-border-main flex items-center justify-between gap-4">
-        <div className="relative w-full max-w-sm">
-          <Input
+      {/* Action Bar (Search + Add) */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 anim-slide-up" style={{ animationDelay: '50ms' }}>
+        <div className="relative w-full sm:w-[28rem]">
+          <Search className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
             placeholder="Search by name, company, phone or email..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="pl-9 h-9 text-xs"
+            className="input-focus w-full pl-11 pr-4 py-2.5 bg-white border-[1.5px] border-black rounded-lg text-[0.875rem] font-medium text-odoo-dark shadow-sm"
           />
-          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
         </div>
+
+        <button
+          onClick={() => setIsCreateOpen(true)}
+          className="text-white px-5 py-2.5 rounded-lg text-[0.875rem] font-bold flex items-center justify-center gap-2 btn-primary cursor-pointer shrink-0"
+        >
+          <Plus className="w-4 h-4" /> Add Customer
+        </button>
       </div>
 
-      {/* Customer Data Table */}
-      <DataTable
-        columns={columns}
-        data={data?.data || []}
-        isLoading={isLoading}
-        onRowClick={(c) => navigate(`/customers/${c.id}`)}
-        emptyTitle="No customers match your search"
-        emptyDescription="Create a customer account or try modifying your search keywords."
-      />
-
-      {data?.pagination && (
-        <Pagination
-          page={page}
-          totalPages={data.pagination.totalPages}
-          total={data.pagination.total}
-          limit={data.pagination.limit}
-          onPageChange={setPage}
+      {/* Customer Data Table Container */}
+      <div className="flex flex-col flex-1">
+        <DataTable
+          columns={columns}
+          data={data?.data || []}
+          isLoading={isLoading}
+          onRowClick={(c) => navigate(`/customers/${c.id}`)}
+          emptyTitle="No customers match your search"
+          emptyDescription="Create a customer account or try modifying your search keywords."
         />
-      )}
 
-      {/* Create Customer Dialog */}
+        {data?.pagination && (
+          <div className="mt-4">
+            <Pagination
+              page={page}
+              totalPages={data.pagination.totalPages}
+              total={data.pagination.total}
+              limit={10}
+              onPageChange={setPage}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Add Customer Modal */}
       <Dialog
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        title="Add New Customer"
-        description="Creates a customer record and creates a portal account"
+        title="Create Customer Account"
+        description="Provision a new enterprise customer tenant into Brightloop"
       >
-        <form onSubmit={handleCreateSubmit} className="space-y-3.5">
-          <div>
-            <Label htmlFor="cust-name" required>
-              Customer / Contact Name
-            </Label>
-            <Input
-              id="cust-name"
-              placeholder="e.g. Wayne Enterprises"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="cust-company">Company Name</Label>
-            <Input
-              id="cust-company"
-              placeholder="e.g. Wayne Enterprises Inc."
-              value={formData.companyName}
-              onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <form onSubmit={handleCreateSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="cust-email" required>
-                Login Email
-              </Label>
-              <Input
-                id="cust-email"
-                type="email"
-                placeholder="contact@company.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Full Name <span className="text-red-500">*</span>
+              </label>
+              <input
                 required
+                type="text"
+                placeholder="e.g. Amanda Roberts"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
               />
             </div>
-
             <div>
-              <Label htmlFor="cust-phone">Phone</Label>
-              <Input
-                id="cust-phone"
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Work Email <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                type="email"
+                placeholder="amanda@cyberdyne.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Company Name
+              </label>
+              <input
+                type="text"
+                placeholder="Cyberdyne AI Inc."
+                value={formData.companyName}
+                onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Phone Number
+              </label>
+              <input
+                type="text"
                 placeholder="+91 98765 43210"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="cust-addr">Billing Address</Label>
-            <Input
-              id="cust-addr"
-              placeholder="10 Downing St, Floor 4"
+            <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+              Billing Address
+            </label>
+            <input
+              type="text"
+              placeholder="Building 4, Tech Park, Whitefield, Bengaluru - 560066"
               value={formData.billingAddress}
               onChange={(e) => setFormData({ ...formData, billingAddress: e.target.value })}
+              className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
             />
           </div>
 
-          <div className="mt-5 flex justify-end space-x-2 pt-2 border-t border-border-main/60">
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)}>
+          <div className="pt-4 flex justify-end gap-3 border-t-[1.5px] border-black/10">
+            <button
+              type="button"
+              onClick={() => setIsCreateOpen(false)}
+              className="px-5 py-2.5 bg-white border-[1.5px] border-black text-odoo-dark font-bold text-[0.875rem] rounded-xl hover:bg-gray-50 transition-all hover:shadow-[0_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none cursor-pointer"
+            >
               Cancel
-            </Button>
-            <Button type="submit" size="sm" isLoading={createMutation.isPending}>
-              Create Customer
-            </Button>
+            </button>
+            <button
+              type="submit"
+              disabled={createMutation.isPending}
+              className="px-6 py-2.5 text-white font-bold text-[0.875rem] rounded-xl btn-primary cursor-pointer"
+            >
+              {createMutation.isPending ? 'Provisioning...' : 'Create Customer'}
+            </button>
           </div>
         </form>
       </Dialog>
     </div>
   );
 };
-

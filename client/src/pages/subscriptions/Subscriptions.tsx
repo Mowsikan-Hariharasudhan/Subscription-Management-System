@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Repeat, Filter } from 'lucide-react';
+import { Plus, Search, Repeat } from 'lucide-react';
 import { subscriptionService } from '../../services/subscriptionService';
 import { Subscription, SubscriptionStatus } from '../../types';
-import { PageHeader } from '../../components/shared/PageHeader';
 import { DataTable, Column } from '../../components/shared/DataTable';
 import { Pagination } from '../../components/shared/Pagination';
 import { StatusBadge } from '../../components/shared/StatusBadge';
 import { CurrencyDisplay } from '../../components/shared/CurrencyDisplay';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
 import { formatDate } from '../../lib/utils';
 
 const STATUS_OPTIONS: SubscriptionStatus[] = ['DRAFT', 'QUOTATION', 'CONFIRMED', 'ACTIVE', 'PAUSED', 'CLOSED'];
@@ -29,21 +26,23 @@ export const Subscriptions: React.FC = () => {
   const columns: Column<Subscription>[] = [
     {
       header: 'Subscription #',
+      className: 'w-[20%]',
       cell: (s) => (
-        <div className="flex items-center space-x-2">
-          <div className="w-7 h-7 rounded-lg bg-plum-light text-plum-primary flex items-center justify-center">
-            <Repeat className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-odoo/10 text-odoo font-bold flex items-center justify-center text-[0.75rem] border border-odoo/20 group-hover:bg-odoo group-hover:text-white transition-colors shrink-0">
+            <Repeat className="w-4 h-4" />
           </div>
-          <span className="font-mono text-xs font-semibold text-plum-primary">{s.number}</span>
+          <span className="font-mono text-xs font-bold text-odoo tracking-tight">{s.number}</span>
         </div>
       ),
     },
     {
       header: 'Customer',
+      className: 'w-[24%]',
       cell: (s) => (
         <div>
-          <p className="font-semibold text-text-primary text-sm">{s.customer?.name}</p>
-          <p className="text-xs text-text-secondary">{s.customer?.companyName}</p>
+          <p className="font-bold text-odoo-dark text-[0.875rem]">{s.customer?.name}</p>
+          <p className="text-[0.75rem] text-gray-500 font-medium truncate mt-0.5">{s.customer?.companyName || 'Individual'}</p>
         </div>
       ),
     },
@@ -51,88 +50,127 @@ export const Subscriptions: React.FC = () => {
       header: 'Plan',
       cell: (s) => (
         <div>
-          <p className="font-medium text-sm text-text-primary">{s.plan?.name}</p>
-          <p className="text-xs text-text-secondary uppercase tracking-wide">{s.plan?.billingFrequency}</p>
+          <p className="font-semibold text-sm text-odoo-dark">{s.plan?.name}</p>
+          <span className="inline-block mt-0.5 px-2 py-0.5 rounded bg-gray-100 border border-gray-200 text-[0.6875rem] font-bold text-gray-600 font-mono uppercase">
+            {s.plan?.billingFrequency}
+          </span>
         </div>
       ),
     },
     {
       header: 'Status',
-      cell: (s) => <StatusBadge status={s.status} />,
-    },
-    {
-      header: 'Start Date',
-      cell: (s) => <span className="text-xs text-text-secondary">{formatDate(s.startDate)}</span>,
-    },
-    {
-      header: 'Next Billing',
+      className: 'text-center',
       cell: (s) => (
-        <span className="text-xs text-text-secondary">
-          {s.nextBillingDate ? formatDate(s.nextBillingDate) : '—'}
-        </span>
+        <div className="text-center">
+          <StatusBadge status={s.status} />
+        </div>
       ),
     },
     {
-      header: 'Total',
-      cell: (s) => <CurrencyDisplay amount={s.total} size="sm" className="font-semibold" />,
+      header: 'Next Billing',
+      className: 'text-center',
+      cell: (s) => (
+        <div className="text-center text-[0.8125rem] font-semibold text-gray-700 font-mono">
+          {s.nextBillingDate ? formatDate(s.nextBillingDate) : '—'}
+        </div>
+      ),
+    },
+    {
+      header: 'Total Value',
+      className: 'text-right font-mono',
+      cell: (s) => (
+        <div className="text-right font-mono font-bold text-[0.875rem] text-odoo-dark">
+          <CurrencyDisplay amount={s.total} size="sm" />
+        </div>
+      ),
     },
   ];
 
   return (
-    <div className="space-y-4">
-      <PageHeader
-        title="Subscriptions"
-        description="Manage the complete subscription lifecycle from draft to closure"
-        actions={
-          <Button onClick={() => navigate('/quotations')} size="sm">
-            <Plus className="w-4 h-4 mr-1" /> New Subscription
-          </Button>
-        }
-      />
-
-      <div className="bg-white p-3.5 rounded-xl border border-border-main flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px] max-w-xs">
-          <Input
-            placeholder="Search by number or customer..."
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="pl-9 h-9 text-xs"
-          />
-          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
-        </div>
-        <div className="flex items-center space-x-2">
-          <Filter className="w-4 h-4 text-text-secondary" />
-          <select
-            value={statusFilter}
-            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-border-main bg-white px-3 text-xs text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20"
-          >
-            <option value="">All Statuses</option>
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+    <div className="space-y-6 flex flex-col flex-1 pb-10">
+      {/* Page Header */}
+      <div className="flex justify-between items-end anim-slide-up">
+        <div>
+          <h1 className="text-[2.25rem] font-bold tracking-tight text-odoo-dark leading-tight">
+            Subscriptions
+          </h1>
+          <p className="text-[0.9375rem] text-gray-500 font-medium mt-1">
+            Manage the complete recurring contract lifecycle from quotation to renewal
+          </p>
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data?.data || []}
-        isLoading={isLoading}
-        onRowClick={(s) => navigate(`/subscriptions/${s.id}`)}
-        emptyTitle="No subscriptions found"
-        emptyDescription="Subscriptions are created by converting accepted quotations."
-      />
+      {/* Action & Filter Bar */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 anim-slide-up" style={{ animationDelay: '50ms' }}>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+          <div className="relative w-full sm:w-[24rem]">
+            <Search className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search by contract # or customer..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="input-focus w-full pl-11 pr-4 py-2.5 bg-white border-[1.5px] border-black rounded-lg text-[0.875rem] font-medium text-odoo-dark shadow-sm"
+            />
+          </div>
 
-      {data?.pagination && (
-        <Pagination
-          page={page}
-          totalPages={data.pagination.totalPages}
-          total={data.pagination.total}
-          limit={data.pagination.limit}
-          onPageChange={setPage}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            <button
+              onClick={() => { setStatusFilter(''); setPage(1); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border-[1.5px] border-black cursor-pointer ${
+                !statusFilter ? 'bg-odoo text-white shadow-[2px_2px_0_#000]' : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              ALL
+            </button>
+            {STATUS_OPTIONS.map((st) => (
+              <button
+                key={st}
+                onClick={() => { setStatusFilter(st); setPage(1); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border-[1.5px] border-black cursor-pointer ${
+                  statusFilter === st ? 'bg-odoo text-white shadow-[2px_2px_0_#000]' : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {st}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={() => navigate('/quotations')}
+          className="text-white px-5 py-2.5 rounded-lg text-[0.875rem] font-bold flex items-center justify-center gap-2 btn-primary cursor-pointer shrink-0"
+        >
+          <Plus className="w-4 h-4" /> New Subscription
+        </button>
+      </div>
+
+      {/* Subscription Table */}
+      <div className="flex flex-col flex-1">
+        <DataTable
+          columns={columns}
+          data={data?.data || []}
+          isLoading={isLoading}
+          onRowClick={(s) => navigate(`/subscriptions/${s.id}`)}
+          emptyTitle="No subscriptions match this filter"
+          emptyDescription="Create a quotation or adjust your search filter."
         />
-      )}
+
+        {data?.pagination && (
+          <div className="mt-4">
+            <Pagination
+              page={page}
+              totalPages={data.pagination.totalPages}
+              total={data.pagination.total}
+              limit={data.pagination.limit}
+              onPageChange={setPage}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

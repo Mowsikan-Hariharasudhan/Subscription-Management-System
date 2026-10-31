@@ -38,41 +38,49 @@ export function DataTable<T extends { id?: string | number }>({
   }
 
   return (
-    <div className={cn('w-full overflow-x-auto rounded-xl border border-border-main bg-white shadow-xs', className)}>
-      <table className="w-full text-left text-sm text-text-primary">
-        <thead className="bg-surface-main text-xs uppercase tracking-wider text-text-secondary border-b border-border-main font-semibold">
-          <tr>
-            {columns.map((col, idx) => (
-              <th key={idx} scope="col" className={cn('px-5 py-3.5', col.className)}>
-                {col.header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border-main/60">
-          {data.map((item, rowIdx) => (
-            <tr
-              key={item.id ? String(item.id) : rowIdx}
-              onClick={() => onRowClick && onRowClick(item)}
-              className={cn(
-                'transition-colors hover:bg-surface-main/60',
-                onRowClick && 'cursor-pointer'
-              )}
-            >
-              {columns.map((col, colIdx) => (
-                <td key={colIdx} className={cn('px-5 py-4 whitespace-nowrap', col.className)}>
-                  {col.cell
-                    ? col.cell(item)
-                    : col.accessorKey
-                    ? (item[col.accessorKey] as any)
-                    : null}
-                </td>
+    <div className={cn('glass-panel rounded-xl overflow-hidden anim-slide-up flex flex-col flex-1 shadow-sm', className)}>
+      <div className="overflow-x-auto flex-1">
+        <table className="w-full text-left border-collapse min-w-[900px]">
+          <thead className="bg-[#f8f6f8] border-b-[1.5px] border-black">
+            <tr>
+              {columns.map((col, idx) => (
+                <th
+                  key={idx}
+                  scope="col"
+                  className={cn(
+                    'px-6 py-4 text-[0.6875rem] font-bold text-gray-600 uppercase tracking-widest',
+                    col.className
+                  )}
+                >
+                  {col.header}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {data.map((item, rowIdx) => (
+              <tr
+                key={item.id ? String(item.id) : rowIdx}
+                onClick={() => onRowClick && onRowClick(item)}
+                className={cn(
+                  'table-row cursor-pointer bg-white group',
+                  onRowClick && 'cursor-pointer'
+                )}
+              >
+                {columns.map((col, colIdx) => (
+                  <td key={colIdx} className={cn('px-6 py-4.5', col.className)}>
+                    {col.cell
+                      ? col.cell(item)
+                      : col.accessorKey
+                      ? (item[col.accessorKey] as any)
+                      : null}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
-

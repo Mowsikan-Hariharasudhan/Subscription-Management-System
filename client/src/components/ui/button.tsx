@@ -10,22 +10,22 @@ export interface ButtonProps
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading = false, children, disabled, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum-primary disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+    const baseStyles = 'inline-flex items-center justify-center font-bold rounded-xl transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
 
     const variants = {
-      primary: 'bg-plum-primary text-white hover:bg-[#5f3e57] shadow-sm',
-      secondary: 'bg-plum-light text-plum-deep hover:bg-[#e8deea]',
-      outline: 'border border-border-main bg-white hover:bg-surface-main text-text-primary',
-      ghost: 'hover:bg-plum-light hover:text-plum-deep text-text-secondary',
-      danger: 'bg-rose-600 text-white hover:bg-rose-700 shadow-sm',
-      link: 'text-plum-primary underline-offset-4 hover:underline p-0 h-auto',
+      primary: 'btn-primary text-white',
+      secondary: 'btn-brutal-secondary text-odoo-dark',
+      outline: 'btn-brutal-secondary text-odoo-dark',
+      ghost: 'text-gray-700 hover:text-odoo-dark hover:bg-black/5 border border-transparent',
+      danger: 'bg-rose-600 hover:bg-rose-700 text-white border-[1.5px] border-black shadow-[0_4px_0_0_#000] hover:shadow-[0_6px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none',
+      link: 'text-odoo font-bold underline-offset-4 hover:underline p-0 h-auto',
     };
 
     const sizes = {
       sm: 'h-8 px-3 text-xs gap-1.5',
-      md: 'h-9 px-4 text-sm gap-2',
-      lg: 'h-11 px-6 text-base gap-2.5',
-      icon: 'h-9 w-9 p-0',
+      md: 'h-10 px-4 text-sm gap-2',
+      lg: 'h-12 px-6 text-[0.9375rem] gap-2.5',
+      icon: 'h-10 w-10 p-0',
     };
 
     return (
@@ -47,4 +47,3 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 Button.displayName = 'Button';
-

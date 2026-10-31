@@ -8,14 +8,10 @@ import { planService } from '../../services/planService';
 import { productService } from '../../services/productService';
 import { taxService } from '../../services/taxService';
 import { Quotation } from '../../types';
-import { PageHeader } from '../../components/shared/PageHeader';
 import { DataTable, Column } from '../../components/shared/DataTable';
 import { Pagination } from '../../components/shared/Pagination';
 import { StatusBadge } from '../../components/shared/StatusBadge';
 import { CurrencyDisplay } from '../../components/shared/CurrencyDisplay';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
 import { Dialog } from '../../components/ui/dialog';
 import { formatDate } from '../../lib/utils';
 
@@ -93,140 +89,156 @@ export const Quotations: React.FC = () => {
   const columns: Column<Quotation>[] = [
     {
       header: 'Quotation #',
+      className: 'w-[18%]',
       cell: (q) => (
-        <span className="font-semibold text-plum-primary hover:underline">
-          {q.number}
-        </span>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-odoo/10 text-odoo font-bold flex items-center justify-center text-[0.75rem] border border-odoo/20 group-hover:bg-odoo group-hover:text-white transition-colors shrink-0">
+            <FileText className="w-4 h-4" />
+          </div>
+          <span className="font-mono text-xs font-bold text-odoo tracking-tight">{q.number}</span>
+        </div>
       ),
     },
     {
       header: 'Customer',
+      className: 'w-[26%]',
       cell: (q) => (
         <div>
-          <span className="font-semibold text-text-primary block">{q.customer?.name}</span>
-          {q.customer?.companyName && (
-            <span className="text-xs text-text-secondary">{q.customer.companyName}</span>
-          )}
+          <span className="font-bold text-odoo-dark text-[0.875rem] block">{q.customer?.name}</span>
+          <span className="text-[0.75rem] text-gray-500 font-medium truncate mt-0.5 block">
+            {q.customer?.companyName || 'Individual'}
+          </span>
         </div>
       ),
     },
     {
       header: 'Subscription Plan',
       cell: (q) => (
-        <span className="text-xs text-text-secondary">{q.plan?.name || 'Manual'}</span>
+        <span className="inline-block px-2 py-0.5 rounded bg-gray-100 border border-gray-200 text-[0.6875rem] font-bold text-gray-700 font-mono uppercase">
+          {q.plan?.name || 'Custom Blueprint'}
+        </span>
       ),
     },
     {
       header: 'Status',
-      cell: (q) => <StatusBadge status={q.status} />,
+      className: 'text-center',
+      cell: (q) => (
+        <div className="text-center">
+          <StatusBadge status={q.status} />
+        </div>
+      ),
     },
     {
-      header: 'Total Amount',
-      cell: (q) => <CurrencyDisplay amount={q.total} size="sm" className="font-bold text-text-primary" />,
+      header: 'Total Value',
+      className: 'font-mono text-right',
+      cell: (q) => (
+        <div className="text-right font-mono font-bold text-[0.875rem] text-odoo-dark">
+          <CurrencyDisplay amount={q.total} size="sm" />
+        </div>
+      ),
     },
     {
-      header: 'Date',
-      cell: (q) => <span className="text-xs text-text-secondary">{formatDate(q.createdAt)}</span>,
+      header: 'Issued Date',
+      className: 'text-right',
+      cell: (q) => (
+        <div className="text-right text-[0.8125rem] font-medium text-gray-500 font-mono">
+          {formatDate(q.createdAt)}
+        </div>
+      ),
     },
   ];
 
   return (
-    <div className="space-y-4">
-      <PageHeader
-        title="Quotations"
-        description="Draft and manage client pricing proposals and convert accepted quotes to active subscriptions"
-        actions={
-          <div className="flex items-center space-x-2">
-            <Link to="/quotations/templates">
-              <Button variant="outline" size="sm">
-                <LayoutTemplate className="w-4 h-4 mr-1" /> Templates
-              </Button>
-            </Link>
-            <Button onClick={() => setIsCreateOpen(true)} size="sm">
-              <Plus className="w-4 h-4 mr-1" /> New Quotation
-            </Button>
-          </div>
-        }
-      />
+    <div className="space-y-6 flex flex-col flex-1 pb-10">
+      {/* Page Header */}
+      <div className="flex justify-between items-end anim-slide-up">
+        <div>
+          <h1 className="text-[2.25rem] font-bold tracking-tight text-odoo-dark leading-tight">
+            Quotations & Proposals
+          </h1>
+          <p className="text-[0.9375rem] text-gray-500 font-medium mt-1">
+            Draft proposals, configure billing line items, and convert accepted quotes to active subscriptions
+          </p>
+        </div>
+      </div>
 
-      {/* Filter Bar */}
-      <div className="bg-white p-3.5 rounded-xl border border-border-main flex flex-wrap items-center justify-between gap-3">
-        <div className="relative w-full max-w-xs">
-          <Input
-            placeholder="Search quotation # or customer..."
+      {/* Action & Filter Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 anim-slide-up" style={{ animationDelay: '50ms' }}>
+        <div className="relative w-full sm:w-[28rem]">
+          <Search className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search quotes by number or client..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="pl-9 h-9 text-xs"
+            className="input-focus w-full pl-11 pr-4 py-2.5 bg-white border-[1.5px] border-black rounded-lg text-[0.875rem] font-medium text-odoo-dark shadow-sm"
           />
-          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
         </div>
 
-        {/* Status filter pills */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto text-xs">
-          {['', 'DRAFT', 'SENT', 'ACCEPTED', 'EXPIRED', 'DECLINED'].map((st) => (
-            <button
-              key={st}
-              onClick={() => {
-                setStatusFilter(st);
-                setPage(1);
-              }}
-              className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
-                statusFilter === st
-                  ? 'bg-plum-primary text-white font-semibold'
-                  : 'bg-surface-main text-text-secondary hover:bg-border-main/50'
-              }`}
-            >
-              {st || 'All Statuses'}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <Link
+            to="/quotations/templates"
+            className="px-4 py-2.5 bg-white border-[1.5px] border-black text-odoo-dark font-bold text-[0.875rem] rounded-lg hover:bg-gray-50 transition-all hover:shadow-[0_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none flex items-center gap-2"
+          >
+            <LayoutTemplate className="w-4 h-4" /> Templates
+          </Link>
+          <button
+            onClick={() => setIsCreateOpen(true)}
+            className="text-white px-5 py-2.5 rounded-lg text-[0.875rem] font-bold flex items-center justify-center gap-2 btn-primary cursor-pointer shrink-0"
+          >
+            <Plus className="w-4 h-4" /> Add Quotation
+          </button>
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data?.data || []}
-        isLoading={isLoading}
-        onRowClick={(q) => navigate(`/quotations/${q.id}`)}
-        emptyTitle="No quotations found"
-        emptyDescription="Create a new quote proposal for a customer."
-      />
-
-      {data?.pagination && (
-        <Pagination
-          page={page}
-          totalPages={data.pagination.totalPages}
-          total={data.pagination.total}
-          limit={data.pagination.limit}
-          onPageChange={setPage}
+      {/* Quotations Table */}
+      <div className="flex flex-col flex-1">
+        <DataTable
+          columns={columns}
+          data={data?.data || []}
+          isLoading={isLoading}
+          onRowClick={(q) => navigate(`/quotations/${q.id}`)}
+          emptyTitle="No quotations found"
+          emptyDescription="Create your first proposal or blueprint template."
         />
-      )}
 
-      {/* New Quotation Modal */}
+        {data?.pagination && (
+          <div className="mt-4">
+            <Pagination
+              page={page}
+              totalPages={data.pagination.totalPages}
+              total={data.pagination.total}
+              limit={data.pagination.limit}
+              onPageChange={setPage}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Create Quotation Dialog */}
       <Dialog
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        title="Create New Quotation"
-        description="Select a customer, plan, and initial product"
-        maxWidth="lg"
+        title="Draft Quotation Proposal"
+        description="Select customer, recurring billing plan, and line items"
       >
-        <form onSubmit={handleCreateSubmit} className="space-y-3.5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <form onSubmit={handleCreateSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="q-customer" required>
-                Target Customer
-              </Label>
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Customer <span className="text-red-500">*</span>
+              </label>
               <select
-                id="q-customer"
+                required
                 value={formData.customerId}
                 onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                required
-                className="flex h-10 w-full rounded-lg border border-border-main bg-white px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20"
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
               >
                 <option value="">Select customer...</option>
-                {(customers?.data || []).map((c: any) => (
+                {customers?.data?.map((c: any) => (
                   <option key={c.id} value={c.id}>
                     {c.name} {c.companyName ? `(${c.companyName})` : ''}
                   </option>
@@ -235,15 +247,16 @@ export const Quotations: React.FC = () => {
             </div>
 
             <div>
-              <Label htmlFor="q-plan">Subscription Plan</Label>
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Subscription Plan
+              </label>
               <select
-                id="q-plan"
                 value={formData.planId}
                 onChange={(e) => setFormData({ ...formData, planId: e.target.value })}
-                className="flex h-10 w-full rounded-lg border border-border-main bg-white px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20"
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
               >
-                <option value="">Select plan cadence...</option>
-                {(plans || []).map((p: any) => (
+                <option value="">No recurring plan (One-time)</option>
+                {plans?.map((p: any) => (
                   <option key={p.id} value={p.id}>
                     {p.name} ({p.billingFrequency})
                   </option>
@@ -252,106 +265,100 @@ export const Quotations: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-3 bg-surface-main/60 rounded-lg border border-border-main/50 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
-              Primary Line Item
-            </span>
-
-            <div>
-              <Label htmlFor="q-prod" required>
-                Product
-              </Label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2">
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Line Item Product <span className="text-red-500">*</span>
+              </label>
               <select
-                id="q-prod"
+                required
                 value={formData.productId}
                 onChange={(e) => {
-                  const selProd = (products?.data || []).find((p: any) => p.id === e.target.value);
+                  const sel = products?.data?.find((p: any) => p.id === e.target.value);
                   setFormData({
                     ...formData,
                     productId: e.target.value,
-                    unitPriceRupees: selProd ? (selProd.salesPrice / 100).toFixed(2) : formData.unitPriceRupees,
+                    unitPriceRupees: sel ? (sel.salesPrice / 100).toFixed(2) : formData.unitPriceRupees,
                   });
                 }}
-                required
-                className="flex h-10 w-full rounded-lg border border-border-main bg-white px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20"
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
               >
                 <option value="">Select product...</option>
-                {(products?.data || []).map((p: any) => (
+                {products?.data?.map((p: any) => (
                   <option key={p.id} value={p.id}>
-                    {p.name} ({p.type})
+                    {p.name} (₹{(p.salesPrice / 100).toFixed(2)})
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <Label htmlFor="q-qty" required>
-                  Quantity
-                </Label>
-                <Input
-                  id="q-qty"
-                  type="number"
-                  min="1"
-                  value={formData.quantity}
-                  onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value, 10) || 1 })}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="q-price" required>
-                  Unit Price (₹)
-                </Label>
-                <Input
-                  id="q-price"
-                  type="number"
-                  step="0.01"
-                  value={formData.unitPriceRupees}
-                  onChange={(e) => setFormData({ ...formData, unitPriceRupees: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="q-tax">Tax Rule</Label>
-                <select
-                  id="q-tax"
-                  value={formData.taxRuleId}
-                  onChange={(e) => setFormData({ ...formData, taxRuleId: e.target.value })}
-                  className="flex h-10 w-full rounded-lg border border-border-main bg-white px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20"
-                >
-                  <option value="">No tax (0%)</option>
-                  {(taxes || []).map((t: any) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name} ({(t.rate / 100).toFixed(0)}%)
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Quantity <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                type="number"
+                min="1"
+                value={formData.quantity}
+                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value, 10) || 1 })}
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
+              />
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="q-terms">Payment Terms</Label>
-            <Input
-              id="q-terms"
-              value={formData.paymentTerms}
-              onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Unit Price (₹) <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                type="number"
+                step="0.01"
+                value={formData.unitPriceRupees}
+                onChange={(e) => setFormData({ ...formData, unitPriceRupees: e.target.value })}
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Applicable Tax Rule
+              </label>
+              <select
+                value={formData.taxRuleId}
+                onChange={(e) => setFormData({ ...formData, taxRuleId: e.target.value })}
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
+              >
+                <option value="">No tax (0%)</option>
+                {taxes?.map((tx: any) => (
+                  <option key={tx.id} value={tx.id}>
+                    {tx.name} ({tx.rate}%)
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="mt-5 flex justify-end space-x-2 pt-2 border-t border-border-main/60">
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)}>
+          <div className="pt-4 flex justify-end gap-3 border-t-[1.5px] border-black/10">
+            <button
+              type="button"
+              onClick={() => setIsCreateOpen(false)}
+              className="px-5 py-2.5 bg-white border-[1.5px] border-black text-odoo-dark font-bold text-[0.875rem] rounded-xl hover:bg-gray-50 transition-all hover:shadow-[0_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none cursor-pointer"
+            >
               Cancel
-            </Button>
-            <Button type="submit" size="sm" isLoading={createMutation.isPending}>
-              Create Quotation
-            </Button>
+            </button>
+            <button
+              type="submit"
+              disabled={createMutation.isPending}
+              className="px-6 py-2.5 text-white font-bold text-[0.875rem] rounded-xl btn-primary cursor-pointer"
+            >
+              {createMutation.isPending ? 'Drafting...' : 'Create Quotation'}
+            </button>
           </div>
         </form>
       </Dialog>
     </div>
   );
 };
-

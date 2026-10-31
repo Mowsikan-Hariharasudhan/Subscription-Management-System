@@ -4,16 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Package, Layers } from 'lucide-react';
 import { productService } from '../../services/productService';
 import { Product } from '../../types';
-import { PageHeader } from '../../components/shared/PageHeader';
 import { DataTable, Column } from '../../components/shared/DataTable';
 import { Pagination } from '../../components/shared/Pagination';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
 import { Dialog } from '../../components/ui/dialog';
-import { Badge } from '../../components/ui/badge';
 import { CurrencyDisplay } from '../../components/shared/CurrencyDisplay';
-import { rupeesToPaise } from '../../lib/utils';
+import { cn } from '../../lib/utils';
 
 export const Products: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -21,7 +16,7 @@ export const Products: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    type: 'SERVICE',
+    type: 'SOFTWARE',
     salesPriceRupees: '',
     costPriceRupees: '',
     notes: '',
@@ -48,7 +43,7 @@ export const Products: React.FC = () => {
     onSuccess: (p) => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       setIsCreateOpen(false);
-      setFormData({ name: '', type: 'SERVICE', salesPriceRupees: '', costPriceRupees: '', notes: '' });
+      setFormData({ name: '', type: 'SOFTWARE', salesPriceRupees: '', costPriceRupees: '', notes: '' });
       navigate(`/products/${p.id}`);
     },
   });
@@ -61,188 +56,241 @@ export const Products: React.FC = () => {
   const columns: Column<Product>[] = [
     {
       header: 'Product Name',
+      className: 'w-[32%]',
       cell: (p) => (
-        <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-plum-light text-plum-primary flex items-center justify-center font-bold text-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-odoo/10 text-odoo font-bold flex items-center justify-center text-[0.75rem] border border-odoo/20 group-hover:bg-odoo group-hover:text-white transition-colors shrink-0">
             <Package className="w-4 h-4" />
           </div>
-          <div>
-            <span className="font-semibold text-text-primary block">{p.name}</span>
-            {p.notes && <span className="text-xs text-text-secondary truncate max-w-xs block">{p.notes}</span>}
+          <div className="min-w-0">
+            <div className="text-[0.875rem] font-bold text-odoo-dark truncate">{p.name}</div>
+            {p.notes && (
+              <div className="text-[0.75rem] text-gray-500 font-medium truncate mt-0.5 max-w-xs">
+                {p.notes}
+              </div>
+            )}
           </div>
         </div>
       ),
     },
     {
       header: 'Type',
+      className: 'text-center',
       cell: (p) => (
-        <Badge variant={p.type === 'SOFTWARE' ? 'default' : 'secondary'}>
-          {p.type}
-        </Badge>
+        <div className="text-center">
+          <span className="inline-flex items-center px-2.5 py-1 rounded bg-odoo/10 border border-odoo/20 text-[0.75rem] font-bold text-odoo-dark font-mono uppercase">
+            {p.type}
+          </span>
+        </div>
       ),
     },
     {
       header: 'Sales Price',
-      cell: (p) => <CurrencyDisplay amount={p.salesPrice} size="sm" className="font-semibold" />,
+      className: 'font-mono',
+      cell: (p) => (
+        <div className="font-mono font-bold text-[0.875rem] text-odoo-dark">
+          <CurrencyDisplay amount={p.salesPrice} size="sm" />
+        </div>
+      ),
     },
     {
       header: 'Cost Price',
-      cell: (p) => <CurrencyDisplay amount={p.costPrice} size="sm" className="text-text-secondary" />,
+      className: 'font-mono',
+      cell: (p) => (
+        <div className="font-mono text-[0.8125rem] text-gray-500">
+          <CurrencyDisplay amount={p.costPrice} size="sm" />
+        </div>
+      ),
     },
     {
       header: 'Variants',
+      className: 'text-center',
       cell: (p) => (
-        <span className="inline-flex items-center space-x-1 text-xs text-text-secondary">
-          <Layers className="w-3.5 h-3.5" />
-          <span>{p.variants?.length || 0} tier(s)</span>
-        </span>
+        <div className="text-center">
+          <span className="inline-flex items-center justify-center px-2.5 py-1 rounded bg-gray-100 border border-gray-200 text-[0.75rem] font-bold text-gray-600 font-mono gap-1">
+            <Layers className="w-3.5 h-3.5 opacity-60" />
+            <span>{p.variants?.length || 0} tier(s)</span>
+          </span>
+        </div>
       ),
     },
     {
       header: 'Status',
+      className: 'text-center',
       cell: (p) => (
-        <Badge variant={p.isActive ? 'success' : 'danger'}>
-          {p.isActive ? 'ACTIVE' : 'INACTIVE'}
-        </Badge>
+        <div className="text-center">
+          <span
+            className={cn(
+              'inline-flex items-center px-2.5 py-1 rounded border-[1.5px] border-black text-[0.625rem] font-bold uppercase tracking-widest shadow-[2px_2px_0_#000]',
+              p.isActive ? 'bg-[#d1fae5] text-[#047857]' : 'bg-[#fee2e2] text-[#b91c1c]'
+            )}
+          >
+            {p.isActive ? 'ACTIVE' : 'INACTIVE'}
+          </span>
+        </div>
       ),
     },
   ];
 
   return (
-    <div className="space-y-4">
-      <PageHeader
-        title="Products & Services"
-        description="Catalogue of billable software subscription tiers and standalone service packages"
-        actions={
-          <Button onClick={() => setIsCreateOpen(true)} size="sm">
-            <Plus className="w-4 h-4 mr-1" /> Add Product
-          </Button>
-        }
-      />
+    <div className="space-y-6 flex flex-col flex-1 pb-10">
+      {/* Page Header */}
+      <div className="flex justify-between items-end anim-slide-up">
+        <div>
+          <h1 className="text-[2.25rem] font-bold tracking-tight text-odoo-dark leading-tight">
+            Products & Services
+          </h1>
+          <p className="text-[0.9375rem] text-gray-500 font-medium mt-1">
+            Catalogue of billable software subscription tiers and standalone service packages
+          </p>
+        </div>
+      </div>
 
-      <div className="bg-white p-3.5 rounded-xl border border-border-main flex items-center justify-between gap-4">
-        <div className="relative w-full max-w-sm">
-          <Input
+      {/* Action Bar (Search + Add) */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 anim-slide-up" style={{ animationDelay: '50ms' }}>
+        <div className="relative w-full sm:w-[28rem]">
+          <Search className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
             placeholder="Search products by title or description..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="pl-9 h-9 text-xs"
+            className="input-focus w-full pl-11 pr-4 py-2.5 bg-white border-[1.5px] border-black rounded-lg text-[0.875rem] font-medium text-odoo-dark shadow-sm"
           />
-          <Search className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
         </div>
+
+        <button
+          onClick={() => setIsCreateOpen(true)}
+          className="text-white px-5 py-2.5 rounded-lg text-[0.875rem] font-bold flex items-center justify-center gap-2 btn-primary cursor-pointer shrink-0"
+        >
+          <Plus className="w-4 h-4" /> Add Product
+        </button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data?.data || []}
-        isLoading={isLoading}
-        onRowClick={(p) => navigate(`/products/${p.id}`)}
-        emptyTitle="No products found"
-        emptyDescription="Create your first subscription product or adjust your filter."
-      />
-
-      {data?.pagination && (
-        <Pagination
-          page={page}
-          totalPages={data.pagination.totalPages}
-          total={data.pagination.total}
-          limit={data.pagination.limit}
-          onPageChange={setPage}
+      {/* Product Data Table Container */}
+      <div className="flex flex-col flex-1">
+        <DataTable
+          columns={columns}
+          data={data?.data || []}
+          isLoading={isLoading}
+          onRowClick={(p) => navigate(`/products/${p.id}`)}
+          emptyTitle="No products found"
+          emptyDescription="Create your first subscription product or adjust your filter."
         />
-      )}
+
+        {data?.pagination && (
+          <div className="mt-4">
+            <Pagination
+              page={page}
+              totalPages={data.pagination.totalPages}
+              total={data.pagination.total}
+              limit={data.pagination.limit}
+              onPageChange={setPage}
+            />
+          </div>
+        )}
+      </div>
 
       {/* Create Product Dialog */}
       <Dialog
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        title="Add New Billable Product"
-        description="Define base catalog item and pricing"
+        title="Add Catalog Product"
+        description="Define a new base product with pricing and classification"
       >
-        <form onSubmit={handleCreateSubmit} className="space-y-3.5">
+        <form onSubmit={handleCreateSubmit} className="space-y-5">
           <div>
-            <Label htmlFor="prod-name" required>
-              Product Name
-            </Label>
-            <Input
-              id="prod-name"
-              placeholder="e.g. BrightCRM"
+            <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+              Product Title <span className="text-red-500">*</span>
+            </label>
+            <input
+              required
+              type="text"
+              placeholder="e.g. Brightloop ERP Core"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
+              className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
             />
           </div>
 
-          <div>
-            <Label htmlFor="prod-type" required>
-              Product Classification
-            </Label>
-            <select
-              id="prod-type"
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="flex h-10 w-full rounded-lg border border-border-main bg-white px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-plum-primary/20"
-            >
-              <option value="SOFTWARE">SOFTWARE (Recurring License / SaaS)</option>
-              <option value="SERVICE">SERVICE (One-time or Support Service)</option>
-              <option value="HARDWARE">HARDWARE (Terminal / Device)</option>
-            </select>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="prod-sales-price" required>
-                Sales Price (₹)
-              </Label>
-              <Input
-                id="prod-sales-price"
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Type
+              </label>
+              <select
+                value={formData.type}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
+              >
+                <option value="SOFTWARE">SOFTWARE</option>
+                <option value="SERVICE">SERVICE</option>
+                <option value="HARDWARE">HARDWARE</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Sales Price (₹) <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
                 type="number"
                 step="0.01"
-                min="0"
                 placeholder="2000.00"
                 value={formData.salesPriceRupees}
                 onChange={(e) => setFormData({ ...formData, salesPriceRupees: e.target.value })}
-                required
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
               />
             </div>
-
             <div>
-              <Label htmlFor="prod-cost-price">Cost Price (₹)</Label>
-              <Input
-                id="prod-cost-price"
+              <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+                Cost Price (₹)
+              </label>
+              <input
                 type="number"
                 step="0.01"
-                min="0"
-                placeholder="500.00"
+                placeholder="800.00"
                 value={formData.costPriceRupees}
                 onChange={(e) => setFormData({ ...formData, costPriceRupees: e.target.value })}
+                className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="prod-notes">Internal Notes</Label>
-            <Input
-              id="prod-notes"
-              placeholder="Features, tier inclusions, support SLA..."
+            <label className="block text-[0.6875rem] font-bold text-gray-800 tracking-wider uppercase mb-1.5">
+              Description / Notes
+            </label>
+            <textarea
+              rows={3}
+              placeholder="Core ERP subscription with modules for finance, inventory, and HR..."
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-[0.875rem] font-medium text-odoo-dark shadow-sm"
             />
           </div>
 
-          <div className="mt-5 flex justify-end space-x-2 pt-2 border-t border-border-main/60">
-            <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)}>
+          <div className="pt-4 flex justify-end gap-3 border-t-[1.5px] border-black/10">
+            <button
+              type="button"
+              onClick={() => setIsCreateOpen(false)}
+              className="px-5 py-2.5 bg-white border-[1.5px] border-black text-odoo-dark font-bold text-[0.875rem] rounded-xl hover:bg-gray-50 transition-all hover:shadow-[0_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none cursor-pointer"
+            >
               Cancel
-            </Button>
-            <Button type="submit" size="sm" isLoading={createMutation.isPending}>
-              Create Product
-            </Button>
+            </button>
+            <button
+              type="submit"
+              disabled={createMutation.isPending}
+              className="px-6 py-2.5 text-white font-bold text-[0.875rem] rounded-xl btn-primary cursor-pointer"
+            >
+              {createMutation.isPending ? 'Saving...' : 'Create Product'}
+            </button>
           </div>
         </form>
       </Dialog>
     </div>
   );
 };
-

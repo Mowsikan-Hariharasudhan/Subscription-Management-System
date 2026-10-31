@@ -8,19 +8,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        odoo: {
+          DEFAULT: '#714B67',
+          dark:    '#4A3043',
+          light:   '#8E627F',
+          glow:    'rgba(113, 75, 103, 0.4)',
+        },
         plum: {
-          primary: '#724B68',
-          deep:    '#36283B',
+          primary: '#714B67',
+          deep:    '#4A3043',
           muted:   '#91768B',
           light:   '#F2EBF0',
         },
         surface: {
-          main:  '#F7F5F7',
+          main:  '#F7F5F8',
           white: '#FFFFFF',
           card:  '#FFFFFF',
         },
         border: {
-          main: '#E4DEE3',
+          main: '#000000',
+          subtle: '#E4DEE3',
         },
         text: {
           primary:   '#29242B',
@@ -36,4 +43,3 @@ const config: Config = {
 };
 
 export default config;
-
