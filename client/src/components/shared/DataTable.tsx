@@ -38,17 +38,17 @@ export function DataTable<T extends { id?: string | number }>({
   }
 
   return (
-    <div className={cn('glass-panel rounded-xl overflow-hidden anim-slide-up flex flex-col flex-1 shadow-sm', className)}>
+    <div className={cn('glass-panel rounded-xl overflow-hidden anim-slide-up flex flex-col flex-1', className)}>
       <div className="overflow-x-auto flex-1">
         <table className="w-full text-left border-collapse min-w-[900px]">
-          <thead className="bg-[#f8f6f8] border-b-[1.5px] border-black">
+          <thead className="bg-odoo text-white border-b-[1.5px] border-black">
             <tr>
               {columns.map((col, idx) => (
                 <th
                   key={idx}
                   scope="col"
                   className={cn(
-                    'px-6 py-4 text-[0.6875rem] font-bold text-gray-600 uppercase tracking-widest',
+                    'px-6 py-4 text-[0.6875rem] font-bold text-white uppercase tracking-widest',
                     col.className
                   )}
                 >
@@ -57,7 +57,7 @@ export function DataTable<T extends { id?: string | number }>({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody>
             {data.map((item, rowIdx) => (
               <tr
                 key={item.id ? String(item.id) : rowIdx}

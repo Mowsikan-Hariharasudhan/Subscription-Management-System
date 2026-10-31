@@ -64,44 +64,20 @@ export const TopNav: React.FC<TopNavProps> = ({ onOpenSidebar }) => {
 
       {/* Right Controls */}
       <div className="flex items-center gap-4 anim-fade">
-        {/* Quick status pill */}
-        <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 border-[1.5px] border-black shadow-[2px_2px_0_#000] text-[0.6875rem] font-bold text-odoo-dark uppercase tracking-wider">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-          <span>GST Ready (INR)</span>
-        </div>
-
-        <div className="h-8 w-px bg-black/15 mx-1 hidden sm:block" />
-
         {/* User Info & Actions */}
         <div className="relative" ref={dropdownRef}>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-white/60 transition-all cursor-pointer focus:outline-none"
-            >
-              <div className="w-9 h-9 rounded-xl glass-odoo text-white font-bold text-xs flex items-center justify-center shadow-sm border-[1.5px] border-black">
-                {getInitials(user?.email)}
-              </div>
-              <div className="hidden md:flex flex-col items-end text-right">
-                <span className="text-[0.8125rem] font-bold text-odoo-dark leading-tight truncate max-w-[150px]">
-                  {user?.customer?.name || user?.email?.split('@')[0] || 'User'}
-                </span>
-                <span className="text-[0.5625rem] font-bold bg-white text-odoo border-[1.5px] border-black px-1.5 py-0.2 rounded uppercase tracking-wider mt-0.5 shadow-xs">
-                  {role}
-                </span>
-              </div>
-              <ChevronDown className="w-4 h-4 text-gray-500 hidden md:block" />
-            </button>
-
-            {/* Direct Logout Button */}
-            <button
-              onClick={logout}
-              title="Sign Out"
-              className="w-9 h-9 bg-white border-[1.5px] border-black rounded-xl flex items-center justify-center text-odoo hover:text-odoo-dark transition-all hover:shadow-[0_4px_0_0_#000] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center gap-3 p-1.5 px-3 rounded-xl hover:bg-white/60 border border-transparent hover:border-black/10 transition-all cursor-pointer focus:outline-none"
+          >
+            <div className="w-9 h-9 rounded-xl glass-odoo text-white font-bold text-xs flex items-center justify-center shadow-sm border-[1.5px] border-black">
+              {getInitials(user?.email)}
+            </div>
+            <span className="hidden md:block text-[0.875rem] font-bold text-odoo-dark truncate max-w-[160px]">
+              {user?.customer?.name || user?.email?.split('@')[0] || 'User'}
+            </span>
+            <ChevronDown className="w-4 h-4 text-gray-500 hidden md:block" />
+          </button>
 
           {/* Profile Dropdown */}
           {dropdownOpen && (

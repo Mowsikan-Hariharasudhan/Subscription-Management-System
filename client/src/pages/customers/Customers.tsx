@@ -58,15 +58,17 @@ export const Customers: React.FC = () => {
       header: 'Customer',
       className: 'w-[28%]',
       cell: (c) => (
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-odoo/10 text-odoo font-bold flex items-center justify-center text-[0.75rem] border border-odoo/20 group-hover:bg-odoo group-hover:text-white transition-colors shrink-0">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-odoo to-odoo-dark text-white border-[1.5px] border-black font-bold flex items-center justify-center text-[0.8125rem] shadow-[2px_2px_0_#000] shrink-0">
             {getInitials(c.companyName || c.name)}
           </div>
           <div className="min-w-0">
-            <div className="text-[0.875rem] font-bold text-odoo-dark truncate">{c.name}</div>
+            <div className="text-[0.875rem] font-bold text-odoo-dark group-hover:text-odoo transition-colors truncate">
+              {c.name}
+            </div>
             {c.companyName && (
-              <div className="text-[0.75rem] text-gray-500 font-medium flex items-center gap-1 mt-0.5 truncate">
-                <Building2 className="w-3 h-3 opacity-60 shrink-0" />
+              <div className="text-[0.75rem] text-gray-500 font-medium flex items-center gap-1.5 mt-0.5 truncate">
+                <Building2 className="w-3.5 h-3.5 opacity-60 shrink-0" />
                 <span className="truncate">{c.companyName}</span>
               </div>
             )}
@@ -97,31 +99,27 @@ export const Customers: React.FC = () => {
     {
       header: 'Subscriptions',
       className: 'text-center',
-      cell: (c) => {
-        const count = c._count?.subscriptions || 0;
-        return (
-          <div className="text-center">
-            <span
-              className={cn(
-                'inline-flex items-center justify-center px-2.5 py-1 rounded text-[0.75rem] font-bold font-mono',
-                count > 0
-                  ? 'bg-odoo/10 border border-odoo/20 text-odoo-dark'
-                  : 'bg-gray-100 border border-gray-200 text-gray-500'
-              )}
-            >
-              <span className={cn('mr-1', count === 0 ? 'text-gray-900' : 'text-odoo font-bold')}>{count}</span> ACTIVE
-            </span>
-          </div>
-        );
-      },
+      cell: (c) => (
+        <div className="flex flex-col items-center justify-center">
+          <span className="text-[1.125rem] font-bold font-mono text-odoo-dark leading-none">
+            {c._count?.subscriptions || 0}
+          </span>
+          <span className="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest mt-1">
+            Active
+          </span>
+        </div>
+      ),
     },
     {
       header: 'Invoices',
       className: 'text-center',
       cell: (c) => (
-        <div className="text-center">
-          <span className="inline-flex items-center justify-center px-2.5 py-1 rounded bg-gray-100 border border-gray-200 text-[0.75rem] font-bold text-gray-500 font-mono">
-            <span className="text-gray-900 mr-1">{c._count?.invoices || 0}</span> TOTAL
+        <div className="flex flex-col items-center justify-center">
+          <span className="text-[1.125rem] font-bold font-mono text-odoo-dark leading-none">
+            {c._count?.invoices || 0}
+          </span>
+          <span className="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest mt-1">
+            Total
           </span>
         </div>
       ),
@@ -133,7 +131,7 @@ export const Customers: React.FC = () => {
         <div className="text-center">
           <span
             className={cn(
-              'inline-flex items-center px-2.5 py-1 rounded border-[1.5px] border-black text-[0.625rem] font-bold uppercase tracking-widest shadow-[2px_2px_0_#000]',
+              'inline-flex items-center px-3 py-1 rounded border-[1.5px] border-black text-[0.6875rem] font-bold uppercase tracking-widest shadow-xs',
               c.isActive ? 'bg-[#d1fae5] text-[#047857]' : 'bg-[#fee2e2] text-[#b91c1c]'
             )}
           >

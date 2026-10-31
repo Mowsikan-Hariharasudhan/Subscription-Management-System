@@ -70,13 +70,11 @@
 
 /* 1. White Glass with Structural Black Border */
 .glass-panel {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.75) 100%);
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  border: 1.5px solid #000000;
-  box-shadow: 
-    0 4px 20px -5px rgba(0, 0, 0, 0.05), 
-    inset 0 1px 0 rgba(255, 255, 255, 1); 
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid #000000;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08); 
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
@@ -205,10 +203,15 @@
 /* 7. Interactive Elements */
 .table-row { 
   transition: all 0.2s ease-in-out; 
+  border-bottom: 1.5px solid #000000;
+  border-left: 4px solid transparent;
 }
 .table-row:hover { 
-  background: #faf9fa;
-  box-shadow: inset 3px 0 0 0 #714B67;
+  background: #fcfbfc;
+  border-left: 4px solid #714B67;
+}
+.table-row:last-child {
+  border-bottom: none;
 }
 
 .anim-slide-up {
