@@ -1,97 +1,88 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Users, FileText, RefreshCw, Package, Calendar, Tag, Receipt,
-  CreditCard, BarChart2, Wand2, Activity, Settings, ChevronLeft, ChevronRight,
-  LogOut, Percent,
+  CreditCard, BarChart2, ShieldCheck, Settings, LogOut
 } from 'lucide-react'
-import { useState } from 'react'
 import { useAuth } from '../auth'
 
-interface NavItem { label: string; to: string; icon: React.ElementType; roles?: string[] }
+interface NavItem {
+  label: string
+  to: string
+  icon: React.ElementType
+  roles?: string[]
+}
 
 const NAV: { section: string; items: NavItem[] }[] = [
   {
     section: 'Overview',
     items: [
-      { label: 'Dashboard', to: '/deepseek/dashboard', icon: LayoutDashboard },
+      { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
     ],
   },
   {
     section: 'Sales',
     items: [
-      { label: 'Customers',      to: '/deepseek/customers',     icon: Users },
-      { label: 'Quotations',     to: '/deepseek/quotations',    icon: FileText },
-      { label: 'Subscriptions',  to: '/deepseek/subscriptions', icon: RefreshCw },
+      { label: 'Customers',     to: '/customers',     icon: Users },
+      { label: 'Quotations',    to: '/quotations',    icon: FileText },
+      { label: 'Subscriptions', to: '/subscriptions', icon: RefreshCw },
     ],
   },
   {
     section: 'Catalog',
     items: [
-      { label: 'Products',   to: '/deepseek/products',   icon: Package },
-      { label: 'Plans',      to: '/deepseek/plans',      icon: Calendar },
-      { label: 'Discounts',  to: '/deepseek/discounts',  icon: Percent, roles: ['ADMIN'] },
-      { label: 'Tax Rules',  to: '/deepseek/taxes',      icon: Tag, roles: ['ADMIN'] },
+      { label: 'Products',      to: '/products',      icon: Package },
+      { label: 'Plans',         to: '/plans',         icon: Calendar },
+      { label: 'Discounts',     to: '/discounts',     icon: Tag, roles: ['ADMIN'] },
+      { label: 'Tax Rules',     to: '/taxes',         icon: ShieldCheck, roles: ['ADMIN'] },
     ],
   },
   {
     section: 'Finance',
     items: [
-      { label: 'Invoices',  to: '/deepseek/invoices',  icon: Receipt },
-      { label: 'Payments',  to: '/deepseek/payments',  icon: CreditCard },
-      { label: 'Reports',   to: '/deepseek/reports',   icon: BarChart2 },
+      { label: 'Invoices',      to: '/invoices',      icon: Receipt },
+      { label: 'Payments',      to: '/payments',      icon: CreditCard },
+      { label: 'Reports',       to: '/reports',       icon: BarChart2 },
     ],
   },
   {
     section: 'Workspace',
     items: [
-      { label: 'AI Studio',       to: '/deepseek/studio',   icon: Wand2, roles: ['ADMIN'] },
-      { label: 'Activity Logs',   to: '/deepseek/activity', icon: Activity, roles: ['ADMIN'] },
-    ],
-  },
-  {
-    section: 'Config',
-    items: [
-      { label: 'Settings', to: '/deepseek/settings', icon: Settings, roles: ['ADMIN'] },
+      { label: 'Activity Logs', to: '/activity',      icon: ShieldCheck, roles: ['ADMIN'] },
+      { label: 'Settings',      to: '/settings',      icon: Settings, roles: ['ADMIN'] },
     ],
   },
 ]
 
 export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
   const { user, logout } = useAuth()
   const loc = useLocation()
 
-  const w = collapsed ? 'w-14' : 'w-[232px]'
-
   return (
-    <aside className={`${w} shrink-0 h-screen flex flex-col border-r border-[var(--line)] bg-white transition-all duration-150 overflow-hidden`}>
+    <aside className="w-64 bg-[#724B68] text-white flex flex-col shrink-0 border-r border-[#36283B] h-screen select-none">
       {/* Brand */}
-      <div className={`flex items-center h-[52px] border-b border-[var(--line)] shrink-0 ${collapsed ? 'justify-center px-0' : 'px-4 gap-2.5'}`}>
-        <div className="w-7 h-7 bg-[var(--ink)] rounded flex items-center justify-center shrink-0">
-          <span className="font-mono text-xs font-semibold text-white">B</span>
+      <div className="h-16 flex items-center px-6 border-b border-white/10 shrink-0">
+        <div className="w-6 h-6 bg-white text-[#724B68] flex items-center justify-center font-bold text-sm rounded-sm mr-3">
+          B
         </div>
-        {!collapsed && (
-          <div className="min-w-0">
-            <p className="text-sm font-bold tracking-tight text-[var(--ink)] leading-none">Brightloop</p>
-            <p className="text-[9px] font-mono font-medium uppercase tracking-widest text-[var(--ink-40)] mt-0.5">DeepSeek Edition</p>
-          </div>
-        )}
+        <div className="flex flex-col">
+          <span className="font-semibold text-sm tracking-wide">BRIGHTLOOP</span>
+          <span className="text-[9px] font-mono text-white/50 tracking-wider">ENTERPRISE SAAS</span>
+        </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
+      <nav className="flex-1 py-4 overflow-y-auto space-y-5">
         {NAV.map(group => {
           const visibleItems = group.items.filter(item =>
             !item.roles || (user && item.roles.includes(user.role))
           )
           if (visibleItems.length === 0) return null
+
           return (
             <div key={group.section}>
-              {!collapsed && (
-                <p className="px-2 mb-1 text-[9px] font-mono font-semibold uppercase tracking-widest text-[var(--ink-40)]">
-                  {group.section}
-                </p>
-              )}
+              <div className="px-6 mb-2 text-xs font-mono text-white/50 tracking-widest uppercase">
+                {group.section}
+              </div>
               <div className="space-y-0.5">
                 {visibleItems.map(item => {
                   const Icon = item.icon
@@ -100,16 +91,14 @@ export default function Sidebar() {
                     <NavLink
                       key={item.to}
                       to={item.to}
-                      className={`flex items-center gap-2.5 px-2 py-1.5 rounded text-sm font-medium transition-colors
-                        ${collapsed ? 'justify-center' : ''}
-                        ${active
-                          ? 'bg-[var(--accent-soft)] text-[var(--accent)] border-l-2 border-[var(--accent)] pl-[6px]'
-                          : 'text-[var(--ink-60)] hover:bg-[var(--surface-2)] hover:text-[var(--ink)]'
-                        }`}
-                      title={collapsed ? item.label : undefined}
+                      className={`flex items-center gap-3 px-6 py-2 text-sm transition-colors ${
+                        active
+                          ? 'bg-[#36283B] text-white border-l-2 border-white font-medium'
+                          : 'text-white/80 hover:bg-white/5 hover:text-white'
+                      }`}
                     >
-                      <Icon size={15} strokeWidth={1.75} className="shrink-0" />
-                      {!collapsed && <span>{item.label}</span>}
+                      <Icon size={15} strokeWidth={1.75} className="shrink-0 text-white/70" />
+                      <span>{item.label}</span>
                     </NavLink>
                   )
                 })}
@@ -119,31 +108,29 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* User + collapse */}
-      <div className="border-t border-[var(--line)] p-2 shrink-0">
-        {!collapsed && user && (
-          <div className="flex items-center gap-2 px-2 py-1.5 mb-1">
-            <div className="w-6 h-6 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)] flex items-center justify-center shrink-0">
-              <span className="text-[10px] font-mono font-semibold text-[var(--accent)]">{user.name[0]}</span>
+      {/* User Info & Logout */}
+      {user && (
+        <div className="p-4 border-t border-white/10 shrink-0 bg-[#36283B]/40">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-full bg-white/10 text-white flex items-center justify-center font-mono text-xs font-bold border border-white/20">
+                {user.name.charAt(0)}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-white truncate leading-none">{user.name}</p>
+                <p className="text-[10px] font-mono text-white/50 uppercase mt-0.5">{user.role}</p>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-[var(--ink)] truncate leading-none">{user.name}</p>
-              <p className="text-[9px] font-mono text-[var(--ink-40)] uppercase tracking-wide mt-0.5">{user.role}</p>
-            </div>
-            <button onClick={logout} title="Sign out" className="text-[var(--ink-40)] hover:text-[var(--bad)] transition-colors p-1">
-              <LogOut size={13} strokeWidth={1.75} />
+            <button
+              onClick={logout}
+              title="Sign out"
+              className="p-1.5 rounded hover:bg-white/10 text-white/60 hover:text-white transition-colors cursor-pointer"
+            >
+              <LogOut size={14} />
             </button>
           </div>
-        )}
-        <button
-          onClick={() => setCollapsed(c => !c)}
-          className="flex items-center justify-center w-full py-1 rounded hover:bg-[var(--surface-2)] text-[var(--ink-40)] transition-colors"
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-        </button>
-      </div>
+        </div>
+      )}
     </aside>
   )
 }
-

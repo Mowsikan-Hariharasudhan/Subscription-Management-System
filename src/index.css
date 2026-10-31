@@ -1,55 +1,74 @@
 /* ============================================================
-   BRIGHTLOOP — Global CSS
-   Imports Tailwind v4 + design tokens as CSS custom properties
+   BRIGHTLOOP — Plum/Purple Corporate Structural Brutalism
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-/* --- Design Tokens ---------------------------------------- */
 :root {
-  --bg:          #FAFAF9;
-  --surface:     #FFFFFF;
-  --surface-2:   #F4F4F2;
-  --ink:         #0A0A0A;
-  --ink-60:      #525252;
-  --ink-40:      #8A8A8A;
-  --line:        #E5E5E5;
-  --line-strong: #171717;
-  --accent:      #1E40AF;
-  --accent-soft: #EFF3FF;
-  --ok:          #16A34A;
-  --ok-soft:     #F0FDF4;
-  --warn:        #CA8A04;
-  --warn-soft:   #FFFBEB;
-  --bad:         #DC2626;
-  --bad-soft:    #FEF2F2;
-  --radius-sm:   4px;
-  --radius-md:   6px;
-  --radius-lg:   10px;
-  --shadow-sm:   0 1px 2px rgba(10,10,10,.05);
-  --shadow-md:   0 2px 8px rgba(10,10,10,.08);
-  --font-sans:   'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono:   'JetBrains Mono', 'Cascadia Code', monospace;
-  --sidebar-w:   232px;
-  --topbar-h:    52px;
+  /* Plum/Purple Theme Tokens */
+  --bg:           #F7F5F7;
+  --surface:      #FFFFFF;
+  --primary-plum: #724B68;
+  --deep-plum:    #36283B;
+  --muted-plum:   #91768B;
+  --border:       #E4DEE3;
+  --text-main:    #29242B;
+  --text-muted:   #746F75;
+  --accent-info:  #D1ECF1;
+
+  /* Semantic Status Tokens */
+  --ok:           #16A34A;
+  --ok-bg:        #F0FDF4;
+  --warn:         #CA8A04;
+  --warn-bg:      #FEFCE8;
+  --bad:          #DC2626;
+  --bad-bg:       #FEF2F2;
+
+  /* Typography */
+  --font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Cascadia Code', monospace;
+
+  /* Structural Rules */
+  --radius:       4px;
 }
 
-/* --- Reset ------------------------------------------------- */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
-body { font-family: var(--font-sans); font-size: 14px; line-height: 1.5; color: var(--ink); background: var(--bg); }
-#root { width: 100%; min-height: 100svh; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* --- Focus ring ------------------------------------------- */
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--radius-sm); }
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg);
+  color: var(--text-main);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-/* --- Scrollbar -------------------------------------------- */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--ink-40); }
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
 
-/* --- Typography helpers ----------------------------------- */
-.font-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.micro-label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-40); }
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Custom crisp structural scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--radius);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-plum);
+}

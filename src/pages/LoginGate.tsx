@@ -53,17 +53,17 @@ export default function LoginGate() {
     localStorage.setItem('bl.provider', id)
   }
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    const res = login(email, password)
+    const res = await login(email, password)
     if (!res.ok) {
       setError(res.error || 'Authentication failed. Please verify credentials.')
       return
     }
     // Navigate into the chosen model's experience or default to deepseek
     localStorage.setItem('bl.provider', selectedModel)
-    navigate('/deepseek/dashboard')
+    navigate('/dashboard')
   }
 
   const fillCredentials = (em: string, pw: string) => {
