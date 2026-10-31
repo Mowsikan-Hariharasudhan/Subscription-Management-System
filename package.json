@@ -1,0 +1,20 @@
+{
+  "name": "brightloop",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "setup": "npm run install:all && cd server && npx prisma migrate deploy && npx prisma db seed",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "build": "cd client && npm run build && cd ../server && npm run build",
+    "seed": "cd server && npx prisma db seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
