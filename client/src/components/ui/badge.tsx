@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { cn } from '../../lib/utils';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -7,7 +7,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const Badge: React.FC<BadgeProps> = ({ className, variant = 'default', ...props }) => {
   const variants = {
-    default: 'bg-plum-primary text-white border border-plum-hover shadow-xs',
+    default: 'bg-plum-primary text-white border border-[#522D46]',
     secondary: 'bg-plum-surface text-plum-primary border border-plum-border',
     outline: 'border border-border-main text-text-primary bg-white',
     success: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
@@ -19,7 +19,7 @@ export const Badge: React.FC<BadgeProps> = ({ className, variant = 'default', ..
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-lg px-2.5 py-0.5 text-[11px] font-semibold tracking-wide transition-colors select-none',
+        'inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider select-none font-mono transition-colors',
         variants[variant],
         className
       )}

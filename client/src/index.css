@@ -30,6 +30,10 @@
     border-color: #E5DFE4;
   }
 
+  html {
+    font-size: 100%;
+  }
+
   body {
     background-color: #FAF7F5;
     color: #1F1A1E;
@@ -58,7 +62,7 @@
   border: 1px solid #E5DFE4;
   border-radius: 14px;
   box-shadow: 2px 2px 0px #E5DFE4;
-  transition: all 0.15s ease-out;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .brutal-card-interactive:hover {
@@ -104,6 +108,56 @@
 .brutal-button-outline:active {
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0px #E5DFE4;
+}
+
+/* Animations & Structural Utilities */
+.anim-spring {
+  animation: springIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+  transform: translateY(8px);
+}
+@keyframes springIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.anim-fade { 
+  animation: fadeIn 0.3s ease-out forwards; 
+  opacity: 0; 
+}
+@keyframes fadeIn { 
+  to { opacity: 1; } 
+}
+
+.stagger-1 { animation-delay: 40ms; }
+.stagger-2 { animation-delay: 80ms; }
+.stagger-3 { animation-delay: 120ms; }
+.stagger-4 { animation-delay: 160ms; }
+
+.anim-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0; 
+  transform: translateY(8px);
+}
+@keyframes slideUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.skeleton {
+  background-color: rgba(229, 223, 228, 0.7);
+  background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 8px;
+  border: 1px solid #E5DFE4;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.tabular-nums { 
+  font-variant-numeric: tabular-nums; 
 }
 
 /* Custom scrollbars with crisp 1px borders */

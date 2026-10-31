@@ -38,40 +38,55 @@ export function DataTable<T extends { id?: string | number }>({
   }
 
   return (
-    <div className={cn('w-full overflow-x-auto rounded-2xl border border-border-main bg-white shadow-card', className)}>
-      <table className="w-full text-left text-sm text-text-primary border-collapse">
-        <thead className="bg-[#FAF7F9] text-[11px] uppercase tracking-wider text-text-secondary border-b border-border-main font-semibold select-none">
-          <tr>
-            {columns.map((col, idx) => (
-              <th key={idx} scope="col" className={cn('px-5 py-3.5', col.className)}>
-                {col.header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border-main/70">
-          {data.map((item, rowIdx) => (
-            <tr
-              key={item.id ? String(item.id) : rowIdx}
-              onClick={() => onRowClick && onRowClick(item)}
-              className={cn(
-                'transition-colors hover:bg-surface-hover/60',
-                onRowClick && 'cursor-pointer'
-              )}
-            >
-              {columns.map((col, colIdx) => (
-                <td key={colIdx} className={cn('px-5 py-3.5 text-xs', col.className)}>
-                  {col.cell
-                    ? col.cell(item)
-                    : col.accessorKey
-                    ? String(item[col.accessorKey] ?? '')
-                    : null}
-                </td>
+    <div className={cn('w-full bg-white border border-border-main rounded-2xl shadow-card overflow-hidden anim-slide-up flex flex-col flex-1', className)}>
+      <div className="overflow-x-auto flex-1 px-6 pb-6 pt-2">
+        <table className="w-full text-left border-collapse min-w-[750px]">
+          <thead className="border-b border-border-main/80 select-none">
+            <tr>
+              {columns.map((col, idx) => (
+                <th
+                  key={idx}
+                  scope="col"
+                  className={cn(
+                    'py-4 px-3 text-[11px] font-bold text-text-secondary uppercase tracking-wider',
+                    col.className
+                  )}
+                >
+                  {col.header}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-border-main/60">
+            {data.map((item, rowIdx) => (
+              <tr
+                key={item.id ? String(item.id) : rowIdx}
+                onClick={() => onRowClick && onRowClick(item)}
+                className={cn(
+                  'group hover:bg-surface-hover/50 transition-colors',
+                  onRowClick && 'cursor-pointer'
+                )}
+              >
+                {columns.map((col, colIdx) => (
+                  <td
+                    key={colIdx}
+                    className={cn(
+                      'py-3.5 px-3 text-xs text-text-primary font-medium',
+                      col.className
+                    )}
+                  >
+                    {col.cell
+                      ? col.cell(item)
+                      : col.accessorKey
+                      ? (item[col.accessorKey] as any)
+                      : null}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

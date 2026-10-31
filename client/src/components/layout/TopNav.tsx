@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, LogOut, Shield, ChevronDown, Moon, Zap, User } from 'lucide-react';
+import { Menu, LogOut, Shield, Moon, Zap } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { Badge } from '../ui/badge';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { invoiceService } from '../../services/invoiceService';
 
@@ -46,7 +45,7 @@ export const TopNav: React.FC<TopNavProps> = ({ onOpenSidebar }) => {
         </button>
 
         <div className="hidden sm:flex items-center space-x-2 text-xs text-text-secondary">
-          <span className="font-semibold text-text-primary">Brightloop Platform</span>
+          <span className="font-bold text-text-primary">Brightloop Platform</span>
           <span>•</span>
           <span>Enterprise Subscription Management</span>
         </div>

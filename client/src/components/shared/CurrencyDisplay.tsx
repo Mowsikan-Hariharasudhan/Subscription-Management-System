@@ -15,15 +15,14 @@ export const CurrencyDisplay: React.FC<CurrencyDisplayProps> = ({
 }) => {
   const sizeStyles = {
     sm: 'text-xs',
-    md: 'text-sm font-medium',
+    md: 'text-sm font-semibold',
     lg: 'text-lg font-bold',
     xl: 'text-2xl font-extrabold tracking-tight',
   };
 
   return (
-    <span className={cn('tabular-nums font-mono', sizeStyles[size], className)}>
+    <span className={cn('tabular-nums font-sans font-semibold tracking-tight', sizeStyles[size], className)}>
       {formatCurrency(amount)}
     </span>
   );
 };
-
