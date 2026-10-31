@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Repeat, Receipt, CreditCard, User, LogOut, Home, Menu, X, Moon } from 'lucide-react';
+import { Repeat, Receipt, CreditCard, User, LogOut, Home, Menu, X, Moon, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const PORTAL_NAV = [
   { to: '/portal', icon: Home, label: 'Overview', end: true },
+  { to: '/portal/explore', icon: Sparkles, label: 'Explore & Buy Apps', end: false },
   { to: '/portal/subscriptions', icon: Repeat, label: 'My Subscriptions', end: false },
   { to: '/portal/invoices', icon: Receipt, label: 'My Invoices', end: false },
   { to: '/portal/payments', icon: CreditCard, label: 'Payment History', end: false },

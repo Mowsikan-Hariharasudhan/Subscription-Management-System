@@ -107,5 +107,69 @@ export class PortalController {
       sendError(res, err.message, 400);
     }
   }
-}
 
+  static async pauseSubscription(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        sendError(res, 'Unauthorized', 401);
+        return;
+      }
+      const updated = await PortalService.pauseSubscription(req.user.userId, req.params.id);
+      sendSuccess(res, updated, 'Subscription paused successfully');
+    } catch (err: any) {
+      sendError(res, err.message, 400);
+    }
+  }
+
+  static async resumeSubscription(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        sendError(res, 'Unauthorized', 401);
+        return;
+      }
+      const updated = await PortalService.resumeSubscription(req.user.userId, req.params.id);
+      sendSuccess(res, updated, 'Subscription resumed successfully');
+    } catch (err: any) {
+      sendError(res, err.message, 400);
+    }
+  }
+
+  static async cancelSubscription(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        sendError(res, 'Unauthorized', 401);
+        return;
+      }
+      const updated = await PortalService.cancelSubscription(req.user.userId, req.params.id);
+      sendSuccess(res, updated, 'Subscription cancelled successfully');
+    } catch (err: any) {
+      sendError(res, err.message, 400);
+    }
+  }
+
+  static async subscribeNew(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        sendError(res, 'Unauthorized', 401);
+        return;
+      }
+      const subscription = await PortalService.subscribeNew(req.user.userId, req.body);
+      sendSuccess(res, subscription, 'Subscribed successfully', 201);
+    } catch (err: any) {
+      sendError(res, err.message, 400);
+    }
+  }
+
+  static async payInvoice(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        sendError(res, 'Unauthorized', 401);
+        return;
+      }
+      const payment = await PortalService.payInvoice(req.user.userId, req.params.id, req.body);
+      sendSuccess(res, payment, 'Invoice paid successfully');
+    } catch (err: any) {
+      sendError(res, err.message, 400);
+    }
+  }
+}

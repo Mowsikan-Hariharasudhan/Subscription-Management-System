@@ -41,7 +41,14 @@ export const CustomerDashboard: React.FC = () => {
             <p className="text-white/80 text-sm mt-1">{customer.companyName}</p>
           )}
         </div>
-        <div>
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
+          <button
+            onClick={() => navigate('/portal/explore')}
+            className="px-4 py-2 rounded-xl bg-white text-[#3E2134] text-xs font-bold shadow-sm hover:bg-white/90 transition-all cursor-pointer flex items-center space-x-1.5"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-plum-primary" />
+            <span>Explore & Buy Apps</span>
+          </button>
           <span className="text-xs bg-white/10 border border-white/20 px-3.5 py-1.5 rounded-xl text-white font-mono font-medium">
             Active Member
           </span>

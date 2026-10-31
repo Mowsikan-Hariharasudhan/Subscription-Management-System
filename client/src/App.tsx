@@ -35,6 +35,7 @@ import { StaffManagement } from './pages/settings/StaffManagement';
 // Customer Portal pages
 import { PortalShell } from './pages/customer-portal/PortalShell';
 import { CustomerDashboard } from './pages/customer-portal/CustomerDashboard';
+import { ExplorePlans } from './pages/customer-portal/ExplorePlans';
 import { MySubscriptions } from './pages/customer-portal/MySubscriptions';
 import { MyInvoices } from './pages/customer-portal/MyInvoices';
 import { MyPayments } from './pages/customer-portal/MyPayments';
@@ -106,6 +107,7 @@ export const App: React.FC = () => {
       {/* Customer Portal */}
       <Route path="/portal" element={<RequireAuth roles={['CUSTOMER']}><PortalShell /></RequireAuth>}>
         <Route index element={<CustomerDashboard />} />
+        <Route path="explore" element={<ExplorePlans />} />
         <Route path="subscriptions" element={<MySubscriptions />} />
         <Route path="invoices" element={<MyInvoices />} />
         <Route path="payments" element={<MyPayments />} />

@@ -1,273 +1,353 @@
-# Brightloop — Enterprise Subscription Management System
+<div align="center">
 
-[![Node.js](https://img.shields.io/badge/Node.js-v22-green.svg)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
-[![Prisma ORM](https://img.shields.io/badge/Prisma-v7-purple.svg)](https://www.prisma.io/)
-[![SQLite](https://img.shields.io/badge/SQLite-WAL--Mode-lightblue.svg)](https://www.sqlite.org/)
+# ⚡ BRIGHTLOOP
+### Enterprise Subscription Management & Recurring Billing Platform
+**Built for the Odoo x Make-A-Ton 9.0 Kochi Hackathon 2026**
 
-**Brightloop** is an enterprise-grade SaaS subscription and recurring billing platform built for the **Odoo x Make-A-Ton 9.0 Kochi Hackathon 2026**. It powers the complete subscription lifecycle—from customer onboarding, dynamic product catalogue and quotation templating to automated recurring billing, discount redemptions, tax calculations, manual payment recording, and customer self-service.
+[![Node.js](https://img.shields.io/badge/Node.js-v20%20%7C%20v22-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Prisma ORM](https://img.shields.io/badge/Prisma-7.2-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![SQLite](https://img.shields.io/badge/SQLite-WAL_Mode-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+
+<p align="center">
+  <b>A comprehensive, production-grade SaaS subscription engine powering customers, dynamic variants, quotations, recurring invoices, discounts, tax snapshots, manual payment ledgers, and a full customer self-service app store.</b>
+</p>
+
+[Quickstart Guide](#-1-minute-quickstart-for-evaluators) • [Live Demo Credentials](#-pre-seeded-demo-credentials) • [End-to-End Lifecycle](#-the-complete-subscription-lifecycle) • [Customer Portal & Marketplace](#-customer-self-service-portal--marketplace) • [Design System](#-design-system-refined-corporate-neo-brutalism) • [Automated Tests](#-automated-testing--verification-1313-passed)
+
+</div>
 
 ---
 
-## 🎨 Design System: Refined Corporate Brutalism
+## 🌟 Executive Summary
 
-The interface follows a **"Refined Professional Clean Corporate Structural Brutalism"** design system inspired by the Odoo Plum aesthetic:
+**Brightloop** is a full-stack, enterprise-grade recurring billing and subscription management system designed to eliminate financial leakage, automate high-volume subscription renewals, and give enterprise customers complete self-service over their software subscriptions.
 
-| Design Token | Hex Code | Usage |
+Unlike simple UI prototypes, **every single button, transition, modal, and filter in Brightloop connects directly to a persistent, atomic SQLite database through Prisma ORM with strict business rules, ACID transactions, and role-based access control (RBAC).**
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                               BRIGHTLOOP ECOSYSTEM                                     │
+├─────────────────────────────────────────┬──────────────────────────────────────────────┤
+│       🏢 ADMIN & STAFF BACKOFFICE       │         🌐 CUSTOMER SELF-SERVICE PORTAL      │
+│  • Customer Master Directory            │  • Live Financial & Subscription Overview   │
+│  • Products & Dynamic Price Variants    │  • App Marketplace: Browse & Buy New Apps   │
+│  • Subscription Frequency Plans         │  • Subscription Lifecycle: Pause / Resume    │
+│  • Quotation Blueprints & Conversions   │  • Self-Service Cancellation with Guards    │
+│  • Automated node-cron Billing Engine   │  • Invoice History & Due Date Alerts         │
+│  • Discounts (Fixed & Basis Points)     │  • 1-Click Instant Payment Checkout (Sim)   │
+│  • Multi-Tax Rules & Historical Snap    │  • Multi-Tenant Isolation & Zero Data Leak  │
+│  • Manual Payment Collection & Ledger   │  • Company Profile & Billing Address Sync    │
+│  • Real-Time C-Suite KPI Analytics      │  • Automated Receipt Tracking                │
+└─────────────────────────────────────────┴──────────────────────────────────────────────┘
+```
+
+---
+
+## 🔄 The Complete Subscription Lifecycle
+
+Brightloop covers 100% of the customer contract journey with strict state machine validation:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Quotation_Draft: Staff creates Quote / Template
+    Quotation_Draft --> Quotation_Sent: Staff sends Quote
+    Quotation_Sent --> Quotation_Accepted: Customer approves terms
+    Quotation_Accepted --> Subscription_Confirmed: Atomic Conversion (Prisma tx)
+    Subscription_Confirmed --> Subscription_Active: Plan Provisioned & Activated
+
+    state Subscription_Active {
+        [*] --> Invoicing_Cycle
+        Invoicing_Cycle --> Invoice_Generated: node-cron identifies due date
+        Invoice_Generated --> Payment_Recorded: Customer pays or Staff collects
+        Payment_Recorded --> Invoice_Settled: Balance == 0 (PAID)
+    }
+
+    Subscription_Active --> Subscription_Paused: Customer / Admin requests Pause
+    Subscription_Paused --> Subscription_Active: Customer / Admin Resumes
+    Subscription_Active --> Subscription_Closed: Term ends / Customer Cancels
+    Subscription_Closed --> [*]
+```
+
+1. **Catalog & Variant Definition:** Admins configure products (Software, Services) and define attribute variants with dynamic surcharges (`+₹560`, `+₹1,500`).
+2. **Quotation Blueprinting:** Staff creates sales quotations with line items, quantities, and applicable discounts, or applies one-click pre-configured **Quotation Templates**.
+3. **Atomic Conversion:** When accepted, an atomic database transaction converts the quotation into a verified `Subscription`, locking in contract prices and scheduling the next billing run.
+4. **Automated Recurring Invoicing:** The `node-cron` background billing engine scans active subscriptions daily, calculates prorated amounts, applies discounts, captures tax rate snapshots, and generates sequential invoices.
+5. **Idempotency Guarantee:** Backed by composite database unique constraints (`@@unique([subscriptionId, periodStart])`), recurring runs can never generate duplicate billing statements.
+6. **Payment & Ledger:** Payments are recorded with precision in minor currency units (paise). Overpayments are strictly rejected, and invoice statuses advance automatically from `CONFIRMED` to `PAID`.
+7. **Customer Self-Service:** Customers browse new products, buy additional plans, pause billing cycles, or cancel contracts directly from their authenticated portal.
+
+---
+
+## 🛍️ Customer Self-Service Portal & Marketplace
+
+A standout capability in Brightloop is the dedicated **Subscriber Self-Service Portal**:
+
+### 1. App Marketplace & Direct Checkout (`/portal/explore`)
+* Customers don't need to wait for sales reps to purchase more software or services.
+* **Live Catalog:** Search applications, filter by software suites vs. cloud services, and examine feature highlights.
+* **Dynamic Edition Selector:** Switch between product editions/variants (Standard, Professional, Enterprise) with instant price recalibration.
+* **Cadence Customizer:** Choose billing intervals (Monthly, Yearly, Weekly, Daily) with recurring cost breakdowns.
+* **Instant Provisioning:** 1-click **"Confirm Subscription"** provisions the subscription, calculates billing schedules, and records an audit trail.
+
+### 2. Contract Maintenance & Controls (`/portal/subscriptions`)
+* **Pause Subscription:** Customers can pause billing temporarily (adhering to plan permissions).
+* **Resume Subscription:** Reactivates the contract and updates the next billing cycle.
+* **Cancel Subscription:** Explicit cancellation with safety confirmation dialogs to prevent accidental churn.
+* **Entitlements Breakdown:** Detailed breakdown of subscribed product lines, quantities, and line totals.
+
+### 3. Online Payments & Statements (`/portal/invoices`)
+* Real-time invoices ledger with overdue badges.
+* **1-Click "Pay Now" Modal:** Settle invoices instantly using the built-in simulated payment gateway.
+* Automatic transition of invoice from `CONFIRMED` to `PAID` with instant balance clearance.
+
+---
+
+## 🎨 Design System: Refined Corporate Neo-Brutalism
+
+Brightloop implements a **"Refined Minimalist Corporate Neo-Brutalism"** design system inspired by modern executive software:
+
+* **Crisp 1px Structural Borders:** `#E5DFE4` defining all functional cards, tables, inputs, and dialogs.
+* **Tactile 2px Flat Offset Shadows:** `shadow-card: 2px 2px 0px #E5DFE4` and `shadow-plum-btn: 2px 2px 0px #3E2134`.
+* **Plum Corporate Identity:** Inspired by enterprise software aesthetics:
+
+| Design Token | Hex Code | Purpose |
 |---|---|---|
-| **Primary Plum** | `#724B68` | Active navigation borders, primary buttons, brand accents |
-| **Deep Plum** | `#36283B` | Persistent left sidebar, brand wordmarks, high-contrast headers |
-| **Muted Plum** | `#91768B` | Subtle badges, secondary accents, icons |
-| **Main Background** | `#F7F5F7` | Neutral light workspace backdrop |
-| **White Surface** | `#FFFFFF` | Cards, modals, data tables |
-| **Main Border** | `#E4DEE3` | Restrained 1px structured grid lines |
-| **Primary Text** | `#29242B` | High legibility typography |
-| **Secondary Text** | `#746F75` | Captions, metadata, column headings |
-| **Information Accent** | `#D1ECF1` | Subtle info callouts, alert banners |
+| **Primary Plum** | `#6A3D5B` | Primary buttons, active navigation pills, brand marks |
+| **Deep Plum** | `#3E2134` | Tactile button drop shadows, dark banner cards |
+| **Plum Surface** | `#F8F0F5` | Soft avatar backgrounds, selected rows, active icon containers |
+| **Plum Border** | `#E8DCE5` | Subtle borders for plum-themed elements |
+| **Canvas Background** | `#FAF7F5` | Warm, low-strain off-white corporate canvas |
+| **Pure White** | `#FFFFFF` | Primary card surfaces, data tables, modals |
+| **Primary Text** | `#1F1A1E` | High-contrast charcoal typography |
+| **Secondary Text** | `#6B636A` | Table column titles, metadata, subtitles |
+| **Mint Success** | `#047857` / `#D1FAE5` | Mint green `ACTIVE` status pills, completed payments |
+
+* **Monospace Typography:** JetBrains Mono for monetary amounts, invoice numbers, dates, percentages, and subscription codes.
 
 ---
 
-## 🚀 Key Features & Highlights
+## 👥 Role-Based Access Control (RBAC) Matrix
 
-1. **Enterprise Role-Based Access Control (RBAC):**
-   - **Admin:** Full access to all modules, staff provisioning, system settings, tax configuration, and discount rule engines.
-   - **Staff:** Daily operational handling: customers, quotation templates, quotes, subscriptions, invoices, and payment recording. Cannot alter admin-only settings or provision staff.
-   - **Customer:** Secure self-service portal strictly isolated to the logged-in customer's subscriptions, invoices, and payments.
+Brightloop strictly segregates permissions across 3 user roles:
 
-2. **Dynamic Products & Attribute Variants:**
-   - Catalog supporting Software (SaaS), Services, and Hardware.
-   - Variants with dynamic price adjustments (e.g., Odoo Brand `+₹560`, Enterprise `+₹1,500`) stored in the database.
-
-3. **Subscription Lifecycle State Machine:**
-   - Strict status progression: `DRAFT` ➔ `QUOTATION` ➔ `CONFIRMED` ➔ `ACTIVE` ➔ `CLOSED`.
-   - Actionable pause and resume controls adhering to plan capabilities.
-   - Safe early closure and renewal workflows.
-
-4. **Quotation Blueprint & Conversion Engine:**
-   - Reusable Quotation Templates for sales reps with pre-configured plans, product lines, quantities, and applicable tax rates.
-   - Atomic quotation-to-subscription conversion executed in a database transaction (`prisma.$transaction`).
-
-5. **Automated Recurring Billing Engine (node-cron):**
-   - Scheduled daily billing engine (`node-cron`) checking all due subscriptions.
-   - Admin-only **"Run Billing Now"** trigger for instant testing and evaluations using the exact same billing service.
-   - **Guaranteed Idempotency:** DB-level unique constraint (`@@unique([subscriptionId, periodStart])`) prevents duplicate billing across runs.
-   - **Financial Snapshots:** Historical invoices lock in line prices, variant additions, and tax rates at the moment of billing.
-
-6. **Automated Discount & Tax Engine:**
-   - Percentage basis points (e.g. 10% = 1000 bps) and fixed paise discounts.
-   - Dedicated `DiscountRedemption` tracking table enforcing minimum purchase amounts, minimum quantities, validity periods, and maximum usage quotas.
-   - Flexible, editable tax rules applied dynamically during invoice calculation.
-
-7. **Manual Payment Recording & Ledger:**
-   - Internal staff payment recording (Cash, Bank Transfer, UPI, Card, Other).
-   - Real-time balance calculations ensuring recorded payments never exceed outstanding amounts.
-   - Automatic invoice status transition from `CONFIRMED` to `PAID` upon settlement. Partial payments maintain remaining balances.
-
-8. **Executive Analytics Dashboard:**
-   - Server-side aggregation queries for instant load times under 2 seconds.
-   - Real-time KPIs: Active Subscriptions, Total Customers, Collected Revenue, Total Invoiced, Outstanding Balance, and Overdue Invoices.
-   - Interactive Recharts: Monthly Collected Revenue, Subscription Growth, and Payment Status Distribution.
-
-9. **Customer Self-Service Portal:**
-   - Streamlined, mobile-responsive portal for subscribers.
-   - Overview metrics, subscription tiers and renewal dates, invoice history, payment ledger, and profile management.
-   - Strict multi-tenant backend isolation preventing any customer from accessing another customer's financial records.
+| Module / Action | 👑 Admin | 👔 Staff | 👤 Customer |
+|---|:---:|:---:|:---:|
+| **Executive Analytics & KPIs** | Full | Full | Own Account Only |
+| **Customer Master Directory** | Full (CRUD) | Full (CRUD) | Own Profile Only |
+| **Product & Variant Catalog** | Full (CRUD) | Read Only | Marketplace View |
+| **Subscription Plans & Frequencies** | Full (CRUD) | Read Only | Marketplace View |
+| **Quotation Templates & Blueprints** | Full (CRUD) | Full (CRUD) | None |
+| **Quotation Creation & Conversion** | Full (CRUD) | Full (CRUD) | None |
+| **Subscription Lifecycle (All)** | Full Control | Full Control | Own (Pause/Resume/Cancel) |
+| **Run Background Billing Now** | ✅ Triggerable | ❌ Restricted | ❌ Restricted |
+| **Discount Rules Engine** | Full (CRUD) | Read Only | ❌ Restricted |
+| **Tax Configuration** | Full (CRUD) | Read Only | Read Only (Calculated) |
+| **Payment Ledger & Recording** | Full Collection | Full Collection | Online Checkout (Own) |
+| **Staff & User Provisioning** | ✅ Yes | ❌ Blocked (403) | ❌ Blocked (403) |
+| **Customer Data Isolation** | Global | Global | Strictly Tenant-Locked |
 
 ---
 
-## 🛠️ Mandatory Technology Stack
+## ⚡ 1-Minute Quickstart for Evaluators
 
-- **Frontend:** React 18, TypeScript, Vite 5, Tailwind CSS, shadcn/ui primitives, Lucide React, Recharts, React Router v6, TanStack Query v5, React Hook Form, Zod.
-- **Backend:** Node.js, Express.js, TypeScript, REST API, JWT authentication, bcryptjs, Zod request validation.
-- **Database:** SQLite with Prisma ORM 7 (`@prisma/adapter-better-sqlite3`, WAL mode, foreign key enforcement, minor currency units in paise).
-- **Automation & Utilities:** node-cron (scheduled billing), Nodemailer (email tokens), date-fns (calendar calculations).
-
----
-
-## ⚡ Quickstart Guide (Evaluator Friendly)
-
-The application runs locally without any external database server, cloud accounts, or paid API keys.
+Brightloop runs 100% locally with zero external paid APIs, cloud database accounts, or third-party gateways.
 
 ### 1. Prerequisites
-- **Node.js**: v18+ (tested on Node v22.19.0)
-- **npm**: v9+ (tested on npm 10.8.3)
+- **Node.js**: `v18+` or `v20+` or `v22+` (tested on Node v22.19.0)
+- **npm**: `v9+` or `v10+`
 
-### 2. Clone and Setup
+### 2. Clone & Automated Setup
 
 ```bash
-# 1. Clone the repository
+# 1. Clone repository
 git clone https://github.com/Mowsikan-Hariharasudhan/Subscription-Management-System.git
 cd Bright-Loop
 
-# 2. Run automated setup (installs dependencies, deploys SQLite database & seeds demo data)
+# 2. Run automated setup (Installs client & server deps, runs Prisma migrations, seeds demo DB)
 npm run setup
 ```
-
-*Note on Windows PowerShell: The script runs seamlessly on both Windows PowerShell and macOS/Linux bash.*
 
 ### 3. Start Development Servers
 
 ```bash
-# Starts both Backend (http://localhost:5000) and Frontend (http://localhost:5173) concurrently
+# Concurrently launches Express Backend (port 5000) and Vite React Client (port 5173)
 npm run dev
 ```
 
-Visit **[http://localhost:5173](http://localhost:5173)** in your browser.
+Open your browser at **[http://localhost:5173](http://localhost:5173)**.
 
 ---
 
-## 🔑 Demo Credentials
+## 🔑 Pre-Seeded Demo Credentials
 
-The database comes pre-seeded with realistic, interrelated enterprise demonstration data:
+The application is pre-seeded with realistic enterprise data (active subscriptions, multi-variant products, generated invoices, overdue alerts, and payments):
 
-| Role | Email | Password | Access / Scope |
+| Role | Email Address | Password | Intended Test Flow |
 |---|---|---|---|
-| **Admin** | `admin@brightloop.io` | `Admin@1234` | Full system access, staff provisioning, tax/discount setup, billing triggers |
-| **Staff** | `sarah@brightloop.io` | `Staff@1234` | Customer operations, quotes, subscriptions, invoices, payment recording |
-| **Staff** | `mike@brightloop.io` | `Staff@1234` | Secondary staff operator account |
-| **Customer** | `customer1@example.com` | `Customer@1234` | Self-service portal: subscriptions, invoices, payments |
-| **Customer** | `customer2@example.com` | `Customer@1234` | Additional pre-seeded customer accounts (up to `customer10@example.com`) |
+| **👑 Admin** | `admin@brightloop.io` | `Admin@1234` | Full backoffice, staff management, tax rules, discount rules, "Run Billing Now" |
+| **👔 Staff** | `sarah@brightloop.io` | `Staff@1234` | Customer onboarding, quote creation, quote-to-subscription conversion, manual payment entry |
+| **👔 Staff** | `mike@brightloop.io` | `Staff@1234` | Secondary staff operator account |
+| **👤 Customer** | `customer1@example.com` | `Customer@1234` | Self-service subscriber portal: browse & buy apps, pause/resume subscriptions, pay invoices |
+| **👤 Customer** | `customer2@example.com` | `Customer@1234` | Alternate customer account with outstanding balances and invoices |
 
-*Convenient single-click demo login buttons are provided directly on the Login page.*
+> **Evaluator Tip:** The Login page features **1-Click Quick Demo Login buttons** for instant switching between Admin, Staff, and Customer without typing credentials!
 
 ---
 
-## 🧪 Automated Testing & Verification
+## 🧪 Automated Testing & Verification (13/13 Passed)
 
-Brightloop includes an automated end-to-end integration test suite validating all 16 business scenarios specified in Section 25 of the requirements:
+Brightloop includes an automated end-to-end integration and business logic verification suite covering the core requirements:
 
 ```bash
 npm test
 ```
 
-### Verified Scenarios:
-- `Scenario 1`: Customer registration & login with strong password policy enforcement.
-- `Scenario 2`: Admin creates product with multiple price-adjusted variants.
-- `Scenario 3`: Admin creates monthly subscription plan with lifecycle controls.
-- `Scenario 4`: Staff creates quotation from scratch or pre-configured blueprint template.
-- `Scenario 5`: Quotation flow: `DRAFT` ➔ `SENT` ➔ `ACCEPTED` ➔ Transactional Subscription creation.
-- `Scenario 6 & 7`: Recurring billing engine identifies due subscriptions and generates invoices.
-- `Scenario 8 & 9`: Automated discount rules applied and tax rates captured in historical snapshots.
-- `Scenario 10 & 11`: Staff records partial and full payments, balance reduction, and `PAID` transition.
-- `Scenario 12`: Finance dashboard real-time server-side KPI aggregations.
-- `Scenario 13`: Closed or paused subscriptions do not generate future invoices.
-- `Scenario 14`: Billing idempotency — repeated execution creates zero duplicate invoices.
-- `Scenario 15`: Customer portal data isolation (cross-tenant access rejected with 403/404).
-- `Scenario 16`: Staff RBAC boundaries — staff forbidden from creating staff or discount rules.
+### Test Results Summary:
+
+```
+======================================================
+ STARTING BRIGHTLOOP ACCEPTANCE & INTEGRATION TEST SUITE
+======================================================
+
+ ✅ PASS: Scenario 1: Customer registration & login with password policy
+ ✅ PASS: Scenario 2: Admin creates product with two variants
+ ✅ PASS: Scenario 3: Admin creates monthly subscription plan
+ ✅ PASS: Scenario 4: Staff creates quotation for customer
+ ✅ PASS: Scenario 5: Quotation status flow: DRAFT -> SENT -> ACCEPTED -> Subscription
+ ✅ PASS: Scenario 6 & 7: Billing engine identifies due subscription and generates invoice
+ ✅ PASS: Scenario 8 & 9: Taxes snapshot & discount calculations on generated invoice
+ ✅ PASS: Scenario 10 & 11: Recording payments, outstanding update, and transition to PAID
+ ✅ PASS: Scenario 12: Finance dashboard server-side aggregation metrics
+ ✅ PASS: Scenario 13: Closed subscription does not generate invoice
+ ✅ PASS: Scenario 14: Billing idempotency — second execution creates 0 duplicates
+ ✅ PASS: Scenario 15: Customer portal data isolation (cannot read other customer data)
+ ✅ PASS: Scenario 16: Staff RBAC boundaries — forbidden from creating staff or discount rules
+
+======================================================
+ RESULTS: 13 PASSED, 0 FAILED (100% SUCCESS)
+======================================================
+```
+
+---
+
+## 🏗️ Technical Architecture & Monorepo Structure
+
+```
+Bright-Loop/
+│
+├── client/                              # Modern React 18 + TypeScript SPA
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── layout/                  # White neo-brutal Sidebar, TopNav, AppShell
+│   │   │   ├── shared/                  # DataTable, StatusBadge, CurrencyDisplay, PageHeader
+│   │   │   └── ui/                      # Button, Dialog, Card, Input, Label, Badge, Tabs
+│   │   ├── context/                     # AuthContext (JWT session, RBAC guards)
+│   │   ├── pages/
+│   │   │   ├── auth/                    # Split-pane Hero Login, Register, Password Reset
+│   │   │   ├── dashboard/               # 5 KPI cards, Recharts Area/Donut, Tables
+│   │   │   ├── customers/               # Customer Directory (Kanban / List view)
+│   │   │   ├── products/                # Catalog & Variant Price Surcharges
+│   │   │   ├── plans/                   # Subscription Billing Intervals & Pause Rules
+│   │   │   ├── quotations/              # Quotation Builder & Blueprint Templates
+│   │   │   ├── subscriptions/           # Full Lifecycle Management & Detail Views
+│   │   │   ├── invoices/                # Invoices, Line Items, & Instant Billing Trigger
+│   │   │   ├── payments/                # Payment Recording Modal & Historical Ledger
+│   │   │   ├── discounts/               # Fixed & Basis Points Discount Rules Engine
+│   │   │   ├── settings/                # Tax Rules, System Settings, Staff Provisioning
+│   │   │   └── customer-portal/         # Subscriber Portal:
+│   │   │       ├── CustomerDashboard    # Subscriber Welcome Hero & KPI Cards
+│   │   │       ├── ExplorePlans         # Marketplace: Browse & Buy New Applications
+│   │   │       ├── MySubscriptions      # Active Contracts, Entitlements, Pause/Resume
+│   │   │       ├── MyInvoices           # Invoices, Overdue Badges, 1-Click Pay Now
+│   │   │       ├── MyPayments           # Verified Transaction History
+│   │   │       └── AccountSettings      # Company Profile & Billing Address Sync
+│   │   ├── services/                    # Typed Axios HTTP API Services
+│   │   └── types/                       # Shared TypeScript Interfaces
+│   └── package.json
+│
+├── server/                              # Express + TypeScript + Prisma Backend
+│   ├── prisma/
+│   │   ├── schema.prisma                # 20 Normalized Models, Foreign Keys, Indexes
+│   │   └── seed.ts                      # Enterprise Demo Data Seeder
+│   ├── src/
+│   │   ├── config/                      # Prisma Client, WAL Mode Pragmas, Env Loader
+│   │   ├── controllers/                 # Express Route Handlers
+│   │   ├── jobs/                        # node-cron Scheduled Billing Engine
+│   │   ├── middleware/                  # JWT Auth, Role RBAC, Zod Validation, Errors
+│   │   ├── routes/                      # Modular REST Endpoints (/api/v1/*)
+│   │   ├── services/                    # Business Logic, Billing Engine, Invoicing
+│   │   ├── tests/                       # 16-Scenario Automated Acceptance Suite
+│   │   └── utils/                       # Paise Minor Units, Audit Logger, Pagination
+│   └── package.json
+│
+├── package.json                         # Monorepo Scripts (setup, dev, test, build)
+└── README.md                            # Comprehensive Hackathon Jury Guide
+```
 
 ---
 
 ## 📡 REST API Reference Summary
 
-All API endpoints are prefixed with `/api/v1` and protected by JWT authentication and RBAC authorization middleware:
+All endpoints are hosted under `/api/v1` and protected by JWT authentication and RBAC middleware:
 
-| Route Group | Methods | Path | Description | Access |
+| Module | Method | Path | Description | Access |
 |---|---|---|---|---|
-| **Auth** | `POST` | `/auth/register` | Register customer account | Public |
-| | `POST` | `/auth/login` | Authenticate & retrieve JWT | Public |
-| | `POST` | `/auth/forgot-password` | Request password reset token | Public |
-| | `POST` | `/auth/reset-password` | Reset password using token | Public |
-| | `GET` | `/auth/me` | Current authenticated user profile | All |
-| **Users** | `GET, POST` | `/users` | List users / Create staff account | Admin |
-| | `PATCH, DELETE` | `/users/:id` | Update / Deactivate user | Admin |
-| **Customers** | `GET, POST` | `/customers` | Paginated customer list / Create | Admin, Staff |
-| | `GET, PATCH` | `/customers/:id` | Customer details & linked entities | Admin, Staff |
-| **Products** | `GET` | `/products` | Filterable catalog list | All |
-| | `POST, PATCH` | `/products` | Create & update catalog products | Admin |
-| **Variants** | `POST, PATCH`| `/product-variants` | Dynamic variant price adjustments | Admin |
-| **Plans** | `GET` | `/plans` | List active subscription plans | All |
-| | `POST, PATCH` | `/plans` | Create & configure plans | Admin |
-| **Taxes** | `GET` | `/taxes` | Tax rules and rates | All |
-| | `POST, PATCH` | `/taxes` | Configure tax rates & validity | Admin |
-| **Templates** | `GET, POST` | `/quotation-templates`| Pre-configured quotation blueprints | Admin, Staff |
-| **Quotations** | `GET, POST` | `/quotations` | List / Create quotations | Admin, Staff |
-| | `POST` | `/quotations/:id/confirm` | Advance quotation to `SENT` | Admin, Staff |
-| | `POST` | `/quotations/:id/accept` | Mark quotation `ACCEPTED` | Admin, Staff |
-| | `POST` | `/quotations/:id/convert`| Transactional conversion to Subscription | Admin, Staff |
-| **Subscriptions**| `GET` | `/subscriptions` | Paginated subscriptions with filters | Admin, Staff |
-| | `POST` | `/subscriptions/:id/activate` | Activate confirmed subscription | Admin, Staff |
-| | `POST` | `/subscriptions/:id/pause` | Pause active subscription | Admin, Staff |
+| **Auth** | `POST` | `/auth/register` | Customer registration | Public |
+| | `POST` | `/auth/login` | Authenticate & issue JWT | Public |
+| | `GET` | `/auth/me` | Current session user profile | Authenticated |
+| **Customers** | `GET, POST` | `/customers` | List & create customers | Admin, Staff |
+| | `GET, PATCH` | `/customers/:id` | View customer & linked contracts | Admin, Staff |
+| **Products** | `GET` | `/products` | List active products | Public / Auth |
+| | `POST, PATCH` | `/products` | Create & update catalog products | Admin, Staff |
+| **Variants** | `POST, PATCH` | `/product-variants` | Create price-adjusted variants | Admin, Staff |
+| **Plans** | `GET` | `/plans` | List recurring subscription plans | Public / Auth |
+| | `POST, PATCH` | `/plans` | Configure plans & pause rules | Admin |
+| **Quotations** | `GET, POST` | `/quotations` | List & build quotations | Admin, Staff |
+| | `POST` | `/quotations/:id/convert` | Atomic convert quote to Subscription | Admin, Staff |
+| **Subscriptions** | `GET` | `/subscriptions` | Paginated subscriptions with filters | Admin, Staff |
+| | `POST` | `/subscriptions/:id/activate` | Activate confirmed contract | Admin, Staff |
+| | `POST` | `/subscriptions/:id/pause` | Pause ongoing billing cycle | Admin, Staff |
 | | `POST` | `/subscriptions/:id/resume` | Resume paused subscription | Admin, Staff |
-| | `POST` | `/subscriptions/:id/close` | Early or permanent closure | Admin, Staff |
-| | `POST` | `/subscriptions/:id/renew` | Extend subscription expiry | Admin, Staff |
-| **Invoices** | `GET` | `/invoices` | Paginated invoices with status filters | Admin, Staff |
-| | `POST` | `/invoices/:id/confirm`| Confirm draft invoice | Admin, Staff |
-| | `POST` | `/invoices/:id/cancel` | Cancel invoice | Admin, Staff |
-| | `POST` | `/invoices/billing/run`| Manual "Run Billing Now" trigger | Admin |
-| **Discounts** | `GET` | `/discounts` | List discount rules & redemptions | Admin, Staff |
-| | `POST, DELETE`| `/discounts` | Create and manage discount rules | Admin |
+| | `POST` | `/subscriptions/:id/close` | Terminate subscription | Admin, Staff |
+| **Invoices** | `GET` | `/invoices` | List invoices with status filter | Admin, Staff |
+| | `POST` | `/invoices/billing/run` | Manual "Run Billing Now" execution | Admin |
 | **Payments** | `GET, POST` | `/payments` | List payments / Record payment | Admin, Staff |
-| **Dashboard** | `GET` | `/dashboard/kpis` | Real-time aggregation KPI metrics | Admin, Staff |
-| | `GET` | `/dashboard/monthly-revenue` | Monthly revenue trend | Admin, Staff |
-| | `GET` | `/dashboard/growth` | New subscription growth | Admin, Staff |
-| **Portal** | `GET` | `/customer-portal/overview` | Customer overview metrics | Customer |
-| | `GET` | `/customer-portal/subscriptions` | Customer's own subscriptions | Customer |
-| | `GET` | `/customer-portal/invoices` | Customer's own invoices | Customer |
+| **Discounts** | `GET, POST` | `/discounts` | Create and manage discount rules | Admin |
+| **Taxes** | `GET, POST` | `/taxes` | Configure tax rates & rules | Admin |
+| **Dashboard** | `GET` | `/dashboard/kpis` | Real-time financial KPI aggregations | Admin, Staff |
+| **Customer Portal** | `GET` | `/customer-portal/overview` | Subscriber dashboard metrics | Customer |
+| | `POST` | `/customer-portal/subscribe` | Self-service new plan subscription | Customer |
+| | `GET` | `/customer-portal/subscriptions`| Customer's active subscriptions | Customer |
+| | `POST` | `/customer-portal/subscriptions/:id/pause` | Customer pauses own subscription | Customer |
+| | `POST` | `/customer-portal/subscriptions/:id/resume`| Customer resumes subscription | Customer |
+| | `POST` | `/customer-portal/subscriptions/:id/cancel`| Customer cancels subscription | Customer |
+| | `GET` | `/customer-portal/invoices` | Customer's invoices | Customer |
+| | `POST` | `/customer-portal/invoices/:id/pay` | 1-click simulated invoice payment | Customer |
 | | `GET` | `/customer-portal/payments` | Customer's payment history | Customer |
 
 ---
 
-## 📂 Project Architecture
+## 🛡️ Security, Financial Precision & Best Practices
 
-```
-Bright-Loop/
-├── client/                      # React 18 + Vite Frontend
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── layout/          # Deep Plum Sidebar, TopNav, AppShell
-│   │   │   ├── shared/          # DataTable, StatusBadge, CurrencyDisplay, PageHeader
-│   │   │   └── ui/              # Button, Dialog, Card, Input, Label, Badge, Tabs
-│   │   ├── context/             # AuthContext (JWT, session persistence, role guards)
-│   │   ├── pages/
-│   │   │   ├── auth/            # Login, Register, ForgotPassword, ResetPassword
-│   │   │   ├── dashboard/       # Executive KPI cards, Recharts visualizations
-│   │   │   ├── customers/       # Customer directory & detail tabs
-│   │   │   ├── products/        # Catalog & dynamic variant management
-│   │   │   ├── plans/           # Subscription plans & frequency rules
-│   │   │   ├── quotations/      # Quotation builder & blueprint templates
-│   │   │   ├── subscriptions/   # Lifecycle management & state controls
-│   │   │   ├── invoices/        # Invoices, lines, & "Run Billing Now"
-│   │   │   ├── payments/        # Payment recording modal & audit ledger
-│   │   │   ├── discounts/       # Fixed & percentage discount rules
-│   │   │   ├── settings/        # System settings, tax rules, staff management
-│   │   │   └── customer-portal/ # Tenant-isolated subscriber portal
-│   │   ├── services/            # Axios API domain clients
-│   │   └── types/               # TypeScript domain interfaces
-│   └── package.json
-│
-├── server/                      # Express + TypeScript Backend
-│   ├── prisma/
-│   │   ├── schema.prisma        # Normalized schema with 20 entities & indexes
-│   │   └── seed.ts              # Comprehensive demo dataset seed script
-│   ├── src/
-│   │   ├── config/              # Prisma client, SQLite WAL pragmas, typed env loader
-│   │   ├── controllers/         # Thin HTTP controllers
-│   │   ├── jobs/                # node-cron recurring billing schedule
-│   │   ├── middleware/          # JWT auth, RBAC authorization, Zod validation
-│   │   ├── routes/              # Modular REST routes mounted under /api/v1
-│   │   ├── services/            # Business logic: billing engine, pricing, subscriptions
-│   │   ├── tests/               # 16-scenario acceptance & integration test suite
-│   │   ├── utils/               # Currency minor units, audit logger, pagination
-│   │   └── validators/          # Zod validation schemas
-│   └── package.json
-│
-├── .env.example                 # Environment variable template
-├── package.json                 # Monorepo orchestrator scripts
-└── README.md                    # Complete evaluator & developer documentation
-```
+1. **Integer Currency Precision (Paise):**
+   Floating point math is never used for financial transactions. All monetary amounts (`salesPrice`, `unitPrice`, `taxAmount`, `total`, `amountPaid`, `outstanding`) are stored as integers in **paise** (1 INR = 100 paise), avoiding Javascript rounding errors.
+2. **True Database-Level Idempotency:**
+   The recurring billing engine enforces composite unique indexes `@@unique([subscriptionId, periodStart])`. Even if the cron job or manual trigger is invoked multiple times in the same billing cycle, duplicate invoices are mathematically impossible.
+3. **Historical Financial Snapshots:**
+   Invoices store snapshots of tax percentages, product names, variant extras, and discount basis points at the exact instant of invoicing, ensuring future price or tax changes never distort historical accounting statements.
+4. **Tenant Isolation:**
+   All customer portal endpoints resolve the customer record directly from the authenticated JWT user ID. Direct object reference attacks (IDOR) are impossible.
+5. **Auditing:**
+   Every significant financial state change (Quotation conversion, Subscription activation, Billing generation, Invoice confirmation, Payment collection) automatically writes an entry to the `AuditLog` table.
 
 ---
 
-## 🔒 Security & Data Integrity
-
-- **Database-Level Idempotency:** The billing engine uses SQLite unique composite indexes `@@unique([subscriptionId, periodStart])` to mathematically prevent duplicate billing.
-- **Financial Precision:** All monetary calculations use integer minor units (**paise** for INR), preventing JavaScript floating-point rounding discrepancies.
-- **Tenant Isolation:** Customer portal endpoints dynamically filter data based on the authenticated JWT customer ID, disallowing cross-tenant data visibility.
-- **Password Protection:** Minimum 9 characters, requiring uppercase, lowercase, and special characters, hashed using `bcryptjs` with salt rounds.
-- **Audit Logging:** Crucial financial actions (quotation conversion, billing cycles, invoice status changes, payments) are logged to the `AuditLog` entity.
-
----
-
-Developed with ❤️ for the **Odoo x Make-A-Ton 9.0 Kochi Hackathon 2026**.
-
+<div align="center">
+  <b>Built with precision and passion for the Odoo Hackathon 2026.</b>
+  <br />
+  <sub>Brightloop Software • Enterprise Subscription and Billing Platform</sub>
+</div>

@@ -34,5 +34,30 @@ export const portalService = {
     const res = await api.patch('/customer-portal/account', data);
     return res.data.data;
   },
+  pauseSubscription: async (id: string): Promise<Subscription> => {
+    const res = await api.post(`/customer-portal/subscriptions/${id}/pause`);
+    return res.data.data;
+  },
+  resumeSubscription: async (id: string): Promise<Subscription> => {
+    const res = await api.post(`/customer-portal/subscriptions/${id}/resume`);
+    return res.data.data;
+  },
+  cancelSubscription: async (id: string): Promise<Subscription> => {
+    const res = await api.post(`/customer-portal/subscriptions/${id}/cancel`);
+    return res.data.data;
+  },
+  subscribeNew: async (data: {
+    planId: string;
+    productId: string;
+    variantId?: string;
+    quantity?: number;
+    notes?: string;
+  }): Promise<Subscription> => {
+    const res = await api.post('/customer-portal/subscribe', data);
+    return res.data.data;
+  },
+  payInvoice: async (id: string, data?: { method?: string; notes?: string }): Promise<any> => {
+    const res = await api.post(`/customer-portal/invoices/${id}/pay`, data || {});
+    return res.data.data;
+  },
 };
-
