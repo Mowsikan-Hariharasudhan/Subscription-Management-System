@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
@@ -12,6 +12,7 @@ import {
   ShieldAlert,
   RotateCw,
   ChevronDown,
+  Check,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -26,6 +27,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { dashboardService } from '../../services/dashboardService';
+import { planService } from '../../services/planService';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
 import { PageHeader } from '../../components/shared/PageHeader';
 import { StatusBadge } from '../../components/shared/StatusBadge';
@@ -37,7 +39,30 @@ export const Dashboard: React.FC = () => {
   const queryClient = useQueryClient();
   const [filterPlan, setFilterPlan] = useState('All Plans');
   const [filterTime, setFilterTime] = useState('All Time');
+  const [planMenuOpen, setPlanMenuOpen] = useState(false);
+  const [timeMenuOpen, setTimeMenuOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const planRef = useRef<HTMLDivElement>(null);
+  const timeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (planRef.current && !planRef.current.contains(e.target as Node)) {
+        setPlanMenuOpen(false);
+      }
+      if (timeRef.current && !timeRef.current.contains(e.target as Node)) {
+        setTimeMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const { data: plansData } = useQuery({
+    queryKey: ['plans-list'],
+    queryFn: () => planService.list(),
+  });
 
   const { data: kpis, isLoading: kpisLoading } = useQuery({
     queryKey: ['dashboard', 'kpis'],
@@ -70,6 +95,23 @@ export const Dashboard: React.FC = () => {
     setTimeout(() => setIsRefreshing(false), 400);
   };
 
+  const planOptions = ['All Plans', ...(plansData ? Array.from(new Set(plansData.map((p: any) => p.name))) : [])];
+  const timeOptions = ['All Time', 'This Month', 'Last 30 Days', 'This Year'];
+
+  // Filter subscriptions dynamically by chosen plan
+  const displayedSubscriptions = (recentSubscriptions || []).filter((sub) => {
+    if (filterPlan !== 'All Plans' && sub.plan?.name !== filterPlan) return false;
+    return true;
+  });
+
+  // Filter revenue items dynamically by chosen time interval
+  const displayedRevenue = (revenueData || []).filter((item, idx, arr) => {
+    if (filterTime === 'This Month') return idx === arr.length - 1;
+    if (filterTime === 'Last 30 Days') return idx >= arr.length - 2;
+    if (filterTime === 'This Year') return true;
+    return true;
+  });
+
   const PIE_COLORS = ['#6A3D5B', '#8A5F7C', '#059669', '#DC2626', '#D97706'];
 
   if (kpisLoading) {
@@ -84,26 +126,86 @@ export const Dashboard: React.FC = () => {
         description="Real-time aggregate data across subscription runs, recurring invoices, payments, and discounts"
         actions={
           <div className="flex items-center gap-2">
-            {/* Filter Dropdown 1 */}
-            <div className="relative">
+            {/* Filter Dropdown 1: Plans */}
+            <div className="relative" ref={planRef}>
               <button
                 type="button"
-                className="h-9 px-3.5 rounded-xl border border-border-main bg-white text-xs font-medium text-text-primary flex items-center gap-2 hover:bg-surface-hover shadow-sm"
+                onClick={() => {
+                  setPlanMenuOpen(!planMenuOpen);
+                  setTimeMenuOpen(false);
+                }}
+                className={`h-9 px-3.5 rounded-xl border text-xs font-medium flex items-center gap-2 shadow-sm transition-all cursor-pointer ${
+                  filterPlan !== 'All Plans'
+                    ? 'border-plum-primary bg-plum-surface text-plum-primary font-bold'
+                    : 'border-border-main bg-white text-text-primary hover:bg-surface-hover'
+                }`}
               >
                 <span>{filterPlan}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-text-secondary" />
               </button>
+
+              {planMenuOpen && (
+                <div className="absolute left-0 sm:right-0 sm:left-auto mt-1.5 w-48 bg-white border border-border-main rounded-xl shadow-lg z-50 py-1 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-3 py-1.5 text-[10px] font-bold text-text-secondary uppercase tracking-wider border-b border-border-subtle">
+                    Filter by Plan
+                  </div>
+                  {planOptions.map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => {
+                        setFilterPlan(opt);
+                        setPlanMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs text-text-primary hover:bg-surface-hover flex items-center justify-between cursor-pointer"
+                    >
+                      <span className={filterPlan === opt ? 'font-bold text-plum-primary' : ''}>{opt}</span>
+                      {filterPlan === opt && <Check className="w-3.5 h-3.5 text-plum-primary" />}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Filter Dropdown 2 */}
-            <div className="relative">
+            {/* Filter Dropdown 2: Time Interval */}
+            <div className="relative" ref={timeRef}>
               <button
                 type="button"
-                className="h-9 px-3.5 rounded-xl border border-border-main bg-white text-xs font-medium text-text-primary flex items-center gap-2 hover:bg-surface-hover shadow-sm"
+                onClick={() => {
+                  setTimeMenuOpen(!timeMenuOpen);
+                  setPlanMenuOpen(false);
+                }}
+                className={`h-9 px-3.5 rounded-xl border text-xs font-medium flex items-center gap-2 shadow-sm transition-all cursor-pointer ${
+                  filterTime !== 'All Time'
+                    ? 'border-plum-primary bg-plum-surface text-plum-primary font-bold'
+                    : 'border-border-main bg-white text-text-primary hover:bg-surface-hover'
+                }`}
               >
                 <span>{filterTime}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-text-secondary" />
               </button>
+
+              {timeMenuOpen && (
+                <div className="absolute left-0 sm:right-0 sm:left-auto mt-1.5 w-44 bg-white border border-border-main rounded-xl shadow-lg z-50 py-1 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="px-3 py-1.5 text-[10px] font-bold text-text-secondary uppercase tracking-wider border-b border-border-subtle">
+                    Time Interval
+                  </div>
+                  {timeOptions.map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => {
+                        setFilterTime(opt);
+                        setTimeMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs text-text-primary hover:bg-surface-hover flex items-center justify-between cursor-pointer"
+                    >
+                      <span className={filterTime === opt ? 'font-bold text-plum-primary' : ''}>{opt}</span>
+                      {filterTime === opt && <Check className="w-3.5 h-3.5 text-plum-primary" />}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Refresh Button */}
@@ -233,7 +335,7 @@ export const Dashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={displayedRevenue} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#6A3D5B" stopOpacity={0.25} />
@@ -404,14 +506,14 @@ export const Dashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-main/70">
-                  {(!recentSubscriptions || recentSubscriptions.length === 0) ? (
+                  {(!displayedSubscriptions || displayedSubscriptions.length === 0) ? (
                     <tr>
                       <td colSpan={5} className="px-5 py-6 text-center text-text-secondary text-xs">
-                        No subscriptions found.
+                        {filterPlan !== 'All Plans' ? `No subscriptions found for "${filterPlan}".` : 'No subscriptions found.'}
                       </td>
                     </tr>
                   ) : (
-                    recentSubscriptions.map((sub) => (
+                    displayedSubscriptions.map((sub) => (
                       <tr key={sub.id} className="hover:bg-surface-hover/60 transition-colors">
                         <td className="px-5 py-3 font-mono font-semibold text-plum-primary">
                           <Link to={`/subscriptions/${sub.id}`} className="hover:underline">

@@ -67,36 +67,23 @@ export const TopNav: React.FC<TopNavProps> = ({ onOpenSidebar }) => {
 
         {/* User profile */}
         <div className="relative" ref={dropdownRef}>
-          <div className="flex items-center space-x-2.5 pl-2 border-l border-border-main">
-            <div className="flex flex-col text-right">
-              <span className="text-xs font-bold text-text-primary truncate max-w-[140px] leading-tight">
-                {user?.customer?.name || (user?.email?.split('@')[0] || 'User')}
-              </span>
-              <span className="inline-block mt-0.5 self-end">
-                <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-md bg-plum-surface text-plum-primary border border-plum-border font-mono">
-                  {role}
-                </span>
-              </span>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center space-x-2.5 pl-2 py-1 pr-1.5 rounded-xl border border-transparent hover:border-border-main hover:bg-surface-hover/80 transition-colors cursor-pointer focus:outline-none"
+            aria-label="User profile menu"
+          >
+            <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary font-bold text-xs flex items-center justify-center border border-plum-border">
+              {user?.email ? user.email.substring(0, 2).toUpperCase() : 'U'}
             </div>
-
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="p-1 rounded-xl hover:bg-surface-hover border border-transparent hover:border-border-main transition-colors cursor-pointer focus:outline-none"
-            >
-              <div className="w-8 h-8 rounded-xl bg-plum-surface text-plum-primary font-bold text-xs flex items-center justify-center border border-plum-border">
-                {user?.email ? user.email.substring(0, 2).toUpperCase() : 'U'}
-              </div>
-            </button>
-
-            <button
-              onClick={logout}
-              className="p-2 rounded-xl border border-border-main text-text-secondary hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-colors cursor-pointer"
-              title="Sign out"
-              aria-label="Sign out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+            <div className="flex flex-col text-left">
+              <span className="text-xs font-bold text-text-primary truncate max-w-[140px] leading-tight">
+                {user?.customer?.name || (role === 'ADMIN' ? 'Admin' : user?.email?.split('@')[0] || 'User')}
+              </span>
+              {user?.customer?.name && (
+                <span className="text-[10px] text-text-secondary font-medium">Customer</span>
+              )}
+            </div>
+          </button>
 
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-card border border-border-main py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
