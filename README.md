@@ -21,7 +21,17 @@
 </div>
 
 ---
+---
 
+## 🚀 Live Application
+
+**Experience Brightloop:** 
+
+[🌐 Open Brightloop — Live Demo](YOUR_DEPLOYED_URL)
+
+Explore the complete subscription management platform, including the admin dashboard, subscription lifecycle, automated billing, invoice management, payment tracking, and customer self-service portal.
+
+Refer to the [Demo Credentials](#-pre-seeded-demo-credentials) section to access the application.
 ## 🌟 Executive Summary
 
 **Brightloop** is a full-stack, enterprise-grade recurring billing and subscription management system designed to eliminate financial leakage, automate high-volume subscription renewals, and give enterprise customers complete self-service over their software subscriptions.
