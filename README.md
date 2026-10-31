@@ -26,7 +26,7 @@
 
 **Experience Brightloop:** 
 
-[🌐 Open Brightloop — Live Demo](YOUR_DEPLOYED_URL)
+[🌐 Open Brightloop — Live Demo]https://subscription-management-system-taupe.vercel.app
 
 Explore the complete subscription management platform, including the admin dashboard, subscription lifecycle, automated billing, invoice management, payment tracking, and customer self-service portal.
 
