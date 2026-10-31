@@ -1,21 +1,32 @@
 import { useState, useEffect } from 'react'
 import { CUSTOMERS, SUBSCRIPTIONS, INVOICES, PAYMENTS, formatPaise, type Customer } from '../data/seed'
 import { Badge, Btn, SearchInput, TableSkeleton } from '../components/ui'
-import { Plus, X, Mail, Phone, MapPin, Building, CreditCard } from 'lucide-react'
+import { Plus, X, Mail, Phone, MapPin, Building, CreditCard, CheckCircle } from 'lucide-react'
 
 export default function CustomersPage() {
   const [loading, setLoading] = useState(true)
+  const [customersList, setCustomersList] = useState<Customer[]>(CUSTOMERS)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL')
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'subscriptions' | 'invoices' | 'payments'>('overview')
+
+  // Add Customer Modal State
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [company, setCompany] = useState('')
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [city, setCity] = useState('')
+  const [gstin, setGstin] = useState('')
+  const [toastNotice, setToastNotice] = useState('')
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 300)
     return () => clearTimeout(timer)
   }, [])
 
-  const filtered = CUSTOMERS.filter(c => {
+  const filtered = customersList.filter(c => {
     const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.company.toLowerCase().includes(search.toLowerCase()) ||
@@ -24,6 +35,36 @@ export default function CustomersPage() {
     const matchesStatus = statusFilter === 'ALL' || c.status === statusFilter
     return matchesSearch && matchesStatus
   })
+
+  const handleAddCustomer = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!company.trim() || !name.trim()) return
+
+    const newCode = `CUS-${String(customersList.length + 1).padStart(3, '0')}`
+    const newCust: Customer = {
+      id: `c-${Date.now()}`,
+      code: newCode,
+      name,
+      company,
+      email: email || `${name.toLowerCase().replace(/\s+/g, '.')}@${company.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`,
+      phone: phone || '+91 98765 43210',
+      city: city || 'Bengaluru',
+      gstin: gstin || '29AAAAA0000A1Z5',
+      status: 'ACTIVE',
+      createdAt: '2026-10-31',
+    }
+
+    setCustomersList([newCust, ...customersList])
+    setAddModalOpen(false)
+    setCompany('')
+    setName('')
+    setEmail('')
+    setPhone('')
+    setCity('')
+    setGstin('')
+    setToastNotice(`Customer ${newCust.company} (${newCode}) created and verified with Indian GSTIN.`)
+    setTimeout(() => setToastNotice(''), 4500)
+  }
 
   // Data linked to selected customer
   const customerSubs = selectedCustomer
@@ -50,10 +91,20 @@ export default function CustomersPage() {
             Enterprise Accounts · Indian GSTIN Verified
           </p>
         </div>
-        <Btn variant="primary" size="md">
+        <Btn variant="primary" size="md" onClick={() => setAddModalOpen(true)}>
           <Plus size={15} strokeWidth={2.5} /> Add Customer
         </Btn>
       </div>
+
+      {toastNotice && (
+        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-emerald-800 flex justify-between items-center anim-spring">
+          <div className="flex items-center gap-2">
+            <CheckCircle size={16} className="text-emerald-600" />
+            <span>{toastNotice}</span>
+          </div>
+          <button onClick={() => setToastNotice('')} className="font-bold text-gray-500 hover:text-black cursor-pointer">×</button>
+        </div>
+      )}
 
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center anim-spring stagger-2">
@@ -77,7 +128,7 @@ export default function CustomersPage() {
         </div>
 
         <div className="text-xs font-mono text-gray-500">
-          Showing {filtered.length} of {CUSTOMERS.length} accounts
+          Showing {filtered.length} of {customersList.length} accounts
         </div>
       </div>
 
@@ -198,10 +249,10 @@ export default function CustomersPage() {
               ))}
             </div>
 
-            {/* Drawer Body */}
+            {/* Tab Body */}
             <div className="p-6 flex-1 overflow-y-auto space-y-4">
               {activeTab === 'overview' && (
-                <div className="space-y-4 text-xs font-mono">
+                <div className="space-y-4 font-mono text-xs">
                   <div className="p-4 border-[1.5px] border-black rounded-xl bg-white shadow-xs space-y-2">
                     <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Company Information</p>
                     <div className="flex justify-between py-1 border-b border-black/10">
@@ -226,49 +277,61 @@ export default function CustomersPage() {
 
               {activeTab === 'subscriptions' && (
                 <div className="space-y-3">
-                  {customerSubs.map(s => (
-                    <div key={s.id} className="p-4 bg-white border-[1.5px] border-black rounded-xl shadow-xs text-xs font-mono">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-bold text-[#4A3043]">{s.number}</span>
-                        <Badge variant="ok">{s.state}</Badge>
+                  {customerSubs.length === 0 ? (
+                    <p className="text-xs font-mono text-gray-400 py-4 text-center">No subscriptions on record.</p>
+                  ) : (
+                    customerSubs.map(s => (
+                      <div key={s.id} className="p-4 bg-white border-[1.5px] border-black rounded-xl shadow-xs text-xs font-mono">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-bold text-[#4A3043]">{s.number}</span>
+                          <Badge variant="ok">{s.state}</Badge>
+                        </div>
+                        <p className="text-gray-600">Recurring Total: {formatPaise(s.totalAmount)}</p>
                       </div>
-                      <p className="text-gray-600">Recurring Total: {formatPaise(s.totalAmount)}</p>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               )}
 
               {activeTab === 'invoices' && (
                 <div className="space-y-3">
-                  {customerInvs.map(i => (
-                    <div key={i.id} className="p-4 bg-white border-[1.5px] border-black rounded-xl shadow-xs text-xs font-mono">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-bold text-[#4A3043]">{i.number}</span>
-                        <Badge variant={i.state === 'PAID' ? 'ok' : 'bad'}>{i.state}</Badge>
+                  {customerInvs.length === 0 ? (
+                    <p className="text-xs font-mono text-gray-400 py-4 text-center">No invoices generated yet.</p>
+                  ) : (
+                    customerInvs.map(i => (
+                      <div key={i.id} className="p-4 bg-white border-[1.5px] border-black rounded-xl shadow-xs text-xs font-mono">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-bold text-[#4A3043]">{i.number}</span>
+                          <Badge variant={i.state === 'PAID' ? 'ok' : 'bad'}>{i.state}</Badge>
+                        </div>
+                        <div className="flex justify-between text-gray-600">
+                          <span>Total: {formatPaise(i.total)}</span>
+                          <span>Date: {i.issueDate}</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-gray-600">
-                        <span>Total: {formatPaise(i.total)}</span>
-                        <span>Date: {i.issueDate}</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               )}
 
               {activeTab === 'payments' && (
                 <div className="space-y-3">
-                  {customerPays.map(p => (
-                    <div key={p.id} className="p-4 bg-white border-[1.5px] border-black rounded-xl shadow-xs text-xs font-mono">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-bold text-[#4A3043]">{p.number}</span>
-                        <Badge variant="ok">{p.method}</Badge>
+                  {customerPays.length === 0 ? (
+                    <p className="text-xs font-mono text-gray-400 py-4 text-center">No payment receipts logged yet.</p>
+                  ) : (
+                    customerPays.map(p => (
+                      <div key={p.id} className="p-4 bg-white border-[1.5px] border-black rounded-xl shadow-xs text-xs font-mono">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-bold text-[#4A3043]">{p.number}</span>
+                          <Badge variant="ok">{p.method}</Badge>
+                        </div>
+                        <div className="flex justify-between text-gray-600">
+                          <span>Paid: {formatPaise(p.amount)}</span>
+                          <span>{p.paidAt}</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-gray-600">
-                        <span>Paid: {formatPaise(p.amount)}</span>
-                        <span>{p.paidAt}</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               )}
             </div>
@@ -277,11 +340,124 @@ export default function CustomersPage() {
             <div className="p-5 border-t-[1.5px] border-black bg-white/80 flex justify-end gap-3">
               <button
                 onClick={() => setSelectedCustomer(null)}
-                className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
+                className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
               >
                 Close Drawer
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Customer Modal */}
+      {addModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop"
+            onClick={() => setAddModalOpen(false)}
+          />
+          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.12)] overflow-hidden modal-panel p-6">
+            <div className="flex justify-between items-center pb-4 border-b border-black/10">
+              <div>
+                <span className="text-[10px] font-mono uppercase font-bold text-[#714B67]">Directory Enrollment</span>
+                <h3 className="text-lg font-bold text-[#4A3043]">Register Enterprise Customer</h3>
+              </div>
+              <button
+                onClick={() => setAddModalOpen(false)}
+                className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddCustomer} className="py-5 space-y-4 font-mono text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Company Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={company}
+                    onChange={e => setCompany(e.target.value)}
+                    placeholder="e.g. Swiggy Technologies"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Contact Person *</label>
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    placeholder="e.g. Rahul Sharma"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Official Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="billing@swiggy.in"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Direct Phone</label>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="+91 98450 11223"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">City / Region</label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={e => setCity(e.target.value)}
+                    placeholder="Bengaluru"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">GSTIN Number</label>
+                  <input
+                    type="text"
+                    value={gstin}
+                    onChange={e => setGstin(e.target.value.toUpperCase())}
+                    placeholder="29AABCS1429B1ZB"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs uppercase"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-black/10">
+                <button
+                  type="button"
+                  onClick={() => setAddModalOpen(false)}
+                  className="px-4 py-2 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary text-white text-xs font-bold px-5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Plus size={14} /> Create Account
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

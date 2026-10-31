@@ -46,10 +46,10 @@ export default function CustomerPortalPage() {
       <header className="w-full border-b-[1.5px] border-black bg-white/60 backdrop-blur-xl h-20 flex items-center justify-between px-8 relative z-10">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-base glass-odoo">
-            P
+            B
           </div>
           <div>
-            <span className="font-bold text-base text-[#4A3043]">PeoplePay360</span>
+            <span className="font-bold text-base text-[#4A3043]">Brightloop</span>
             <span className="text-[10px] font-mono text-gray-500 uppercase tracking-wider ml-2 font-bold">
               Customer Self-Service
             </span>

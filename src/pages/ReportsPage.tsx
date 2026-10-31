@@ -33,7 +33,7 @@ export default function ReportsPage() {
   }, [activeReport])
 
   const handleExportCSV = () => {
-    setDownloadNotice(`Export generated: peoplepay360_${activeReport.toLowerCase()}_2026.csv`)
+    setDownloadNotice(`Export generated: brightloop_${activeReport.toLowerCase()}_2026.csv`)
     setTimeout(() => setDownloadNotice(''), 4000)
   }
 

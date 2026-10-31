@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { INVOICES, CUSTOMERS, formatPaise, type Invoice, type InvoiceState } from '../data/seed'
 import { Badge, Btn, SearchInput, TableSkeleton } from '../components/ui'
-import { Printer, RefreshCw, X, Download, FileText } from 'lucide-react'
+import { Printer, RefreshCw, X, Download, FileText, CheckCircle, CreditCard } from 'lucide-react'
 
 export default function InvoicesPage() {
   const [loading, setLoading] = useState(true)
@@ -31,51 +31,68 @@ export default function InvoicesPage() {
     setTimeout(() => setBatchNotice(''), 4000)
   }
 
+  const markInvoicePaid = (invId: string) => {
+    setInvoices(prev =>
+      prev.map(inv => {
+        if (inv.id === invId) {
+          const updated: Invoice = { ...inv, state: 'PAID', amountPaid: inv.total }
+          if (selectedInvoice?.id === invId) setSelectedInvoice(updated)
+          return updated
+        }
+        return inv
+      })
+    )
+    setBatchNotice(`Invoice ${selectedInvoice?.number || invId} marked as fully PAID. Ledger reconciled.`)
+    setTimeout(() => setBatchNotice(''), 4000)
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-black/10 anim-spring stagger-1">
         <div>
-          <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">Tax Invoices</h1>
+          <h1 className="text-[2rem] font-bold tracking-tight text-[#4A3043]">Invoices Ledger</h1>
           <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mt-1">
-            Automated Recurring Billing · Anti-Double-Billing Idempotency Locks
+            Automated GST Billing · Sequential Numbering (e.g. INV-2026-000001) · Idempotent Engine
           </p>
         </div>
         <Btn variant="primary" size="md" onClick={runBatchBilling}>
-          <RefreshCw size={14} /> Run Recurring Billing Day
+          <RefreshCw size={14} /> Run Billing Job Now
         </Btn>
       </div>
 
       {batchNotice && (
-        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-[#4A3043] flex justify-between items-center anim-spring">
-          <span>{batchNotice}</span>
-          <button onClick={() => setBatchNotice('')} className="font-bold cursor-pointer">×</button>
+        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-emerald-800 flex justify-between items-center anim-spring">
+          <div className="flex items-center gap-2">
+            <CheckCircle size={16} className="text-emerald-600" />
+            <span>{batchNotice}</span>
+          </div>
+          <button onClick={() => setBatchNotice('')} className="font-bold text-gray-500 hover:text-black cursor-pointer">×</button>
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2 text-xs font-mono anim-spring stagger-2">
-        {(['ALL', 'DRAFT', 'CONFIRMED', 'PARTIALLY_PAID', 'PAID', 'OVERDUE'] as const).map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab as any)}
-            className={`px-3 py-1.5 rounded-xl border-[1.5px] border-black transition-all cursor-pointer font-bold ${
-              activeTab === tab
-                ? 'glass-odoo text-white shadow-[2px_2px_0_#000]'
-                : 'bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            {tab.replace('_', ' ')} ({tab === 'ALL' ? invoices.length : invoices.filter(i => i.state === tab).length})
-          </button>
-        ))}
-      </div>
+      {/* Filter and Tab Strip */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center anim-spring stagger-2">
+        <div className="flex items-center gap-3">
+          <SearchInput value={search} onChange={setSearch} placeholder="Search invoice or customer..." />
+          <div className="flex border-[1.5px] border-black rounded-xl bg-white p-1 text-xs font-mono shadow-[2px_2px_0_#000] overflow-x-auto">
+            {(['ALL', 'CONFIRMED', 'PAID', 'PARTIALLY_PAID', 'OVERDUE'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-3 py-1 rounded-lg cursor-pointer transition-colors ${
+                  activeTab === tab
+                    ? 'glass-odoo text-white font-bold'
+                    : 'text-gray-600 hover:text-black'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      {/* Search Bar */}
-      <div className="flex justify-between items-center anim-spring stagger-2">
-        <SearchInput value={search} onChange={setSearch} placeholder="Search invoice or client..." />
-        <span className="text-xs font-mono text-gray-500">
-          {filtered.length} invoices matching
-        </span>
+        <span className="text-xs font-mono text-gray-500">{filtered.length} invoices recorded</span>
       </div>
 
       {/* Table / Skeleton */}
@@ -211,17 +228,25 @@ export default function InvoicesPage() {
             </div>
 
             <div className="flex justify-between items-center pt-6 border-t-[1.5px] border-black">
-              <span className="text-xs font-mono text-gray-500">Status: <Badge variant="ok">{selectedInvoice.state}</Badge></span>
-              <div className="flex gap-3">
+              <span className="text-xs font-mono text-gray-500">Status: <Badge variant={selectedInvoice.state === 'PAID' ? 'ok' : 'bad'}>{selectedInvoice.state}</Badge></span>
+              <div className="flex gap-2.5">
+                {selectedInvoice.state !== 'PAID' && (
+                  <button
+                    onClick={() => markInvoicePaid(selectedInvoice.id)}
+                    className="px-4 py-2 border-[1.5px] border-black rounded-xl font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 shadow-[2px_2px_0_#000] cursor-pointer flex items-center gap-1.5"
+                  >
+                    <CreditCard size={14} /> Mark as Settled
+                  </button>
+                )}
                 <button
                   onClick={() => setSelectedInvoice(null)}
-                  className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
+                  className="px-4 py-2 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
                 >
                   Close
                 </button>
                 <button
                   onClick={() => window.print()}
-                  className="btn-primary text-white text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer"
+                  className="btn-primary text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2 cursor-pointer"
                 >
                   <Printer size={14} /> Print Document
                 </button>

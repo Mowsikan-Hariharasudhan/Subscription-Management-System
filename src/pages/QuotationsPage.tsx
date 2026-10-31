@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { CUSTOMERS, PRODUCTS, PLANS, formatPaise } from '../data/seed'
 import { Badge, Btn, CardSkeleton, Skeleton } from '../components/ui'
-import { FileText, Check, ArrowRight, Plus, X } from 'lucide-react'
+import { FileText, Check, ArrowRight, Plus, X, CheckCircle } from 'lucide-react'
 
 interface QuotationItem {
   id: string
@@ -29,13 +29,14 @@ export default function QuotationsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedCustomerId, setSelectedCustomerId] = useState(CUSTOMERS[0].id)
   const [selectedProductId, setSelectedProductId] = useState(PRODUCTS[0].id)
+  const [selectedVariantId, setSelectedVariantId] = useState(PRODUCTS[0].variants[1]?.id || '')
+  const [quantity, setQuantity] = useState(1)
+  const [toastNotice, setToastNotice] = useState('')
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 300)
     return () => clearTimeout(timer)
   }, [])
-  const [selectedVariantId, setSelectedVariantId] = useState(PRODUCTS[0].variants[1]?.id || '')
-  const [quantity, setQuantity] = useState(1)
 
   const activeProduct = PRODUCTS.find(p => p.id === selectedProductId) || PRODUCTS[0]
   const activeVariant = activeProduct.variants.find(v => v.id === selectedVariantId)
@@ -53,8 +54,11 @@ export default function QuotationsPage() {
     setQuotes(prev =>
       prev.map(q => {
         if (q.id === id && q.state !== 'ACTIVE') {
-          const updated = { ...q, state: nextMap[q.state] }
+          const nextState = nextMap[q.state]
+          const updated = { ...q, state: nextState }
           if (selectedQuote.id === id) setSelectedQuote(updated)
+          setToastNotice(`Quotation ${q.number} transitioned to ${nextState}${nextState === 'ACTIVE' ? ' (Subscription Activated)' : ''}.`)
+          setTimeout(() => setToastNotice(''), 4000)
           return updated
         }
         return q
@@ -65,9 +69,10 @@ export default function QuotationsPage() {
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault()
     const customer = CUSTOMERS.find(c => c.id === selectedCustomerId)
+    const quoteNum = `QTN-2026-${String(quotes.length + 42).padStart(6, '0')}`
     const newQ: QuotationItem = {
       id: `q-${Date.now()}`,
-      number: `QTN-2026-${String(quotes.length + 42).padStart(6, '0')}`,
+      number: quoteNum,
       customerName: customer?.company || 'Enterprise Client',
       planName: `${activeProduct.name}${activeVariant ? ` (${activeVariant.name})` : ''}`,
       total: grandTotal,
@@ -77,6 +82,8 @@ export default function QuotationsPage() {
     setQuotes([newQ, ...quotes])
     setSelectedQuote(newQ)
     setModalOpen(false)
+    setToastNotice(`Quotation offer ${quoteNum} drafted for ${customer?.company}.`)
+    setTimeout(() => setToastNotice(''), 4000)
   }
 
   return (
@@ -94,6 +101,16 @@ export default function QuotationsPage() {
         </Btn>
       </div>
 
+      {toastNotice && (
+        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-emerald-800 flex justify-between items-center anim-spring">
+          <div className="flex items-center gap-2">
+            <CheckCircle size={16} className="text-emerald-600" />
+            <span>{toastNotice}</span>
+          </div>
+          <button onClick={() => setToastNotice('')} className="font-bold text-gray-500 hover:text-black cursor-pointer">×</button>
+        </div>
+      )}
+
       {loading ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 space-y-3">
@@ -106,88 +123,122 @@ export default function QuotationsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 anim-spring stagger-2">
-        {/* Left Column: Quotes List */}
-        <div className="lg:col-span-1 space-y-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 font-mono">
-            QUOTATIONS LIST ({quotes.length})
-          </p>
-          {quotes.map(q => (
-            <div
-              key={q.id}
-              onClick={() => setSelectedQuote(q)}
-              className={`p-5 glass-panel rounded-2xl cursor-pointer transition-all ${
-                selectedQuote.id === q.id
-                  ? '!border-black !bg-white shadow-[0_6px_0_0_#000] translate-x-1'
-                  : 'hover:border-black/50'
-              }`}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <span className="font-bold font-mono text-[#4A3043] text-sm">{q.number}</span>
-                <Badge
-                  variant={
-                    q.state === 'ACTIVE'
-                      ? 'ok'
-                      : q.state === 'CONFIRMED'
-                      ? 'info'
-                      : q.state === 'QUOTATION'
-                      ? 'warn'
-                      : 'neutral'
-                  }
-                >
-                  {q.state}
-                </Badge>
-              </div>
-              <p className="font-bold text-[#4A3043]">{q.customerName}</p>
-              <p className="text-xs text-gray-500 font-mono mt-0.5">{q.planName}</p>
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-black/10 text-xs font-mono">
-                <span className="font-bold text-black">{formatPaise(q.total)}</span>
-                <span className="text-gray-400">Valid: {q.validUntil}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Right Column: Selected Quote Detail */}
-        <div className="lg:col-span-2 glass-panel rounded-2xl p-8 space-y-6">
-          <div className="flex justify-between items-start pb-4 border-b border-black/10">
-            <div>
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs font-bold text-[#714B67]">{selectedQuote.number}</span>
-                <Badge variant={selectedQuote.state === 'ACTIVE' ? 'ok' : 'info'}>{selectedQuote.state}</Badge>
-              </div>
-              <h2 className="text-2xl font-bold tracking-tight text-[#4A3043] mt-1">
-                {selectedQuote.customerName}
-              </h2>
-              <p className="text-xs text-gray-500 font-mono mt-0.5">Commercial Offer Specification</p>
-            </div>
-            {selectedQuote.state !== 'ACTIVE' && (
-              <button
-                onClick={() => advanceStage(selectedQuote.id)}
-                className="btn-primary text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer"
+          {/* Left Column: Quotes List */}
+          <div className="lg:col-span-1 space-y-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 font-mono">
+              QUOTATIONS LIST ({quotes.length})
+            </p>
+            {quotes.map(q => (
+              <div
+                key={q.id}
+                onClick={() => setSelectedQuote(q)}
+                className={`p-5 glass-panel rounded-2xl cursor-pointer transition-all ${
+                  selectedQuote.id === q.id
+                    ? '!border-black !bg-white shadow-[0_6px_0_0_#000] translate-x-1'
+                    : 'hover:border-black/50'
+                }`}
               >
-                <span>Advance to {selectedQuote.state === 'DRAFT' ? 'Quotation' : selectedQuote.state === 'QUOTATION' ? 'Confirmed' : 'Active Subscription'}</span>
-                <ArrowRight size={14} />
-              </button>
-            )}
+                <div className="flex justify-between items-start mb-2">
+                  <span className="font-bold font-mono text-[#4A3043] text-sm">{q.number}</span>
+                  <Badge
+                    variant={
+                      q.state === 'ACTIVE'
+                        ? 'ok'
+                        : q.state === 'CONFIRMED'
+                        ? 'info'
+                        : q.state === 'QUOTATION'
+                        ? 'warn'
+                        : 'neutral'
+                    }
+                  >
+                    {q.state}
+                  </Badge>
+                </div>
+                <p className="font-bold text-[#4A3043]">{q.customerName}</p>
+                <p className="text-xs text-gray-500 font-mono mt-0.5">{q.planName}</p>
+                <div className="flex justify-between items-center mt-3 pt-3 border-t border-black/10 text-xs font-mono">
+                  <span className="font-bold text-black">{formatPaise(q.total)}</span>
+                  <span className="text-gray-400">Valid: {q.validUntil}</span>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Pricing Box */}
-          <div className="p-6 bg-white border-[1.5px] border-black rounded-2xl shadow-xs space-y-3 font-mono text-xs">
-            <div className="flex justify-between">
-              <span className="text-gray-500">Plan & Included Modules</span>
-              <span className="font-bold text-[#4A3043]">{selectedQuote.planName}</span>
+          {/* Right Column: Selected Quote Detail */}
+          <div className="lg:col-span-2 glass-panel rounded-2xl p-8 space-y-6">
+            <div className="flex justify-between items-start pb-4 border-b border-black/10">
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs font-bold text-[#714B67]">{selectedQuote.number}</span>
+                  <Badge variant={selectedQuote.state === 'ACTIVE' ? 'ok' : 'info'}>{selectedQuote.state}</Badge>
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight text-[#4A3043] mt-1">
+                  {selectedQuote.customerName}
+                </h2>
+                <p className="text-xs text-gray-500 font-mono mt-0.5">Commercial Offer Specification</p>
+              </div>
+              {selectedQuote.state !== 'ACTIVE' && (
+                <button
+                  onClick={() => advanceStage(selectedQuote.id)}
+                  className="btn-primary text-white text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer"
+                >
+                  {selectedQuote.state === 'DRAFT' && 'Send to Client →'}
+                  {selectedQuote.state === 'QUOTATION' && 'Confirm Commercial Order →'}
+                  {selectedQuote.state === 'CONFIRMED' && 'Convert to Active Subscription →'}
+                </button>
+              )}
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">GST (18% Statutory Rate)</span>
-              <span className="font-bold text-gray-700">Included</span>
+
+            {/* Pipeline Stage Visualizer */}
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 font-mono mb-3">
+                LIFECYCLE PIPELINE PROGRESS
+              </p>
+              <div className="grid grid-cols-4 gap-2 font-mono text-xs">
+                {(['DRAFT', 'QUOTATION', 'CONFIRMED', 'ACTIVE'] as const).map((stage, idx) => {
+                  const stageOrder = ['DRAFT', 'QUOTATION', 'CONFIRMED', 'ACTIVE']
+                  const isCurrent = selectedQuote.state === stage
+                  const isPassed = stageOrder.indexOf(selectedQuote.state) >= idx
+                  return (
+                    <div
+                      key={stage}
+                      className={`p-3 border-[1.5px] rounded-xl text-center transition-all ${
+                        isCurrent
+                          ? 'glass-odoo text-white font-bold border-black shadow-[2px_2px_0_#000]'
+                          : isPassed
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-500 font-semibold'
+                          : 'bg-white/60 text-gray-400 border-black/20'
+                      }`}
+                    >
+                      <div className="text-[10px] opacity-75">{idx + 1}. STAGE</div>
+                      <div className="text-xs truncate">{stage}</div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-            <div className="flex justify-between text-base pt-3 border-t border-black/10">
-              <span className="font-bold text-black">Net Total (Payable)</span>
-              <span className="font-bold text-[#4A3043] tabular-nums text-lg">{formatPaise(selectedQuote.total)}</span>
+
+            {/* Quotation Specs */}
+            <div className="p-6 bg-white border-[1.5px] border-black rounded-2xl shadow-xs space-y-4 font-mono text-xs">
+              <div className="flex justify-between items-center pb-3 border-b border-black/10">
+                <span className="font-bold uppercase text-gray-500">Plan Description</span>
+                <span className="font-bold text-[#4A3043]">{selectedQuote.planName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Term Expiry</span>
+                <span className="font-bold">{selectedQuote.validUntil}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">GST (18% Statutory Rate)</span>
+                <span className="font-bold text-gray-700">Included</span>
+              </div>
+              <div className="flex justify-between text-base pt-3 border-t border-black/10">
+                <span className="font-bold text-black">Net Total (Payable)</span>
+                <span className="font-bold text-[#4A3043] tabular-nums text-lg">{formatPaise(selectedQuote.total)}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       )}
 
       {/* Creation Modal */}
@@ -196,19 +247,22 @@ export default function QuotationsPage() {
           <div className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop" onClick={() => setModalOpen(false)} />
           <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.12)] overflow-hidden modal-panel p-6">
             <div className="flex justify-between items-center pb-4 border-b border-black/10">
-              <h3 className="text-lg font-bold text-[#4A3043]">Create New Quotation</h3>
-              <button onClick={() => setModalOpen(false)} className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors">
+              <div>
+                <span className="text-[10px] font-mono uppercase font-bold text-[#714B67]">Commercial Proposal</span>
+                <h3 className="text-lg font-bold text-[#4A3043]">Create New Quotation</h3>
+              </div>
+              <button onClick={() => setModalOpen(false)} className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer">
                 <X size={15} />
               </button>
             </div>
 
-            <form onSubmit={handleCreate} className="py-6 space-y-4">
+            <form onSubmit={handleCreate} className="py-5 space-y-4 font-mono text-xs">
               <div>
-                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase font-mono mb-1">Select Customer</label>
+                <label className="block text-[10px] font-bold text-gray-800 uppercase mb-1">Select Customer *</label>
                 <select
                   value={selectedCustomerId}
                   onChange={e => setSelectedCustomerId(e.target.value)}
-                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs font-mono"
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 >
                   {CUSTOMERS.map(c => (
                     <option key={c.id} value={c.id}>{c.company} ({c.name})</option>
@@ -217,7 +271,7 @@ export default function QuotationsPage() {
               </div>
 
               <div>
-                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase font-mono mb-1">Base Product</label>
+                <label className="block text-[10px] font-bold text-gray-800 uppercase mb-1">Base Product *</label>
                 <select
                   value={selectedProductId}
                   onChange={e => {
@@ -225,7 +279,7 @@ export default function QuotationsPage() {
                     const p = PRODUCTS.find(x => x.id === e.target.value)
                     setSelectedVariantId(p?.variants[0]?.id || '')
                   }}
-                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs font-mono"
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 >
                   {PRODUCTS.map(p => (
                     <option key={p.id} value={p.id}>{p.name} — {formatPaise(p.salesPrice)}</option>
@@ -233,50 +287,63 @@ export default function QuotationsPage() {
                 </select>
               </div>
 
-              {activeProduct.variants.length > 0 && (
+              <div className="grid grid-cols-2 gap-3">
+                {activeProduct.variants.length > 0 && (
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-800 uppercase mb-1">Additive Variant</label>
+                    <select
+                      value={selectedVariantId}
+                      onChange={e => setSelectedVariantId(e.target.value)}
+                      className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                    >
+                      <option value="">No variant (+₹0.00)</option>
+                      {activeProduct.variants.map(v => (
+                        <option key={v.id} value={v.id}>{v.name} (+{formatPaise(v.priceDelta)})</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div>
-                  <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase font-mono mb-1">Additive Variant</label>
-                  <select
-                    value={selectedVariantId}
-                    onChange={e => setSelectedVariantId(e.target.value)}
-                    className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs font-mono"
-                  >
-                    <option value="">No variant (+₹0.00)</option>
-                    {activeProduct.variants.map(v => (
-                      <option key={v.id} value={v.id}>{v.name} (+{formatPaise(v.priceDelta)})</option>
-                    ))}
-                  </select>
+                  <label className="block text-[10px] font-bold text-gray-800 uppercase mb-1">Licenses Quantity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={quantity}
+                    onChange={e => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
                 </div>
-              )}
+              </div>
 
-              <div className="p-4 bg-gray-50 border-[1.5px] border-black rounded-xl font-mono text-xs space-y-1">
+              <div className="p-3 bg-gray-50 border border-black/20 rounded-xl space-y-1">
                 <div className="flex justify-between">
                   <span>Unit Price:</span>
-                  <span className="font-bold">{formatPaise(unitPrice)}</span>
+                  <span className="font-bold">{formatPaise(unitPrice)} × {quantity}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>GST 18%:</span>
+                  <span>GST (18%):</span>
                   <span>{formatPaise(taxAmount)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-[#4A3043] pt-1 border-t border-black/10">
-                  <span>Total Payable:</span>
+                  <span>Net Proposal Total:</span>
                   <span>{formatPaise(grandTotal)}</span>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-black">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-black/10">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
+                  className="px-4 py-2 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary text-white text-xs font-bold px-5 py-2.5 rounded-xl"
+                  className="btn-primary text-white text-xs font-bold px-5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
                 >
-                  Save & Generate Offer
+                  <Plus size={14} /> Generate Offer
                 </button>
               </div>
             </form>

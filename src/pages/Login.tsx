@@ -46,9 +46,9 @@ export default function Login() {
       <header className="h-24 px-10 flex items-center justify-between flex-shrink-0 relative z-10">
         <div className="flex items-center gap-3 anim-fade">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg glass-odoo">
-            P
+            B
           </div>
-          <span className="font-bold text-[1.125rem] tracking-tight text-[#4A3043]">PeoplePay360</span>
+          <span className="font-bold text-[1.125rem] tracking-tight text-[#4A3043]">Brightloop</span>
         </div>
 
         <div className="flex items-center gap-4 anim-fade stagger-1">
@@ -70,14 +70,14 @@ export default function Login() {
             <div className="relative z-10">
               <div className="flex items-start gap-4 mb-14">
                 <div className="w-14 h-14 border-[1.5px] border-white/30 rounded-2xl flex items-center justify-center text-white font-bold text-2xl bg-white/10 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]">
-                  P
+                  B
                 </div>
                 <div>
                   <div className="text-[0.6875rem] font-bold text-white/70 tracking-[0.2em] uppercase mb-1.5 font-mono">
-                    HR & BILLING SUITE
+                    SUBSCRIPTION & BILLING SUITE
                   </div>
                   <div className="text-[1.5rem] font-bold text-white tracking-tight">
-                    PeoplePay360
+                    Brightloop
                   </div>
                 </div>
               </div>
@@ -90,14 +90,14 @@ export default function Login() {
               </div>
 
               <h1 className="text-[2.6rem] font-bold text-white leading-[1.1] tracking-tight drop-shadow-lg">
-                Manage people, pay,<br />
-                and performance in<br />
-                one place.
+                Manage subscriptions,<br />
+                invoices, and revenue<br />
+                in one place.
               </h1>
             </div>
 
             <div className="text-[0.75rem] text-white/60 font-mono">
-              © 2026 PeoplePay360 / Brightloop Enterprise Systems Pvt Ltd.
+              © 2026 Brightloop Enterprise Systems Pvt Ltd.
             </div>
           </div>
 

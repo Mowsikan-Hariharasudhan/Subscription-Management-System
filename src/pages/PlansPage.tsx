@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { PLANS, PRODUCTS, formatPaise, type Plan } from '../data/seed'
 import { Badge, Btn, FlagBadge, SearchInput, TableSkeleton } from '../components/ui'
-import { Plus, Lock } from 'lucide-react'
+import { Plus, Lock, X, CheckCircle } from 'lucide-react'
 import { useAuth } from '../auth'
 
 export default function PlansPage() {
@@ -12,6 +12,19 @@ export default function PlansPage() {
   const [plansList, setPlansList] = useState<Plan[]>(PLANS)
   const [search, setSearch] = useState('')
   const [periodFilter, setPeriodFilter] = useState<'ALL' | 'D' | 'W' | 'M' | 'Y'>('ALL')
+  const [toastNotice, setToastNotice] = useState('')
+
+  // Create Plan Modal State
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newCode, setNewCode] = useState('')
+  const [newProductId, setNewProductId] = useState(PRODUCTS[0].id)
+  const [newPeriod, setNewPeriod] = useState<'D' | 'W' | 'M' | 'Y'>('M')
+  const [newPriceRupees, setNewPriceRupees] = useState('1499')
+  const [flagAutoClose, setFlagAutoClose] = useState(false)
+  const [flagEarlyClose, setFlagEarlyClose] = useState(true)
+  const [flagPause, setFlagPause] = useState(true)
+  const [flagRenew, setFlagRenew] = useState(true)
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 300)
@@ -36,6 +49,38 @@ export default function PlansPage() {
     )
   }
 
+  const handleCreatePlan = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newName.trim()) return
+
+    const code = newCode.trim() || `PLN-${newPeriod}-${String(plansList.length + 1).padStart(3, '0')}`
+    const pricePaise = Math.round(parseFloat(newPriceRupees || '0') * 100)
+
+    const newPlan: Plan = {
+      id: `plan-${Date.now()}`,
+      code,
+      name: newName.trim(),
+      productId: newProductId,
+      billingPeriod: newPeriod,
+      price: pricePaise,
+      minQuantity: 1,
+      availableFrom: '2026-01-01',
+      availableTo: '2027-12-31',
+      autoCloseOnEnd: flagAutoClose,
+      allowEarlyClose: flagEarlyClose,
+      allowPause: flagPause,
+      allowRenew: flagRenew,
+      isActive: true,
+    }
+
+    setPlansList([newPlan, ...plansList])
+    setCreateModalOpen(false)
+    setNewName('')
+    setNewCode('')
+    setToastNotice(`Subscription Plan ${newPlan.name} (${code}) configured successfully.`)
+    setTimeout(() => setToastNotice(''), 4500)
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -48,7 +93,7 @@ export default function PlansPage() {
         </div>
 
         {isAdmin ? (
-          <Btn variant="primary" size="md">
+          <Btn variant="primary" size="md" onClick={() => setCreateModalOpen(true)}>
             <Plus size={15} strokeWidth={2.5} /> Create Plan
           </Btn>
         ) : (
@@ -58,8 +103,18 @@ export default function PlansPage() {
         )}
       </div>
 
+      {toastNotice && (
+        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-emerald-800 flex justify-between items-center anim-spring">
+          <div className="flex items-center gap-2">
+            <CheckCircle size={16} className="text-emerald-600" />
+            <span>{toastNotice}</span>
+          </div>
+          <button onClick={() => setToastNotice('')} className="font-bold text-gray-500 hover:text-black cursor-pointer">×</button>
+        </div>
+      )}
+
       {/* Filter and Search */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center anim-spring stagger-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 anim-spring stagger-2">
         <div className="flex items-center gap-3">
           <SearchInput value={search} onChange={setSearch} placeholder="Search plans..." />
           <div className="flex border-[1.5px] border-black rounded-xl bg-white p-1 text-xs font-mono shadow-[2px_2px_0_#000]">
@@ -161,6 +216,155 @@ export default function PlansPage() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Create Plan Modal */}
+      {createModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop"
+            onClick={() => setCreateModalOpen(false)}
+          />
+          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.12)] overflow-hidden modal-panel p-6">
+            <div className="flex justify-between items-center pb-4 border-b border-black/10">
+              <div>
+                <span className="text-[10px] font-mono uppercase font-bold text-[#714B67]">Recurrence Architecture</span>
+                <h3 className="text-lg font-bold text-[#4A3043]">Create Subscription Plan</h3>
+              </div>
+              <button
+                onClick={() => setCreateModalOpen(false)}
+                className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreatePlan} className="py-5 space-y-4 font-mono text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Plan Code</label>
+                  <input
+                    type="text"
+                    value={newCode}
+                    onChange={e => setNewCode(e.target.value.toUpperCase())}
+                    placeholder="PLN-M-005"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs uppercase"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Base Product *</label>
+                  <select
+                    value={newProductId}
+                    onChange={e => setNewProductId(e.target.value)}
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  >
+                    {PRODUCTS.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Plan Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                  placeholder="e.g. Enterprise Cloud Annual"
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Billing Recurrence</label>
+                  <select
+                    value={newPeriod}
+                    onChange={e => setNewPeriod(e.target.value as any)}
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  >
+                    <option value="D">Daily Recurrence</option>
+                    <option value="W">Weekly Recurrence</option>
+                    <option value="M">Monthly Recurrence (30 days)</option>
+                    <option value="Y">Annual Recurrence (365 days)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Price per Cycle (₹ INR) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={newPriceRupees}
+                    onChange={e => setNewPriceRupees(e.target.value)}
+                    placeholder="1499"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 bg-white border border-black/20 rounded-xl space-y-2">
+                <span className="block text-[10px] uppercase font-bold text-gray-600 mb-1 font-mono">Contract Policy Flags</span>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={flagAutoClose}
+                      onChange={e => setFlagAutoClose(e.target.checked)}
+                      className="accent-[#714B67]"
+                    />
+                    <span>AUTOCLOSE ON END</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={flagEarlyClose}
+                      onChange={e => setFlagEarlyClose(e.target.checked)}
+                      className="accent-[#714B67]"
+                    />
+                    <span>ALLOW EARLY CLOSE</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={flagPause}
+                      onChange={e => setFlagPause(e.target.checked)}
+                      className="accent-[#714B67]"
+                    />
+                    <span>ALLOW PAUSE</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={flagRenew}
+                      onChange={e => setFlagRenew(e.target.checked)}
+                      className="accent-[#714B67]"
+                    />
+                    <span>ALLOW RENEWAL</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-black/10">
+                <button
+                  type="button"
+                  onClick={() => setCreateModalOpen(false)}
+                  className="px-4 py-2 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary text-white text-xs font-bold px-5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Plus size={14} /> Create Plan
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

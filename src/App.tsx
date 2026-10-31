@@ -16,7 +16,6 @@ import ReportsPage from './pages/ReportsPage'
 import ActivityLogsPage from './pages/ActivityLogsPage'
 import SettingsPage from './pages/SettingsPage'
 import CustomerPortalPage from './pages/CustomerPortalPage'
-
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
   if (isLoading) {
@@ -31,7 +30,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
   return <>{children}</>
 }
-
 export default function App() {
   return (
     <AuthProvider>
@@ -39,7 +37,6 @@ export default function App() {
         <Routes>
           {/* Public Auth Entry Point */}
           <Route path="/login" element={<Login />} />
-
           {/* Customer Self-Service Portal */}
           <Route
             path="/portal"
@@ -49,7 +46,6 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
           {/* Unified Enterprise SaaS Shell */}
           <Route
             path="/"
@@ -74,7 +70,6 @@ export default function App() {
             <Route path="activity" element={<ActivityLogsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
-
           {/* Catch-all redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

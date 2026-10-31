@@ -1,28 +1,68 @@
 import { useState, useEffect } from 'react'
 import { PRODUCTS, formatPaise, type Product, type ProductVariant } from '../data/seed'
 import { Badge, Btn, SearchInput, TableSkeleton } from '../components/ui'
-import { Plus, X, Layers, Check } from 'lucide-react'
+import { Plus, X, Layers, Check, CheckCircle } from 'lucide-react'
 
 export default function ProductsPage() {
   const [loading, setLoading] = useState(true)
   const [productsList, setProductsList] = useState<Product[]>(PRODUCTS)
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 300)
-    return () => clearTimeout(timer)
-  }, [])
+  // Add Product Modal State
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [newCode, setNewCode] = useState('')
+  const [newName, setNewName] = useState('')
+  const [newType, setNewType] = useState('Software')
+  const [newSalesRupees, setNewSalesRupees] = useState('2499')
+  const [newCostRupees, setNewCostRupees] = useState('800')
+  const [newDesc, setNewDesc] = useState('')
+  const [toastNotice, setToastNotice] = useState('')
 
   // Variant drawer state
   const [variantDrawerProduct, setVariantDrawerProduct] = useState<Product | null>(null)
   const [newVariantName, setNewVariantName] = useState('')
   const [newVariantDeltaRupees, setNewVariantDeltaRupees] = useState('560')
 
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
+
   const filtered = productsList.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
     p.code.toLowerCase().includes(search.toLowerCase()) ||
     p.type.toLowerCase().includes(search.toLowerCase())
   )
+
+  const handleCreateProduct = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newName.trim()) return
+
+    const code = newCode.trim() || `PRD-${String(productsList.length + 1).padStart(3, '0')}`
+    const salesPaise = Math.round(parseFloat(newSalesRupees || '0') * 100)
+    const costPaise = Math.round(parseFloat(newCostRupees || '0') * 100)
+
+    const newProduct: Product = {
+      id: `p-${Date.now()}`,
+      code,
+      name: newName.trim(),
+      description: newDesc.trim() || 'Enterprise SaaS software subscription license with Indian GST compliance.',
+      type: newType,
+      salesPrice: salesPaise,
+      costPrice: costPaise,
+      isActive: true,
+      variants: [],
+      createdAt: '2026-10-31',
+    }
+
+    setProductsList([newProduct, ...productsList])
+    setAddModalOpen(false)
+    setNewCode('')
+    setNewName('')
+    setNewDesc('')
+    setToastNotice(`Product ${newProduct.name} (${code}) added to catalog.`)
+    setTimeout(() => setToastNotice(''), 4500)
+  }
 
   const handleAddVariant = (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,6 +90,8 @@ export default function ProductsPage() {
     setVariantDrawerProduct(prev => prev ? { ...prev, variants: [...prev.variants, newVariant] } : null)
     setNewVariantName('')
     setNewVariantDeltaRupees('0')
+    setToastNotice(`Variant "${newVariant.name}" (+₹${newVariantDeltaRupees}) added to ${variantDrawerProduct.name}.`)
+    setTimeout(() => setToastNotice(''), 4000)
   }
 
   const toggleArchive = (productId: string) => {
@@ -68,10 +110,20 @@ export default function ProductsPage() {
             Software Licenses & Infrastructure Modules · Additive Variant Pricing
           </p>
         </div>
-        <Btn variant="primary" size="md">
+        <Btn variant="primary" size="md" onClick={() => setAddModalOpen(true)}>
           <Plus size={15} strokeWidth={2.5} /> Add Product
         </Btn>
       </div>
+
+      {toastNotice && (
+        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-emerald-800 flex justify-between items-center anim-spring">
+          <div className="flex items-center gap-2">
+            <CheckCircle size={16} className="text-emerald-600" />
+            <span>{toastNotice}</span>
+          </div>
+          <button onClick={() => setToastNotice('')} className="font-bold text-gray-500 hover:text-black cursor-pointer">×</button>
+        </div>
+      )}
 
       {/* Filter and Search */}
       <div className="flex justify-between items-center anim-spring stagger-2">
@@ -145,6 +197,123 @@ export default function ProductsPage() {
         </div>
       )}
 
+      {/* Add Product Modal */}
+      {addModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop"
+            onClick={() => setAddModalOpen(false)}
+          />
+          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.12)] overflow-hidden modal-panel p-6">
+            <div className="flex justify-between items-center pb-4 border-b border-black/10">
+              <div>
+                <span className="text-[10px] font-mono uppercase font-bold text-[#714B67]">Catalog Management</span>
+                <h3 className="text-lg font-bold text-[#4A3043]">Add Product / Service Module</h3>
+              </div>
+              <button
+                onClick={() => setAddModalOpen(false)}
+                className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateProduct} className="py-5 space-y-4 font-mono text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Product Code</label>
+                  <input
+                    type="text"
+                    value={newCode}
+                    onChange={e => setNewCode(e.target.value.toUpperCase())}
+                    placeholder={`PRD-${String(productsList.length + 1).padStart(3, '0')}`}
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs uppercase"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Category / Type</label>
+                  <select
+                    value={newType}
+                    onChange={e => setNewType(e.target.value)}
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  >
+                    <option value="Software">Software License</option>
+                    <option value="Infrastructure">Infrastructure Module</option>
+                    <option value="Service">Professional Service</option>
+                    <option value="Integration">Integration Add-on</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Product Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                  placeholder="e.g. Brightloop Automated Reconciliation Suite"
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Sales Price (₹ INR) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={newSalesRupees}
+                    onChange={e => setNewSalesRupees(e.target.value)}
+                    placeholder="2499"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Cost Price (₹ INR)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={newCostRupees}
+                    onChange={e => setNewCostRupees(e.target.value)}
+                    placeholder="800"
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Description</label>
+                <textarea
+                  rows={2}
+                  value={newDesc}
+                  onChange={e => setNewDesc(e.target.value)}
+                  placeholder="Comprehensive billing module with automated tax computation and reconciliation."
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs resize-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-black/10">
+                <button
+                  type="button"
+                  onClick={() => setAddModalOpen(false)}
+                  className="px-4 py-2 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary text-white text-xs font-bold px-5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Plus size={14} /> Add to Catalog
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Variant Editor Drawer */}
       {variantDrawerProduct && (
         <div className="fixed inset-0 z-50 flex justify-end">
@@ -169,7 +338,6 @@ export default function ProductsPage() {
                 className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 <X size={15} />
-                <X size={16} />
               </button>
             </div>
 
@@ -231,7 +399,7 @@ export default function ProductsPage() {
                 </div>
                 <button
                   type="submit"
-                  className="btn-primary text-white text-xs font-bold w-full py-2.5 rounded-xl flex items-center justify-center gap-1.5 mt-2"
+                  className="btn-primary text-white text-xs font-bold w-full py-2.5 rounded-xl flex items-center justify-center gap-1.5 mt-2 cursor-pointer"
                 >
                   <Check size={14} /> Add Variant (+₹{newVariantDeltaRupees})
                 </button>
@@ -242,7 +410,7 @@ export default function ProductsPage() {
             <div className="p-5 border-t-[1.5px] border-black bg-white/80 flex justify-end">
               <button
                 onClick={() => setVariantDrawerProduct(null)}
-                className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
+                className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
               >
                 Close Drawer
               </button>

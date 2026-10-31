@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { SUBSCRIPTIONS, CUSTOMERS, PLANS, formatPaise, type Subscription, type SubscriptionState } from '../data/seed'
 import { Badge, Btn, SearchInput, TableSkeleton } from '../components/ui'
-import { Play, Pause, RefreshCw, XCircle, X, ShieldAlert, Check } from 'lucide-react'
+import { Play, Pause, RefreshCw, XCircle, X, ShieldAlert, Check, Plus, CheckCircle } from 'lucide-react'
 
 export default function SubscriptionsPage() {
   const [loading, setLoading] = useState(true)
@@ -10,6 +10,13 @@ export default function SubscriptionsPage() {
   const [stateFilter, setStateFilter] = useState<'ALL' | SubscriptionState>('ALL')
   const [selectedSub, setSelectedSub] = useState<Subscription | null>(null)
   const [toastNotice, setToastNotice] = useState('')
+
+  // New Subscription Modal State
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [newCustomerId, setNewCustomerId] = useState(CUSTOMERS[0].id)
+  const [newPlanId, setNewPlanId] = useState(PLANS[0].id)
+  const [newStartDate, setNewStartDate] = useState('2026-11-01')
+  const [newState, setNewState] = useState<SubscriptionState>('ACTIVE')
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 300)
@@ -65,7 +72,7 @@ export default function SubscriptionsPage() {
     const plan = PLANS.find(p => p.id === sub?.planId)
 
     if (plan && !plan.allowEarlyClose) {
-      notify('POLICY VIOLATION: Early closure prohibited on this annual contract.')
+      notify('POLICY VIOLATION: Early termination restricted by contract flags.')
       return
     }
 
@@ -75,7 +82,34 @@ export default function SubscriptionsPage() {
     if (selectedSub?.id === id) {
       setSelectedSub(prev => prev ? { ...prev, state: 'CLOSED', mrr: 0 } : null)
     }
-    notify(`Subscription closed early. Contract terminated and audit logged.`)
+    notify(`Subscription ${sub?.number} closed per customer request.`)
+  }
+
+  const handleCreateSubscription = (e: React.FormEvent) => {
+    e.preventDefault()
+    const selectedPlan = PLANS.find(p => p.id === newPlanId) || PLANS[0]
+    const customer = CUSTOMERS.find(c => c.id === newCustomerId) || CUSTOMERS[0]
+
+    const nextNum = `SUB-2026-${String(subs.length + 1).padStart(6, '0')}`
+    const mrrPaise = selectedPlan.billingPeriod === 'M' ? selectedPlan.price : Math.round(selectedPlan.price / 12)
+
+    const newSub: Subscription = {
+      id: `s-${Date.now()}`,
+      number: nextNum,
+      customerId: newCustomerId,
+      planId: newPlanId,
+      state: newState,
+      startDate: newStartDate,
+      expiryDate: '2027-10-31',
+      totalAmount: selectedPlan.price,
+      mrr: mrrPaise,
+      nextBillingAt: '2026-12-01',
+      createdAt: '2026-10-31',
+    }
+
+    setSubs([newSub, ...subs])
+    setCreateModalOpen(false)
+    notify(`Subscription contract ${nextNum} established for ${customer.company}.`)
   }
 
   return (
@@ -88,15 +122,15 @@ export default function SubscriptionsPage() {
             Finite State Transitions · Automated Recurring Invoicing Pipeline
           </p>
         </div>
-        <Btn variant="primary" size="md">
-          + New Subscription
+        <Btn variant="primary" size="md" onClick={() => setCreateModalOpen(true)}>
+          <Plus size={15} strokeWidth={2.5} /> New Subscription
         </Btn>
       </div>
 
       {toastNotice && (
         <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-[#4A3043] flex justify-between items-center anim-spring">
           <span className="flex items-center gap-2">
-            <ShieldAlert size={16} className="text-amber-500" />
+            <CheckCircle size={16} className="text-emerald-600" />
             {toastNotice}
           </span>
           <button onClick={() => setToastNotice('')} className="font-bold text-gray-500 hover:text-black cursor-pointer">×</button>
@@ -296,11 +330,110 @@ export default function SubscriptionsPage() {
             <div className="p-5 border-t-[1.5px] border-black bg-white/80 flex justify-end">
               <button
                 onClick={() => setSelectedSub(null)}
-                className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
+                className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
               >
                 Close Drawer
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Subscription Modal */}
+      {createModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop"
+            onClick={() => setCreateModalOpen(false)}
+          />
+          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.12)] overflow-hidden modal-panel p-6">
+            <div className="flex justify-between items-center pb-4 border-b border-black/10">
+              <div>
+                <span className="text-[10px] font-mono uppercase font-bold text-[#714B67]">Contract Initiation</span>
+                <h3 className="text-lg font-bold text-[#4A3043]">Create Subscription Contract</h3>
+              </div>
+              <button
+                onClick={() => setCreateModalOpen(false)}
+                className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateSubscription} className="py-5 space-y-4 font-mono text-xs">
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Subscriber / Customer *</label>
+                <select
+                  value={newCustomerId}
+                  onChange={e => setNewCustomerId(e.target.value)}
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                >
+                  {CUSTOMERS.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.company} ({c.code} · {c.name})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Subscription Plan *</label>
+                <select
+                  value={newPlanId}
+                  onChange={e => setNewPlanId(e.target.value)}
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                >
+                  {PLANS.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({formatPaise(p.price)} / {p.billingPeriod === 'M' ? 'mo' : p.billingPeriod === 'Y' ? 'yr' : 'cycle'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Contract Start Date</label>
+                  <input
+                    type="date"
+                    value={newStartDate}
+                    onChange={e => setNewStartDate(e.target.value)}
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-gray-700 mb-1">Initial State</label>
+                  <select
+                    value={newState}
+                    onChange={e => setNewState(e.target.value as SubscriptionState)}
+                    className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  >
+                    <option value="ACTIVE">ACTIVE (Immediate Billing)</option>
+                    <option value="CONFIRMED">CONFIRMED (Pending First Charge)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="p-3 bg-gray-50 border border-black/15 rounded-xl text-gray-600 text-[11px]">
+                Contract terms: Idempotent billing locks applied. Automated GST calculation and 30-day billing ledger scheduling.
+              </div>
+
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-black/10">
+                <button
+                  type="button"
+                  onClick={() => setCreateModalOpen(false)}
+                  className="px-4 py-2 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary text-white text-xs font-bold px-5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Plus size={14} /> Start Subscription
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

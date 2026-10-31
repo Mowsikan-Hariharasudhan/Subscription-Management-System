@@ -81,7 +81,7 @@ export default function SettingsPage() {
               <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Company Registered Name</label>
               <input
                 type="text"
-                defaultValue="PeoplePay360 Systems Private Limited"
+                defaultValue="Brightloop Technologies Private Limited"
                 className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
               />
             </div>

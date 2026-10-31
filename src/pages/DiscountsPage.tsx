@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { DISCOUNTS, formatPaise, type Discount } from '../data/seed'
 import { Badge, Btn, TableSkeleton } from '../components/ui'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, CheckCircle } from 'lucide-react'
 
 export default function DiscountsPage() {
   const [loading, setLoading] = useState(true)
   const [discountsList, setDiscountsList] = useState<Discount[]>(DISCOUNTS)
   const [modalOpen, setModalOpen] = useState(false)
+  const [toastNotice, setToastNotice] = useState('')
 
   // Form State
   const [name, setName] = useState('')
@@ -21,10 +22,12 @@ export default function DiscountsPage() {
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!name.trim()) return
+
     const val = type === 'FIXED' ? Math.round(parseFloat(value) * 100) : parseInt(value)
     const newD: Discount = {
       id: `d-${Date.now()}`,
-      name,
+      name: name.trim(),
       type,
       value: val,
       minPurchaseAmount: 0,
@@ -37,8 +40,13 @@ export default function DiscountsPage() {
       productIds: [],
       isActive: true,
     }
+
     setDiscountsList([newD, ...discountsList])
     setModalOpen(false)
+    setName('')
+    setValue('15')
+    setToastNotice(`Discount code "${newD.name}" (${type === 'PERCENT' ? `${val}%` : formatPaise(val)}) deployed.`)
+    setTimeout(() => setToastNotice(''), 4000)
   }
 
   return (
@@ -55,6 +63,16 @@ export default function DiscountsPage() {
           <Plus size={15} strokeWidth={2.5} /> Add Discount Rule
         </Btn>
       </div>
+
+      {toastNotice && (
+        <div className="p-4 bg-white/95 backdrop-blur-md border-[1.5px] border-black rounded-2xl shadow-[0_4px_0_0_#000] text-xs font-mono text-emerald-800 flex justify-between items-center anim-spring">
+          <div className="flex items-center gap-2">
+            <CheckCircle size={16} className="text-emerald-600" />
+            <span>{toastNotice}</span>
+          </div>
+          <button onClick={() => setToastNotice('')} className="font-bold text-gray-500 hover:text-black cursor-pointer">×</button>
+        </div>
+      )}
 
       {/* Table / Skeleton */}
       {loading ? (
@@ -118,31 +136,34 @@ export default function DiscountsPage() {
           <div className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop" onClick={() => setModalOpen(false)} />
           <div className="relative w-full max-w-md bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.12)] overflow-hidden modal-panel p-6">
             <div className="flex justify-between items-center pb-4 border-b border-black/10">
-              <h3 className="text-lg font-bold text-[#4A3043]">Deploy Discount Rule</h3>
-              <button onClick={() => setModalOpen(false)} className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors">
+              <div>
+                <span className="text-[10px] font-mono uppercase font-bold text-[#714B67]">Promotional Campaigns</span>
+                <h3 className="text-lg font-bold text-[#4A3043]">Deploy Discount Rule</h3>
+              </div>
+              <button onClick={() => setModalOpen(false)} className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer">
                 <X size={15} />
               </button>
             </div>
 
-            <form onSubmit={handleCreate} className="py-6 space-y-4 font-mono text-xs">
+            <form onSubmit={handleCreate} className="py-5 space-y-4 font-mono text-xs">
               <div>
-                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Discount Name</label>
+                <label className="block text-[10px] font-bold text-gray-800 uppercase mb-1">Discount Name *</label>
                 <input
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
                   placeholder="e.g. Founder Early Access"
                   required
-                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Calculation Type</label>
+                <label className="block text-[10px] font-bold text-gray-800 uppercase mb-1">Calculation Type</label>
                 <select
                   value={type}
                   onChange={e => setType(e.target.value as 'FIXED' | 'PERCENT')}
-                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 >
                   <option value="PERCENT">Percentage Discount (%)</option>
                   <option value="FIXED">Fixed Amount (₹)</option>
@@ -150,41 +171,42 @@ export default function DiscountsPage() {
               </div>
 
               <div>
-                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">
-                  Discount Value ({type === 'PERCENT' ? '%' : '₹ INR'})
+                <label className="block text-[10px] font-bold text-gray-800 uppercase mb-1">
+                  Discount Value ({type === 'PERCENT' ? '%' : '₹ INR'}) *
                 </label>
                 <input
                   type="number"
                   value={value}
                   onChange={e => setValue(e.target.value)}
                   required
-                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs font-bold"
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs font-bold"
                 />
               </div>
 
               <div>
-                <label className="block text-[0.6875rem] font-bold text-gray-800 uppercase mb-1">Max Redemptions Cap</label>
+                <label className="block text-[10px] font-bold text-gray-800 uppercase mb-1">Max Redemptions Cap</label>
                 <input
                   type="number"
+                  min="1"
                   value={maxRedemptions}
                   onChange={e => setMaxRedemptions(parseInt(e.target.value) || 1)}
-                  className="input-focus w-full px-4 py-2.5 bg-white border-[1.5px] border-black rounded-xl text-xs"
+                  className="input-focus w-full px-3.5 py-2 bg-white border-[1.5px] border-black rounded-xl text-xs"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-black">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-black/10">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-5 py-2.5 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50"
+                  className="px-4 py-2 bg-white border-[1.5px] border-black text-[#4A3043] font-bold text-xs rounded-xl hover:bg-gray-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary text-white text-xs font-bold px-5 py-2.5 rounded-xl"
+                  className="btn-primary text-white text-xs font-bold px-5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
                 >
-                  Deploy Rule
+                  <Plus size={14} /> Deploy Rule
                 </button>
               </div>
             </form>
