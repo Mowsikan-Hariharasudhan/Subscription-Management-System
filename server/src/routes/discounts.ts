@@ -8,15 +8,13 @@ import { discountRuleSchema, updateDiscountRuleSchema } from '../validators/bill
 const router = Router();
 
 router.use(authenticate);
-router.use(authorize('ADMIN', 'STAFF'));
 
-router.get('/', DiscountController.list);
-router.get('/:id', DiscountController.getById);
-router.get('/:id/redemptions', DiscountController.getRedemptions);
+router.get('/', authorize('ADMIN', 'STAFF'), DiscountController.list);
+router.get('/:id', authorize('ADMIN', 'STAFF'), DiscountController.getById);
+router.get('/:id/redemptions', authorize('ADMIN', 'STAFF'), DiscountController.getRedemptions);
 
-router.post('/', validate(discountRuleSchema), DiscountController.create);
-router.patch('/:id', validate(updateDiscountRuleSchema), DiscountController.update);
-router.delete('/:id', DiscountController.delete);
+router.post('/', authorize('ADMIN'), validate(discountRuleSchema), DiscountController.create);
+router.patch('/:id', authorize('ADMIN'), validate(updateDiscountRuleSchema), DiscountController.update);
+router.delete('/:id', authorize('ADMIN'), DiscountController.delete);
 
 export default router;
-
