@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, LogOut, Shield, Moon, Zap } from 'lucide-react';
+import { Menu, LogOut, Shield, Zap } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { invoiceService } from '../../services/invoiceService';
@@ -51,9 +51,9 @@ export const TopNav: React.FC<TopNavProps> = ({ onOpenSidebar }) => {
         </div>
       </div>
 
-      {/* Right Controls matching reference style */}
+      {/* Right Controls */}
       <div className="flex items-center space-x-3">
-        {/* Quick action button (like "Punch In" in reference) */}
+        {/* Quick action button */}
         {role === 'ADMIN' && (
           <button
             onClick={() => billingMutation.mutate()}
@@ -65,16 +65,7 @@ export const TopNav: React.FC<TopNavProps> = ({ onOpenSidebar }) => {
           </button>
         )}
 
-        {/* Theme pill outline button */}
-        <button
-          className="p-2 rounded-xl border border-border-main text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors cursor-pointer"
-          title="Toggle appearance"
-          aria-label="Toggle appearance"
-        >
-          <Moon className="w-4 h-4" />
-        </button>
-
-        {/* User profile & Role pill */}
+        {/* User profile */}
         <div className="relative" ref={dropdownRef}>
           <div className="flex items-center space-x-2.5 pl-2 border-l border-border-main">
             <div className="flex flex-col text-right">
