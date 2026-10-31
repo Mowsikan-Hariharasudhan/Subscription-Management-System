@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PLANS, PRODUCTS, formatPaise, type Plan } from '../data/seed'
-import { Badge, Btn, FlagBadge, SearchInput } from '../components/ui'
+import { Badge, Btn, FlagBadge, SearchInput, TableSkeleton } from '../components/ui'
 import { Plus, Lock } from 'lucide-react'
 import { useAuth } from '../auth'
 
@@ -8,9 +8,15 @@ export default function PlansPage() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
 
+  const [loading, setLoading] = useState(true)
   const [plansList, setPlansList] = useState<Plan[]>(PLANS)
   const [search, setSearch] = useState('')
   const [periodFilter, setPeriodFilter] = useState<'ALL' | 'D' | 'W' | 'M' | 'Y'>('ALL')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const filtered = plansList.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.code.toLowerCase().includes(search.toLowerCase())
@@ -76,83 +82,87 @@ export default function PlansPage() {
         <span className="text-xs font-mono text-gray-500">{filtered.length} active plans</span>
       </div>
 
-      {/* Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
-        <table className="w-full text-left border-collapse">
-          <thead className="border-b-[1.5px] border-black bg-white/60">
-            <tr>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CODE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PLAN NAME</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PRODUCT</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CYCLE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">PRICE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-center">POLICY FLAGS</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">STATUS</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/10">
-            {filtered.map(pl => {
-              const prod = PRODUCTS.find(p => p.id === pl.productId)
-              return (
-                <tr key={pl.id} className="table-row">
-                  <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{pl.code}</td>
-                  <td className="px-6 py-4 font-bold text-sm text-[#4A3043]">{pl.name}</td>
-                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{prod?.name || '—'}</td>
-                  <td className="px-6 py-4">
-                    <span className="px-2.5 py-1 border-[1.5px] border-black rounded-md bg-white font-bold text-[10px] font-mono shadow-[1px_1px_0_#000]">
-                      {pl.billingPeriod === 'D' ? 'DAILY' : pl.billingPeriod === 'W' ? 'WEEKLY' : pl.billingPeriod === 'M' ? 'MONTHLY' : 'ANNUAL'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right font-bold text-sm font-mono text-[#4A3043]">
-                    {formatPaise(pl.price)}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="inline-flex items-center gap-1.5 p-1 rounded-xl bg-white/70 border-[1.5px] border-black">
-                      <button
-                        onClick={() => toggleFlag(pl.id, 'autoCloseOnEnd')}
-                        disabled={!isAdmin}
-                        title="Auto-close on end"
-                        className="cursor-pointer disabled:cursor-not-allowed"
-                      >
-                        <FlagBadge on={pl.autoCloseOnEnd} label="AUTOCLOSE" />
-                      </button>
-                      <button
-                        onClick={() => toggleFlag(pl.id, 'allowEarlyClose')}
-                        disabled={!isAdmin}
-                        title="Allow early cancellation"
-                        className="cursor-pointer disabled:cursor-not-allowed"
-                      >
-                        <FlagBadge on={pl.allowEarlyClose} label="EARLYCLOSE" />
-                      </button>
-                      <button
-                        onClick={() => toggleFlag(pl.id, 'allowPause')}
-                        disabled={!isAdmin}
-                        title="Allow customer pause"
-                        className="cursor-pointer disabled:cursor-not-allowed"
-                      >
-                        <FlagBadge on={pl.allowPause} label="PAUSE" />
-                      </button>
-                      <button
-                        onClick={() => toggleFlag(pl.id, 'allowRenew')}
-                        disabled={!isAdmin}
-                        title="Allow renewal"
-                        className="cursor-pointer disabled:cursor-not-allowed"
-                      >
-                        <FlagBadge on={pl.allowRenew} label="RENEW" />
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Badge variant={pl.isActive ? 'ok' : 'neutral'}>
-                      {pl.isActive ? 'ACTIVE' : 'ARCHIVED'}
-                    </Badge>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+      {/* Table / Skeleton */}
+      {loading ? (
+        <TableSkeleton rows={4} cols={7} />
+      ) : (
+        <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+          <table className="w-full text-left border-collapse">
+            <thead className="border-b-[1.5px] border-black bg-white/60">
+              <tr>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CODE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PLAN NAME</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PRODUCT</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CYCLE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">PRICE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-center">POLICY FLAGS</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">STATUS</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black/10">
+              {filtered.map(pl => {
+                const prod = PRODUCTS.find(p => p.id === pl.productId)
+                return (
+                  <tr key={pl.id} className="table-row">
+                    <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{pl.code}</td>
+                    <td className="px-6 py-4 font-bold text-sm text-[#4A3043]">{pl.name}</td>
+                    <td className="px-6 py-4 text-xs font-mono text-gray-600">{prod?.name || '—'}</td>
+                    <td className="px-6 py-4">
+                      <span className="px-2.5 py-1 border-[1.5px] border-black rounded-md bg-white font-bold text-[10px] font-mono shadow-[1px_1px_0_#000]">
+                        {pl.billingPeriod === 'D' ? 'DAILY' : pl.billingPeriod === 'W' ? 'WEEKLY' : pl.billingPeriod === 'M' ? 'MONTHLY' : 'ANNUAL'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-sm font-mono text-[#4A3043]">
+                      {formatPaise(pl.price)}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="inline-flex items-center gap-1.5 p-1 rounded-xl bg-white/70 border-[1.5px] border-black">
+                        <button
+                          onClick={() => toggleFlag(pl.id, 'autoCloseOnEnd')}
+                          disabled={!isAdmin}
+                          title="Auto-close on end"
+                          className="cursor-pointer disabled:cursor-not-allowed"
+                        >
+                          <FlagBadge on={pl.autoCloseOnEnd} label="AUTOCLOSE" />
+                        </button>
+                        <button
+                          onClick={() => toggleFlag(pl.id, 'allowEarlyClose')}
+                          disabled={!isAdmin}
+                          title="Allow early cancellation"
+                          className="cursor-pointer disabled:cursor-not-allowed"
+                        >
+                          <FlagBadge on={pl.allowEarlyClose} label="EARLYCLOSE" />
+                        </button>
+                        <button
+                          onClick={() => toggleFlag(pl.id, 'allowPause')}
+                          disabled={!isAdmin}
+                          title="Allow customer pause"
+                          className="cursor-pointer disabled:cursor-not-allowed"
+                        >
+                          <FlagBadge on={pl.allowPause} label="PAUSE" />
+                        </button>
+                        <button
+                          onClick={() => toggleFlag(pl.id, 'allowRenew')}
+                          disabled={!isAdmin}
+                          title="Allow renewal"
+                          className="cursor-pointer disabled:cursor-not-allowed"
+                        >
+                          <FlagBadge on={pl.allowRenew} label="RENEW" />
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <Badge variant={pl.isActive ? 'ok' : 'neutral'}>
+                        {pl.isActive ? 'ACTIVE' : 'ARCHIVED'}
+                      </Badge>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

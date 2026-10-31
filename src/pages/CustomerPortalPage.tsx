@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CUSTOMERS, SUBSCRIPTIONS, INVOICES, PAYMENTS, PLANS, formatPaise } from '../data/seed'
-import { Badge } from '../components/ui'
+import { Badge, TableSkeleton, CardSkeleton } from '../components/ui'
 import { ShieldCheck, Download, ArrowLeft, RefreshCw, X, Check } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 export default function CustomerPortalPage() {
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+
   // Scoped to customer CUS-001 (Zoho Corp India)
   const customer = CUSTOMERS[0]
   const mySubs = SUBSCRIPTIONS.filter(s => s.customerId === customer.id)
@@ -14,6 +16,11 @@ export default function CustomerPortalPage() {
 
   const [activeTab, setActiveTab] = useState<'subs' | 'invoices' | 'payments'>('subs')
   const [toast, setToast] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const outstanding = myInvs
     .filter(i => i.state !== 'PAID' && i.state !== 'CANCELLED')
@@ -119,85 +126,91 @@ export default function CustomerPortalPage() {
           </button>
         </div>
 
-        {/* Content */}
-        {activeTab === 'subs' && (
-          <div className="space-y-4">
-            {mySubs.map(s => {
-              const plan = PLANS.find(p => p.id === s.planId)
-              return (
-                <div key={s.id} className="glass-panel rounded-2xl p-6 flex justify-between items-center">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-mono text-xs font-bold text-[#714B67]">{s.number}</span>
-                      <Badge variant={s.state === 'ACTIVE' ? 'ok' : 'warn'}>{s.state}</Badge>
+        {/* Content / Skeleton */}
+        {loading ? (
+          <TableSkeleton rows={4} cols={5} />
+        ) : (
+          <>
+            {activeTab === 'subs' && (
+              <div className="space-y-4">
+                {mySubs.map(s => {
+                  const plan = PLANS.find(p => p.id === s.planId)
+                  return (
+                    <div key={s.id} className="glass-panel rounded-2xl p-6 flex justify-between items-center">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-xs font-bold text-[#714B67]">{s.number}</span>
+                          <Badge variant={s.state === 'ACTIVE' ? 'ok' : 'warn'}>{s.state}</Badge>
+                        </div>
+                        <h3 className="font-bold text-[#4A3043] text-lg">{plan?.name}</h3>
+                        <p className="text-xs font-mono text-gray-500 mt-1">
+                          Billing Cycle: Every 30 Days · Next Charge: {s.nextBillingAt}
+                        </p>
+                      </div>
+                      <div className="text-right font-mono">
+                        <p className="text-xl font-bold text-[#4A3043]">{formatPaise(s.totalAmount)}</p>
+                        <p className="text-[10px] text-gray-400">per cycle (incl. GST)</p>
+                      </div>
                     </div>
-                    <h3 className="font-bold text-[#4A3043] text-lg">{plan?.name}</h3>
-                    <p className="text-xs font-mono text-gray-500 mt-1">
-                      Billing Cycle: Every 30 Days · Next Charge: {s.nextBillingAt}
-                    </p>
-                  </div>
-                  <div className="text-right font-mono">
-                    <p className="text-xl font-bold text-[#4A3043]">{formatPaise(s.totalAmount)}</p>
-                    <p className="text-[10px] text-gray-400">per cycle (incl. GST)</p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
+                  )
+                })}
+              </div>
+            )}
 
-        {activeTab === 'invoices' && (
-          <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
-            <table className="w-full text-left border-collapse font-mono text-xs">
-              <thead className="border-b-[1.5px] border-black bg-white/60">
-                <tr>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800">INVOICE</th>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800">DATE</th>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800">DUE DATE</th>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800 text-right">TOTAL</th>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800 text-right">STATUS</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-black/10">
-                {myInvs.map(i => (
-                  <tr key={i.id} className="table-row">
-                    <td className="px-6 py-4 font-bold text-[#4A3043]">{i.number}</td>
-                    <td className="px-6 py-4 text-gray-500">{i.issueDate}</td>
-                    <td className="px-6 py-4 text-gray-500">{i.dueDate}</td>
-                    <td className="px-6 py-4 text-right font-bold text-[#4A3043]">{formatPaise(i.total)}</td>
-                    <td className="px-6 py-4 text-right"><Badge variant={i.state === 'PAID' ? 'ok' : 'bad'}>{i.state}</Badge></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+            {activeTab === 'invoices' && (
+              <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
+                <table className="w-full text-left border-collapse font-mono text-xs">
+                  <thead className="border-b-[1.5px] border-black bg-white/60">
+                    <tr>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800">INVOICE</th>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800">DATE</th>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800">DUE DATE</th>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800 text-right">TOTAL</th>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800 text-right">STATUS</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-black/10">
+                    {myInvs.map(i => (
+                      <tr key={i.id} className="table-row">
+                        <td className="px-6 py-4 font-bold text-[#4A3043]">{i.number}</td>
+                        <td className="px-6 py-4 text-gray-500">{i.issueDate}</td>
+                        <td className="px-6 py-4 text-gray-500">{i.dueDate}</td>
+                        <td className="px-6 py-4 text-right font-bold text-[#4A3043]">{formatPaise(i.total)}</td>
+                        <td className="px-6 py-4 text-right"><Badge variant={i.state === 'PAID' ? 'ok' : 'bad'}>{i.state}</Badge></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
-        {activeTab === 'payments' && (
-          <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
-            <table className="w-full text-left border-collapse font-mono text-xs">
-              <thead className="border-b-[1.5px] border-black bg-white/60">
-                <tr>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800">RECEIPT</th>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800">METHOD</th>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800">REFERENCE</th>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800">DATE</th>
-                  <th className="px-6 py-4 font-bold uppercase text-gray-800 text-right">AMOUNT PAID</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-black/10">
-                {myPays.map(p => (
-                  <tr key={p.id} className="table-row">
-                    <td className="px-6 py-4 font-bold text-[#4A3043]">{p.number}</td>
-                    <td className="px-6 py-4"><Badge variant="ok">{p.method}</Badge></td>
-                    <td className="px-6 py-4 text-gray-600">{p.reference}</td>
-                    <td className="px-6 py-4 text-gray-500">{p.paidAt}</td>
-                    <td className="px-6 py-4 text-right font-bold text-emerald-700">{formatPaise(p.amount)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+            {activeTab === 'payments' && (
+              <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
+                <table className="w-full text-left border-collapse font-mono text-xs">
+                  <thead className="border-b-[1.5px] border-black bg-white/60">
+                    <tr>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800">RECEIPT</th>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800">METHOD</th>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800">REFERENCE</th>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800">DATE</th>
+                      <th className="px-6 py-4 font-bold uppercase text-gray-800 text-right">AMOUNT PAID</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-black/10">
+                    {myPays.map(p => (
+                      <tr key={p.id} className="table-row">
+                        <td className="px-6 py-4 font-bold text-[#4A3043]">{p.number}</td>
+                        <td className="px-6 py-4"><Badge variant="ok">{p.method}</Badge></td>
+                        <td className="px-6 py-4 text-gray-600">{p.reference}</td>
+                        <td className="px-6 py-4 text-gray-500">{p.paidAt}</td>
+                        <td className="px-6 py-4 text-right font-bold text-emerald-700">{formatPaise(p.amount)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

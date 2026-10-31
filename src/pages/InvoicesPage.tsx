@@ -1,14 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { INVOICES, CUSTOMERS, formatPaise, type Invoice, type InvoiceState } from '../data/seed'
-import { Badge, Btn, SearchInput } from '../components/ui'
+import { Badge, Btn, SearchInput, TableSkeleton } from '../components/ui'
 import { Printer, RefreshCw, X, Download, FileText } from 'lucide-react'
 
 export default function InvoicesPage() {
+  const [loading, setLoading] = useState(true)
   const [invoices, setInvoices] = useState<Invoice[]>(INVOICES)
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState<'ALL' | InvoiceState>('ALL')
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const [batchNotice, setBatchNotice] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const filtered = invoices.filter(inv => {
     const cust = CUSTOMERS.find(c => c.id === inv.customerId)
@@ -72,90 +78,94 @@ export default function InvoicesPage() {
         </span>
       </div>
 
-      {/* Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
-        <table className="w-full text-left border-collapse">
-          <thead className="border-b-[1.5px] border-black bg-white/60">
-            <tr>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">INVOICE NUMBER</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CLIENT / COMPANY</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">ISSUE DATE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">DUE DATE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">TOTAL</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">BALANCE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">STATUS</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">ACTION</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/10">
-            {filtered.map(inv => {
-              const cust = CUSTOMERS.find(c => c.id === inv.customerId)
-              const balance = inv.total - inv.amountPaid
-              return (
-                <tr
-                  key={inv.id}
-                  onClick={() => setSelectedInvoice(inv)}
-                  className="table-row cursor-pointer"
-                >
-                  <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{inv.number}</td>
-                  <td className="px-6 py-4">
-                    <p className="font-bold text-[#4A3043] text-sm">{cust?.company || 'Enterprise'}</p>
-                    <p className="text-[10px] text-gray-500 font-mono">{cust?.name}</p>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{inv.issueDate}</td>
-                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{inv.dueDate}</td>
-                  <td className="px-6 py-4 text-right font-bold font-mono text-[#4A3043]">{formatPaise(inv.total)}</td>
-                  <td className="px-6 py-4 text-right font-bold font-mono text-red-600">
-                    {balance > 0 ? formatPaise(balance) : '₹0.00'}
-                  </td>
-                  <td className="px-6 py-4">
-                    <Badge
-                      variant={
-                        inv.state === 'PAID'
-                          ? 'ok'
-                          : inv.state === 'OVERDUE'
-                          ? 'bad'
-                          : inv.state === 'PARTIALLY_PAID'
-                          ? 'warn'
-                          : 'neutral'
-                      }
-                    >
-                      {inv.state}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 text-right font-mono text-xs">
-                    <span className="font-bold text-[#714B67] hover:underline">
-                      View PDF →
-                    </span>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+      {/* Table / Skeleton */}
+      {loading ? (
+        <TableSkeleton rows={6} cols={8} />
+      ) : (
+        <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+          <table className="w-full text-left border-collapse">
+            <thead className="border-b-[1.5px] border-black bg-white/60">
+              <tr>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">INVOICE NUMBER</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CLIENT / COMPANY</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">ISSUE DATE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">DUE DATE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">TOTAL</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">BALANCE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">STATUS</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">ACTION</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black/10">
+              {filtered.map(inv => {
+                const cust = CUSTOMERS.find(c => c.id === inv.customerId)
+                const balance = inv.total - inv.amountPaid
+                return (
+                  <tr
+                    key={inv.id}
+                    onClick={() => setSelectedInvoice(inv)}
+                    className="table-row cursor-pointer"
+                  >
+                    <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{inv.number}</td>
+                    <td className="px-6 py-4">
+                      <p className="font-bold text-[#4A3043] text-sm">{cust?.company || 'Enterprise'}</p>
+                      <p className="text-[10px] text-gray-500 font-mono">{cust?.name}</p>
+                    </td>
+                    <td className="px-6 py-4 text-xs font-mono text-gray-600">{inv.issueDate}</td>
+                    <td className="px-6 py-4 text-xs font-mono text-gray-600">{inv.dueDate}</td>
+                    <td className="px-6 py-4 text-right font-bold font-mono text-[#4A3043]">{formatPaise(inv.total)}</td>
+                    <td className="px-6 py-4 text-right font-bold font-mono text-red-600">
+                      {balance > 0 ? formatPaise(balance) : '₹0.00'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge
+                        variant={
+                          inv.state === 'PAID'
+                            ? 'ok'
+                            : inv.state === 'OVERDUE'
+                            ? 'bad'
+                            : inv.state === 'PARTIALLY_PAID'
+                            ? 'warn'
+                            : 'neutral'
+                        }
+                      >
+                        {inv.state}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 text-right font-mono text-xs">
+                      <span className="font-bold text-[#714B67] hover:underline">
+                        View PDF →
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Tax Invoice Printable Modal */}
       {selectedInvoice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop"
+            className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop"
             onClick={() => setSelectedInvoice(null)}
           />
-          <div className="relative w-full max-w-2xl bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-3xl shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] overflow-hidden modal-panel p-8">
-            <div className="flex justify-between items-start pb-6 border-b-[1.5px] border-black">
+          <div className="relative w-full max-w-2xl bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.12)] overflow-hidden modal-panel p-6">
+            <div className="flex justify-between items-start pb-5 border-b-[1.5px] border-black">
               <div>
                 <span className="font-mono text-xs font-bold text-[#714B67]">TAX INVOICE</span>
-                <h2 className="text-2xl font-bold tracking-tight text-[#4A3043]">
+                <h2 className="text-xl font-bold tracking-tight text-[#4A3043]">
                   {selectedInvoice.number}
                 </h2>
                 <p className="text-xs font-mono text-gray-500 mt-0.5">GSTIN: 33AAACB9876Z1Z8</p>
               </div>
               <button
                 onClick={() => setSelectedInvoice(null)}
-                className="w-8 h-8 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
               >
-                <X size={16} />
+                <X size={15} />
               </button>
             </div>
 

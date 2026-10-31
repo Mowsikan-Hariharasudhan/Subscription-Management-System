@@ -310,3 +310,81 @@ export function FlagBadge({ on, label }: { on: boolean; label: string }) {
     </span>
   )
 }
+
+// ---- Skeleton Loader Primitives ----
+export function Skeleton({ className = '', style }: { className?: string; style?: React.CSSProperties }) {
+  return <div className={`skeleton ${className}`} style={style} />
+}
+
+export function KpiSkeleton() {
+  return (
+    <div className="glass-panel rounded-2xl p-6 anim-spring">
+      <div className="flex justify-between items-start mb-4">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-9 w-9 rounded-lg" />
+      </div>
+      <Skeleton className="h-8 w-32 mb-3" />
+      <Skeleton className="h-3 w-24" />
+    </div>
+  )
+}
+
+export function TableSkeleton({ rows = 5, cols = 5 }: { rows?: number; cols?: number }) {
+  return (
+    <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
+      <div className="px-6 py-4 bg-white/60 border-b-[1.5px] border-black flex gap-6">
+        {Array.from({ length: cols }).map((_, i) => (
+          <Skeleton key={i} className="h-3.5 flex-1" />
+        ))}
+      </div>
+      <div className="divide-y divide-black/10">
+        {Array.from({ length: rows }).map((_, r) => (
+          <div key={r} className="px-6 py-4 flex gap-6 items-center">
+            {Array.from({ length: cols }).map((_, c) => (
+              <Skeleton key={c} className={`h-4 ${c === 0 ? 'w-24' : 'flex-1'}`} />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function ChartSkeleton() {
+  return (
+    <div className="glass-panel rounded-2xl p-6 anim-spring space-y-4">
+      <div className="flex justify-between items-center pb-4 border-b border-black/10">
+        <div className="space-y-1.5">
+          <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+        <Skeleton className="h-7 w-24 rounded-lg" />
+      </div>
+      <div className="h-56 w-full flex items-end gap-6 pt-6 px-4">
+        {[40, 25, 60, 45, 80, 65].map((pct, i) => (
+          <div key={i} className="flex-1 flex flex-col justify-end items-center gap-2 h-full">
+            <Skeleton className="w-full rounded-t-md" style={{ height: `${pct}%` }} />
+            <Skeleton className="h-3 w-8" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function CardSkeleton() {
+  return (
+    <div className="glass-panel rounded-2xl p-6 anim-spring space-y-4">
+      <div className="flex justify-between items-start">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-6 w-16 rounded-md" />
+      </div>
+      <Skeleton className="h-3 w-48" />
+      <Skeleton className="h-3 w-full" />
+      <div className="pt-2 flex justify-between items-center border-t border-black/10">
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-8 w-24 rounded-lg" />
+      </div>
+    </div>
+  )
+}

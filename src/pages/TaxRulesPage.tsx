@@ -1,11 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { TAX_RULES, PRODUCTS, type TaxRule } from '../data/seed'
-import { Badge, Btn } from '../components/ui'
+import { Badge, Btn, TableSkeleton } from '../components/ui'
 import { Plus, HelpCircle } from 'lucide-react'
 
 export default function TaxRulesPage() {
+  const [loading, setLoading] = useState(true)
   const [taxes] = useState<TaxRule[]>(TAX_RULES)
   const [testProductId, setTestProductId] = useState(PRODUCTS[0].id)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Resolve which tax applies to a product
   const resolvedTax = taxes.find(t => t.isActive && t.applicableProducts.includes(testProductId)) || {
@@ -57,37 +63,41 @@ export default function TaxRulesPage() {
         </div>
       </div>
 
-      {/* Tax Rules Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
-        <table className="w-full text-left border-collapse">
-          <thead className="border-b-[1.5px] border-black bg-white/60">
-            <tr>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">RULE ID</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">TAX RULE NAME</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">TYPE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">RATE %</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">VALIDITY PERIOD</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">STATUS</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/10">
-            {taxes.map(t => (
-              <tr key={t.id} className="table-row">
-                <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{t.id}</td>
-                <td className="px-6 py-4 font-bold text-sm text-[#4A3043]">{t.name}</td>
-                <td className="px-6 py-4 text-xs font-mono"><Badge variant="info">{t.type}</Badge></td>
-                <td className="px-6 py-4 text-right font-bold font-mono text-emerald-700 text-sm">{t.rate}%</td>
-                <td className="px-6 py-4 text-xs font-mono text-gray-500">{t.effectiveFrom} to {t.effectiveTo}</td>
-                <td className="px-6 py-4 text-right">
-                  <Badge variant={t.isActive ? 'ok' : 'neutral'}>
-                    {t.isActive ? 'ACTIVE' : 'ARCHIVED'}
-                  </Badge>
-                </td>
+      {/* Tax Rules Table / Skeleton */}
+      {loading ? (
+        <TableSkeleton rows={4} cols={6} />
+      ) : (
+        <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+          <table className="w-full text-left border-collapse">
+            <thead className="border-b-[1.5px] border-black bg-white/60">
+              <tr>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">RULE ID</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">TAX RULE NAME</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">TYPE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">RATE %</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">VALIDITY PERIOD</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">STATUS</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-black/10">
+              {taxes.map(t => (
+                <tr key={t.id} className="table-row">
+                  <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{t.id}</td>
+                  <td className="px-6 py-4 font-bold text-sm text-[#4A3043]">{t.name}</td>
+                  <td className="px-6 py-4 text-xs font-mono"><Badge variant="info">{t.type}</Badge></td>
+                  <td className="px-6 py-4 text-right font-bold font-mono text-emerald-700 text-sm">{t.rate}%</td>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-500">{t.effectiveFrom} to {t.effectiveTo}</td>
+                  <td className="px-6 py-4 text-right">
+                    <Badge variant={t.isActive ? 'ok' : 'neutral'}>
+                      {t.isActive ? 'ACTIVE' : 'ARCHIVED'}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

@@ -333,8 +333,9 @@ export default function LoginGate() {
 
       {/* Forgot Password Modal */}
       {forgotModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white border border-[var(--line-strong)] rounded-lg p-6 max-w-sm w-full shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-xs modal-backdrop" onClick={() => { setForgotModal(false); setResetSent(false); }} />
+          <div className="relative bg-white border border-[var(--line-strong)] rounded-2xl p-6 max-w-sm w-full shadow-lg modal-panel">
             <h3 className="text-base font-semibold text-[var(--ink)]">Reset your password</h3>
             <p className="text-xs text-[var(--ink-60)] mt-1">
               We'll record a single-use 30-minute token in the system Outbox.

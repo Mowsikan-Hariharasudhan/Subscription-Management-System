@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CUSTOMERS, PRODUCTS, PLANS, formatPaise } from '../data/seed'
-import { Badge, Btn } from '../components/ui'
+import { Badge, Btn, CardSkeleton, Skeleton } from '../components/ui'
 import { FileText, Check, ArrowRight, Plus, X } from 'lucide-react'
 
 interface QuotationItem {
@@ -21,6 +21,7 @@ const INITIAL_QUOTES: QuotationItem[] = [
 ]
 
 export default function QuotationsPage() {
+  const [loading, setLoading] = useState(true)
   const [quotes, setQuotes] = useState<QuotationItem[]>(INITIAL_QUOTES)
   const [selectedQuote, setSelectedQuote] = useState<QuotationItem>(INITIAL_QUOTES[0])
 
@@ -28,6 +29,11 @@ export default function QuotationsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedCustomerId, setSelectedCustomerId] = useState(CUSTOMERS[0].id)
   const [selectedProductId, setSelectedProductId] = useState(PRODUCTS[0].id)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
   const [selectedVariantId, setSelectedVariantId] = useState(PRODUCTS[0].variants[1]?.id || '')
   const [quantity, setQuantity] = useState(1)
 
@@ -88,7 +94,18 @@ export default function QuotationsPage() {
         </Btn>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 anim-spring stagger-2">
+      {loading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 space-y-3">
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
+          <div className="lg:col-span-2">
+            <CardSkeleton />
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 anim-spring stagger-2">
         {/* Left Column: Quotes List */}
         <div className="lg:col-span-1 space-y-3">
           <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 font-mono">
@@ -171,16 +188,17 @@ export default function QuotationsPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Creation Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop" onClick={() => setModalOpen(false)} />
-          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-3xl shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] overflow-hidden modal-panel p-8">
-            <div className="flex justify-between items-center pb-4 border-b border-black">
-              <h3 className="text-xl font-bold text-[#4A3043]">Create New Quotation</h3>
-              <button onClick={() => setModalOpen(false)} className="p-1.5 rounded-lg border border-black hover:bg-gray-100">
-                <X size={16} />
+          <div className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop" onClick={() => setModalOpen(false)} />
+          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.12)] overflow-hidden modal-panel p-6">
+            <div className="flex justify-between items-center pb-4 border-b border-black/10">
+              <h3 className="text-lg font-bold text-[#4A3043]">Create New Quotation</h3>
+              <button onClick={() => setModalOpen(false)} className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors">
+                <X size={15} />
               </button>
             </div>
 

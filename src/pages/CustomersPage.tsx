@@ -1,13 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CUSTOMERS, SUBSCRIPTIONS, INVOICES, PAYMENTS, formatPaise, type Customer } from '../data/seed'
-import { Badge, Btn, SearchInput } from '../components/ui'
+import { Badge, Btn, SearchInput, TableSkeleton } from '../components/ui'
 import { Plus, X, Mail, Phone, MapPin, Building, CreditCard } from 'lucide-react'
 
 export default function CustomersPage() {
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL')
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'subscriptions' | 'invoices' | 'payments'>('overview')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const filtered = CUSTOMERS.filter(c => {
     const matchesSearch =
@@ -75,64 +81,68 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
-        <table className="w-full text-left border-collapse">
-          <thead className="border-b-[1.5px] border-black bg-white/60">
-            <tr>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CODE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">NAME & COMPANY</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CITY</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">GSTIN</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PHONE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">STATUS</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">ACTION</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/10">
-            {filtered.map(c => (
-              <tr
-                key={c.id}
-                onClick={() => setSelectedCustomer(c)}
-                className="table-row cursor-pointer"
-              >
-                <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{c.code}</td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#714B67] to-[#4A3043] text-white border-[1.5px] border-black font-bold flex items-center justify-center text-xs shadow-sm">
-                      {c.company.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-bold text-[#4A3043] text-sm">{c.company}</p>
-                      <p className="text-[11px] text-gray-500 font-mono">{c.name} · {c.email}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-xs font-mono text-gray-600">{c.city}</td>
-                <td className="px-6 py-4 text-xs font-mono text-gray-600">{c.gstin}</td>
-                <td className="px-6 py-4 text-xs font-mono text-gray-500">{c.phone}</td>
-                <td className="px-6 py-4">
-                  <Badge variant={c.status === 'ACTIVE' ? 'ok' : 'neutral'}>{c.status}</Badge>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <span className="text-xs font-bold text-[#714B67] hover:underline font-mono">
-                    View 360° →
-                  </span>
-                </td>
+      {/* Table / Skeleton */}
+      {loading ? (
+        <TableSkeleton rows={6} cols={7} />
+      ) : (
+        <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+          <table className="w-full text-left border-collapse">
+            <thead className="border-b-[1.5px] border-black bg-white/60">
+              <tr>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CODE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">NAME & COMPANY</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CITY</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">GSTIN</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PHONE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">STATUS</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">ACTION</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-black/10">
+              {filtered.map(c => (
+                <tr
+                  key={c.id}
+                  onClick={() => setSelectedCustomer(c)}
+                  className="table-row cursor-pointer"
+                >
+                  <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{c.code}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#714B67] to-[#4A3043] text-white border-[1.5px] border-black font-bold flex items-center justify-center text-xs shadow-sm">
+                        {c.company.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-bold text-[#4A3043] text-sm">{c.company}</p>
+                        <p className="text-[11px] text-gray-500 font-mono">{c.name} · {c.email}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{c.city}</td>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{c.gstin}</td>
+                  <td className="px-6 py-4 text-xs font-mono text-gray-500">{c.phone}</td>
+                  <td className="px-6 py-4">
+                    <Badge variant={c.status === 'ACTIVE' ? 'ok' : 'neutral'}>{c.status}</Badge>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <span className="text-xs font-bold text-[#714B67] hover:underline font-mono">
+                      View 360° →
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Customer 360 Drawer / Modal */}
       {selectedCustomer && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div
-            className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop"
+            className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop"
             onClick={() => setSelectedCustomer(null)}
           />
-          <div className="relative w-full max-w-xl bg-white/95 backdrop-blur-2xl h-full shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] flex flex-col border-l-[1.5px] border-black z-10 anim-spring">
+          <div className="relative w-full max-w-xl bg-white/95 backdrop-blur-2xl h-full shadow-[0_15px_40px_rgba(0,0,0,0.15)] flex flex-col border-l-[1.5px] border-black z-10 drawer-panel">
             {/* Drawer Header */}
             <div className="p-6 border-b-[1.5px] border-black flex justify-between items-start bg-white/80">
               <div>
@@ -149,9 +159,9 @@ export default function CustomersPage() {
               </div>
               <button
                 onClick={() => setSelectedCustomer(null)}
-                className="w-8 h-8 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
               >
-                <X size={16} />
+                <X size={15} />
               </button>
             </div>
 

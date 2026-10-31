@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   calcMRR,
   calcARR,
@@ -8,7 +8,7 @@ import {
   PAYMENTS,
   CUSTOMERS,
 } from '../data/seed'
-import { Badge, Btn } from '../components/ui'
+import { Badge, Btn, TableSkeleton, ChartSkeleton } from '../components/ui'
 import { Download, BarChart2 } from 'lucide-react'
 
 type ReportType =
@@ -22,8 +22,15 @@ type ReportType =
   | 'CUSTOMER_LTV'
 
 export default function ReportsPage() {
+  const [loading, setLoading] = useState(true)
   const [activeReport, setActiveReport] = useState<ReportType>('RECOGNIZED_REVENUE')
   const [downloadNotice, setDownloadNotice] = useState('')
+
+  useEffect(() => {
+    setLoading(true)
+    const timer = setTimeout(() => setLoading(false), 200)
+    return () => clearTimeout(timer)
+  }, [activeReport])
 
   const handleExportCSV = () => {
     setDownloadNotice(`Export generated: peoplepay360_${activeReport.toLowerCase()}_2026.csv`)
@@ -99,8 +106,12 @@ export default function ReportsPage() {
           </span>
         </div>
 
-        {/* Dynamic Report Content */}
-        {activeReport === 'RECOGNIZED_REVENUE' && (
+        {/* Dynamic Report Content / Skeleton */}
+        {loading ? (
+          <TableSkeleton rows={5} cols={5} />
+        ) : (
+          <>
+            {activeReport === 'RECOGNIZED_REVENUE' && (
           <div className="space-y-5">
             <div className="p-4 bg-white/70 border-[1.5px] border-black rounded-xl text-xs">
               <span className="font-bold text-[#4A3043]">ACCOUNTING DEFINITION: </span>
@@ -192,7 +203,9 @@ export default function ReportsPage() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </>
+    )}
+  </div>
+</div>
   )
 }

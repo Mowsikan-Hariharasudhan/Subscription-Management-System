@@ -1,12 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PAYMENTS, INVOICES, CUSTOMERS, formatPaise, type Payment, type PaymentMethod } from '../data/seed'
-import { Badge, Btn, SearchInput } from '../components/ui'
+import { Badge, Btn, SearchInput, TableSkeleton } from '../components/ui'
 import { Plus, CreditCard, Check, X, ShieldCheck } from 'lucide-react'
 
 export default function PaymentsPage() {
+  const [loading, setLoading] = useState(true)
   const [paymentsList, setPaymentsList] = useState<Payment[]>(PAYMENTS)
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Record payment form state
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(INVOICES.find(i => i.state !== 'PAID')?.id || INVOICES[0].id)
@@ -98,53 +104,57 @@ export default function PaymentsPage() {
         </span>
       </div>
 
-      {/* Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
-        <table className="w-full text-left border-collapse">
-          <thead className="border-b-[1.5px] border-black bg-white/60">
-            <tr>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PAYMENT NUMBER</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CUSTOMER</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">SETTLED INVOICE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">METHOD</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">BANK / GATEWAY REF</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">DATE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">AMOUNT SETTLED</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/10">
-            {filtered.map(p => {
-              const cust = CUSTOMERS.find(c => c.id === p.customerId)
-              const inv = INVOICES.find(i => i.id === p.invoiceId)
-              return (
-                <tr key={p.id} className="table-row">
-                  <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{p.number}</td>
-                  <td className="px-6 py-4 font-bold text-sm text-[#4A3043]">{cust?.company || 'Enterprise'}</td>
-                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{inv?.number || 'INV-REF'}</td>
-                  <td className="px-6 py-4">
-                    <Badge variant="ok">{p.method}</Badge>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-mono text-gray-600">{p.reference}</td>
-                  <td className="px-6 py-4 text-xs font-mono text-gray-500">{p.paidAt}</td>
-                  <td className="px-6 py-4 text-right font-bold font-mono text-emerald-700">
-                    {formatPaise(p.amount)}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+      {/* Table / Skeleton */}
+      {loading ? (
+        <TableSkeleton rows={5} cols={7} />
+      ) : (
+        <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+          <table className="w-full text-left border-collapse">
+            <thead className="border-b-[1.5px] border-black bg-white/60">
+              <tr>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PAYMENT NUMBER</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CUSTOMER</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">SETTLED INVOICE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">METHOD</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">BANK / GATEWAY REF</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">DATE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">AMOUNT SETTLED</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black/10">
+              {filtered.map(p => {
+                const cust = CUSTOMERS.find(c => c.id === p.customerId)
+                const inv = INVOICES.find(i => i.id === p.invoiceId)
+                return (
+                  <tr key={p.id} className="table-row">
+                    <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{p.number}</td>
+                    <td className="px-6 py-4 font-bold text-sm text-[#4A3043]">{cust?.company || 'Enterprise'}</td>
+                    <td className="px-6 py-4 text-xs font-mono text-gray-600">{inv?.number || 'INV-REF'}</td>
+                    <td className="px-6 py-4">
+                      <Badge variant="ok">{p.method}</Badge>
+                    </td>
+                    <td className="px-6 py-4 text-xs font-mono text-gray-600">{p.reference}</td>
+                    <td className="px-6 py-4 text-xs font-mono text-gray-500">{p.paidAt}</td>
+                    <td className="px-6 py-4 text-right font-bold font-mono text-emerald-700">
+                      {formatPaise(p.amount)}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Record Payment Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop" onClick={() => setModalOpen(false)} />
-          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-3xl shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] overflow-hidden modal-panel p-8">
-            <div className="flex justify-between items-center pb-4 border-b border-black">
-              <h3 className="text-xl font-bold text-[#4A3043]">Record Payment Receipt</h3>
-              <button onClick={() => setModalOpen(false)} className="p-1.5 rounded-lg border border-black hover:bg-gray-100">
-                <X size={16} />
+          <div className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop" onClick={() => setModalOpen(false)} />
+          <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-3xl border-[1.5px] border-black rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.12)] overflow-hidden modal-panel p-6">
+            <div className="flex justify-between items-center pb-4 border-b border-black/10">
+              <h3 className="text-lg font-bold text-[#4A3043]">Record Payment Receipt</h3>
+              <button onClick={() => setModalOpen(false)} className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors">
+                <X size={15} />
               </button>
             </div>
 

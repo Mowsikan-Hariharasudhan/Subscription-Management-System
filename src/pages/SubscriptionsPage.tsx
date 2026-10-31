@@ -1,14 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SUBSCRIPTIONS, CUSTOMERS, PLANS, formatPaise, type Subscription, type SubscriptionState } from '../data/seed'
-import { Badge, Btn, SearchInput } from '../components/ui'
+import { Badge, Btn, SearchInput, TableSkeleton } from '../components/ui'
 import { Play, Pause, RefreshCw, XCircle, X, ShieldAlert, Check } from 'lucide-react'
 
 export default function SubscriptionsPage() {
+  const [loading, setLoading] = useState(true)
   const [subs, setSubs] = useState<Subscription[]>(SUBSCRIPTIONS)
   const [search, setSearch] = useState('')
   const [stateFilter, setStateFilter] = useState<'ALL' | SubscriptionState>('ALL')
   const [selectedSub, setSelectedSub] = useState<Subscription | null>(null)
   const [toastNotice, setToastNotice] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const filtered = subs.filter(s => {
     const cust = CUSTOMERS.find(c => c.id === s.customerId)
@@ -123,93 +129,97 @@ export default function SubscriptionsPage() {
         </span>
       </div>
 
-      {/* Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
-        <table className="w-full text-left border-collapse">
-          <thead className="border-b-[1.5px] border-black bg-white/60">
-            <tr>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CONTRACT</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CUSTOMER</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PLAN</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">STATE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">MRR (PAISE)</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">NEXT INVOICE</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/10">
-            {filtered.map(s => {
-              const cust = CUSTOMERS.find(c => c.id === s.customerId)
-              const plan = PLANS.find(p => p.id === s.planId)
-              return (
-                <tr
-                  key={s.id}
-                  onClick={() => setSelectedSub(s)}
-                  className="table-row cursor-pointer"
-                >
-                  <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{s.number}</td>
-                  <td className="px-6 py-4">
-                    <p className="font-bold text-[#4A3043] text-sm">{cust?.company || cust?.name}</p>
-                    <p className="text-[10px] text-gray-500 font-mono">{s.startDate} - {s.expiryDate}</p>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-mono text-gray-700">{plan?.name || 'ERP Plan'}</td>
-                  <td className="px-6 py-4">
-                    <Badge variant={s.state === 'ACTIVE' ? 'ok' : s.state === 'PAUSED' ? 'warn' : 'neutral'}>
-                      {s.state}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 text-right font-bold font-mono text-[#4A3043]">{formatPaise(s.mrr)}</td>
-                  <td className="px-6 py-4 text-xs font-mono font-bold text-[#714B67]">{s.nextBillingAt}</td>
-                  <td className="px-6 py-4 text-right space-x-2 font-mono text-xs">
-                    {s.state === 'ACTIVE' && (
-                      <button
-                        onClick={e => {
-                          e.stopPropagation()
-                          handlePause(s.id)
-                        }}
-                        className="font-bold text-amber-700 hover:underline cursor-pointer"
-                      >
-                        Pause
-                      </button>
-                    )}
-                    {s.state === 'PAUSED' && (
-                      <button
-                        onClick={e => {
-                          e.stopPropagation()
-                          handleResume(s.id)
-                        }}
-                        className="font-bold text-emerald-700 hover:underline cursor-pointer"
-                      >
-                        Resume
-                      </button>
-                    )}
-                    {s.state !== 'CLOSED' && (
-                      <button
-                        onClick={e => {
-                          e.stopPropagation()
-                          handleCloseEarly(s.id)
-                        }}
-                        className="font-bold text-red-600 hover:underline cursor-pointer"
-                      >
-                        Close
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+      {/* Table / Skeleton */}
+      {loading ? (
+        <TableSkeleton rows={6} cols={7} />
+      ) : (
+        <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-3">
+          <table className="w-full text-left border-collapse">
+            <thead className="border-b-[1.5px] border-black bg-white/60">
+              <tr>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CONTRACT</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">CUSTOMER</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">PLAN</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">STATE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">MRR (PAISE)</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono">NEXT INVOICE</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 font-mono text-right">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black/10">
+              {filtered.map(s => {
+                const cust = CUSTOMERS.find(c => c.id === s.customerId)
+                const plan = PLANS.find(p => p.id === s.planId)
+                return (
+                  <tr
+                    key={s.id}
+                    onClick={() => setSelectedSub(s)}
+                    className="table-row cursor-pointer"
+                  >
+                    <td className="px-6 py-4 font-bold font-mono text-[#4A3043]">{s.number}</td>
+                    <td className="px-6 py-4">
+                      <p className="font-bold text-[#4A3043] text-sm">{cust?.company || cust?.name}</p>
+                      <p className="text-[10px] text-gray-500 font-mono">{s.startDate} - {s.expiryDate}</p>
+                    </td>
+                    <td className="px-6 py-4 text-xs font-mono text-gray-700">{plan?.name || 'ERP Plan'}</td>
+                    <td className="px-6 py-4">
+                      <Badge variant={s.state === 'ACTIVE' ? 'ok' : s.state === 'PAUSED' ? 'warn' : 'neutral'}>
+                        {s.state}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold font-mono text-[#4A3043]">{formatPaise(s.mrr)}</td>
+                    <td className="px-6 py-4 text-xs font-mono font-bold text-[#714B67]">{s.nextBillingAt}</td>
+                    <td className="px-6 py-4 text-right space-x-2 font-mono text-xs">
+                      {s.state === 'ACTIVE' && (
+                        <button
+                          onClick={e => {
+                            e.stopPropagation()
+                            handlePause(s.id)
+                          }}
+                          className="font-bold text-amber-700 hover:underline cursor-pointer"
+                        >
+                          Pause
+                        </button>
+                      )}
+                      {s.state === 'PAUSED' && (
+                        <button
+                          onClick={e => {
+                            e.stopPropagation()
+                            handleResume(s.id)
+                          }}
+                          className="font-bold text-emerald-700 hover:underline cursor-pointer"
+                        >
+                          Resume
+                        </button>
+                      )}
+                      {s.state !== 'CLOSED' && (
+                        <button
+                          onClick={e => {
+                            e.stopPropagation()
+                            handleCloseEarly(s.id)
+                          }}
+                          className="font-bold text-red-600 hover:underline cursor-pointer"
+                        >
+                          Close
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Subscription Drawer Modal */}
       {selectedSub && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div
-            className="absolute inset-0 bg-[#4A3043]/60 backdrop-blur-md modal-backdrop"
+            className="absolute inset-0 bg-[#4A3043]/50 backdrop-blur-xs modal-backdrop"
             onClick={() => setSelectedSub(null)}
           />
-          <div className="relative w-full max-w-xl bg-white/95 backdrop-blur-2xl h-full shadow-[0_20px_60px_-10px_rgba(113,75,103,0.5)] flex flex-col border-l-[1.5px] border-black z-10 anim-spring">
+          <div className="relative w-full max-w-xl bg-white/95 backdrop-blur-2xl h-full shadow-[0_15px_40px_rgba(0,0,0,0.15)] flex flex-col border-l-[1.5px] border-black z-10 drawer-panel">
             {/* Drawer Header */}
             <div className="p-6 border-b-[1.5px] border-black flex justify-between items-start bg-white/80">
               <div>
@@ -226,9 +236,9 @@ export default function SubscriptionsPage() {
               </div>
               <button
                 onClick={() => setSelectedSub(null)}
-                className="w-8 h-8 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-lg border border-black flex items-center justify-center text-gray-600 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
               >
-                <X size={16} />
+                <X size={15} />
               </button>
             </div>
 

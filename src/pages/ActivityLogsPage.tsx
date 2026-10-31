@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Badge } from '../components/ui'
+import { useState, useEffect } from 'react'
+import { Badge, TableSkeleton } from '../components/ui'
 import { ShieldCheck } from 'lucide-react'
 
 interface AuditItem {
@@ -22,7 +22,13 @@ const AUDIT_LOGS: AuditItem[] = [
 ]
 
 export default function ActivityLogsPage() {
+  const [loading, setLoading] = useState(true)
   const [filterAction, setFilterAction] = useState('ALL')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   const filtered = AUDIT_LOGS.filter(l =>
     filterAction === 'ALL' || l.action.includes(filterAction)
@@ -44,39 +50,43 @@ export default function ActivityLogsPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-2">
-        <table className="w-full text-left border-collapse font-mono text-xs">
-          <thead className="border-b-[1.5px] border-black bg-white/60">
-            <tr>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">TIMESTAMP</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">ACTOR</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">EVENT</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">ENTITY</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">MUTATION DETAILS</th>
-              <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 text-right">SECURITY</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/10">
-            {filtered.map(log => (
-              <tr key={log.id} className="table-row">
-                <td className="px-6 py-4 text-gray-500">{log.timestamp}</td>
-                <td className="px-6 py-4 font-bold text-[#4A3043]">{log.actor}</td>
-                <td className="px-6 py-4">
-                  <span className="px-2.5 py-1 bg-white border-[1.5px] border-black rounded-md text-[10px] font-bold shadow-[1px_1px_0_#000]">
-                    {log.action}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-gray-700">{log.entity} #{log.entityId}</td>
-                <td className="px-6 py-4 text-gray-600">{log.diff}</td>
-                <td className="px-6 py-4 text-right">
-                  <Badge variant="ok">LOGGED</Badge>
-                </td>
+      {/* Table / Skeleton */}
+      {loading ? (
+        <TableSkeleton rows={6} cols={6} />
+      ) : (
+        <div className="glass-panel rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.04)] anim-spring stagger-2">
+          <table className="w-full text-left border-collapse font-mono text-xs">
+            <thead className="border-b-[1.5px] border-black bg-white/60">
+              <tr>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">TIMESTAMP</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">ACTOR</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">EVENT</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">ENTITY</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800">MUTATION DETAILS</th>
+                <th className="px-6 py-4 text-[0.6875rem] font-bold uppercase tracking-widest text-gray-800 text-right">SECURITY</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-black/10">
+              {filtered.map(log => (
+                <tr key={log.id} className="table-row">
+                  <td className="px-6 py-4 text-gray-500">{log.timestamp}</td>
+                  <td className="px-6 py-4 font-bold text-[#4A3043]">{log.actor}</td>
+                  <td className="px-6 py-4">
+                    <span className="px-2.5 py-1 bg-white border-[1.5px] border-black rounded-md text-[10px] font-bold shadow-[1px_1px_0_#000]">
+                      {log.action}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-gray-700">{log.entity} #{log.entityId}</td>
+                  <td className="px-6 py-4 text-gray-600">{log.diff}</td>
+                  <td className="px-6 py-4 text-right">
+                    <Badge variant="ok">LOGGED</Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

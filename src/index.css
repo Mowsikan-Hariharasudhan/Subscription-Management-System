@@ -1,6 +1,6 @@
 /* ============================================================
    PEOPLEPAY360 / BRIGHTLOOP — Premium Enterprise (90% Scale)
-   Neo-Brutalist Glassmorphism with Odoo Purple (#714B67)
+   Clean Minimal Neo-Brutalist Glassmorphism in Odoo Purple
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -48,42 +48,23 @@ body {
   left: 30%;
   width: 70vw;
   height: 70vh;
-  background: radial-gradient(circle, rgba(113, 75, 103, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(circle, rgba(113, 75, 103, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
 
 /* 1. White Glass with Structural Black Border */
 .glass-panel {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
   border: 1.5px solid #000000;
   box-shadow:
     0 4px 20px -5px rgba(0, 0, 0, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 1);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
-}
-
-/* Subtle shine overlay for white glass */
-.glass-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
-  transform: skewX(-25deg);
-  transition: all 0.7s ease;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.glass-panel:hover::before {
-  left: 200%;
 }
 
 /* 2. Deep Odoo Purple Glass */
@@ -103,7 +84,7 @@ body {
   background: linear-gradient(to bottom, #714B67, #5C3D54);
   border: 1.5px solid #000000;
   box-shadow: 0 4px 0 0 #000000, 0 8px 15px rgba(113, 75, 103, 0.3);
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
   cursor: pointer;
@@ -111,31 +92,13 @@ body {
 
 .btn-primary:hover {
   background: linear-gradient(to bottom, #855878, #714B67);
-  box-shadow: 0 6px 0 0 #000000, 0 12px 25px rgba(113, 75, 103, 0.5);
-  transform: translateY(-2px);
+  box-shadow: 0 5px 0 0 #000000, 0 10px 20px rgba(113, 75, 103, 0.4);
+  transform: translateY(-1px);
 }
 
 .btn-primary:active {
-  transform: translateY(4px);
-  box-shadow: 0 0px 0 0 #000000, 0 2px 5px rgba(113, 75, 103, 0.3);
-}
-
-/* Button Shimmer Effect */
-.btn-primary::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0) 100%);
-  transform: rotate(30deg) translateY(-100%);
-  transition: transform 0.6s ease;
-  pointer-events: none;
-}
-
-.btn-primary:hover::after {
-  transform: rotate(30deg) translateY(100%);
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #000000, 0 2px 5px rgba(113, 75, 103, 0.2);
 }
 
 /* Tactile Secondary Button */
@@ -145,14 +108,14 @@ body {
   color: #4A3043;
   font-weight: 600;
   border-radius: 0.75rem;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 0 0 #000000;
   cursor: pointer;
 }
 
 .btn-secondary:hover {
   background: #F9FAFB;
-  box-shadow: 0 4px 0 0 #000000;
+  box-shadow: 0 3px 0 0 #000000;
   transform: translateY(-1px);
 }
 
@@ -161,29 +124,81 @@ body {
   box-shadow: 0 0 0 0 #000000;
 }
 
-/* 4. Spring Physics Animations */
+/* 4. Minimal Clean Animations */
 .anim-spring {
-  animation: springIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: subtleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
-  transform: translateY(30px) scale(0.95);
+  transform: translateY(8px);
 }
 
-@keyframes springIn {
-  0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes subtleIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-.anim-fade { animation: fadeIn 0.5s ease-out forwards; }
-@keyframes fadeIn { to { opacity: 1; } }
+.anim-fade {
+  animation: fadeIn 0.2s ease-out forwards;
+}
 
-.stagger-1 { animation-delay: 100ms; }
-.stagger-2 { animation-delay: 200ms; }
-.stagger-3 { animation-delay: 300ms; }
-.stagger-4 { animation-delay: 400ms; }
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
 
-/* 5. Interactive Elements */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+
+/* 5. Minimal Popup & Drawer Animations */
+.modal-backdrop {
+  animation: fadeIn 0.12s ease-out forwards;
+}
+
+.modal-panel {
+  animation: modalIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: scale(0.98) translateY(4px);
+}
+
+@keyframes modalIn {
+  0% { opacity: 0; transform: scale(0.98) translateY(4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.drawer-panel {
+  animation: drawerIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateX(14px);
+}
+
+@keyframes drawerIn {
+  0% { opacity: 0; transform: translateX(14px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* 6. High-End Shimmer Skeleton Loader */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(113, 75, 103, 0.05) 25%,
+    rgba(113, 75, 103, 0.12) 50%,
+    rgba(113, 75, 103, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 0.5rem;
+  display: block;
+}
+
+/* 7. Interactive Elements */
 .table-row {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   border-left: 4px solid transparent;
 }
 
@@ -195,30 +210,15 @@ body {
 }
 
 .input-focus {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .input-focus:focus {
   outline: none;
   border-color: #714B67;
-  box-shadow: 0 0 0 4px rgba(113, 75, 103, 0.15);
+  box-shadow: 0 0 0 3px rgba(113, 75, 103, 0.15);
   background: white;
-  transform: translateY(-1px);
 }
-
-/* Modal Pop */
-.modal-backdrop {
-  animation: backdropIn 0.3s ease-out forwards;
-}
-
-.modal-panel {
-  animation: modalSpringIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  opacity: 0;
-  transform: scale(0.9) translateY(20px);
-}
-
-@keyframes backdropIn { to { opacity: 1; } }
-@keyframes modalSpringIn { to { opacity: 1; transform: scale(1) translateY(0); } }
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
@@ -232,5 +232,5 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: rgba(113, 75, 103, 0.6); }
 
 /* Icon Bounce */
-.icon-bounce { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.group:hover .icon-bounce { transform: scale(1.15) rotate(5deg); }
+.icon-bounce { transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+.group:hover .icon-bounce { transform: scale(1.1) rotate(4deg); }
