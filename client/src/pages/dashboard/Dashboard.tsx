@@ -320,116 +320,117 @@ export const Dashboard: React.FC = () => {
         </Card>
       </div>
 
-      {/* Tables Row with .table-row hover treatment */}
+      {/* Tables Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Overdue Invoices Alert Table */}
-        <Card className="border-rose-400">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 bg-rose-50/40">
-            <div className="flex items-center space-x-2">
-              <AlertTriangle className="w-5 h-5 text-rose-600" />
-              <CardTitle className="text-base text-rose-950">Overdue Invoices Requiring Follow-Up</CardTitle>
+        <div className="w-full bg-white border-[1.5px] border-black rounded-2xl shadow-sm overflow-hidden flex flex-col">
+          {/* Header */}
+          <div className="px-8 py-6 flex justify-between items-center border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-6 h-6 text-red-500" />
+              <h2 className="text-[1.15rem] font-bold text-gray-900 tracking-tight">Overdue Invoices Requiring Follow-Up</h2>
             </div>
-            <Link to="/invoices" className="text-xs text-rose-700 font-bold hover:underline flex items-center">
-              View All <ArrowRight className="w-3.5 h-3.5 ml-1" />
+            <Link to="/invoices" className="text-[0.875rem] font-bold text-odoo hover:text-odoo/80 transition-colors flex items-center gap-1 group">
+              View All 
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-white/50 text-gray-700 uppercase border-b-[1.5px] border-black/10 font-bold">
-                  <tr>
-                    <th className="px-5 py-3">Invoice #</th>
-                    <th className="px-5 py-3">Customer</th>
-                    <th className="px-5 py-3">Due Date</th>
-                    <th className="px-5 py-3 text-right">Outstanding</th>
+          </div>
+
+          {/* Table */}
+          <div className="px-8 pb-8 pt-2 overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr>
+                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest w-1/4">Invoice #</th>
+                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest w-1/3">Customer</th>
+                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest w-1/4">Due Date</th>
+                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest text-right">Outstanding</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(!overdueInvoices || overdueInvoices.length === 0) ? (
+                  <tr className="border-t border-gray-100">
+                    <td colSpan={4} className="py-8 text-center text-gray-500 font-medium">
+                      No overdue invoices! All accounts are settled.
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-black/10">
-                  {(!overdueInvoices || overdueInvoices.length === 0) ? (
-                    <tr>
-                      <td colSpan={4} className="px-5 py-8 text-center text-gray-500 font-medium">
-                        No overdue invoices! All accounts are settled.
+                ) : (
+                  overdueInvoices.map((inv) => (
+                    <tr key={inv.id} className="border-t border-gray-100 group hover:bg-gray-50/50 transition-colors cursor-pointer">
+                      <td className="py-4 text-[0.875rem] font-medium text-gray-500 font-mono">
+                        <Link to="/invoices" className="hover:underline text-odoo font-bold">
+                          {inv.number}
+                        </Link>
+                      </td>
+                      <td className="py-4 text-[0.875rem] font-medium text-gray-800">
+                        {inv.customer.name}
+                      </td>
+                      <td className="py-4 text-[0.875rem] font-bold text-red-600">
+                        {formatDate(inv.dueDate)}
+                      </td>
+                      <td className="py-4 text-[0.875rem] font-bold text-red-600 text-right font-mono">
+                        <CurrencyDisplay amount={inv.outstanding} size="sm" className="text-red-600 font-bold" />
                       </td>
                     </tr>
-                  ) : (
-                    overdueInvoices.map((inv) => (
-                      <tr key={inv.id} className="table-row cursor-pointer">
-                        <td className="px-5 py-3.5 font-bold text-odoo">
-                          <Link to="/invoices" className="hover:underline">
-                            {inv.number}
-                          </Link>
-                        </td>
-                        <td className="px-5 py-3.5 text-odoo-dark font-semibold truncate max-w-[150px]">
-                          {inv.customer.name}
-                        </td>
-                        <td className="px-5 py-3.5 text-rose-600 font-bold">
-                          {formatDate(inv.dueDate)}
-                        </td>
-                        <td className="px-5 py-3.5 text-right font-mono">
-                          <CurrencyDisplay amount={inv.outstanding} size="sm" className="text-rose-700 font-bold" />
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         {/* Recent Subscriptions */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base">Active Subscriptions</CardTitle>
-            <Link to="/subscriptions" className="text-xs text-odoo font-bold hover:underline flex items-center">
-              View All <ArrowRight className="w-3.5 h-3.5 ml-1" />
+        <div className="w-full bg-white border-[1.5px] border-black rounded-2xl shadow-sm overflow-hidden flex flex-col">
+          <div className="px-8 py-6 flex justify-between items-center border-b border-gray-200">
+            <h2 className="text-[1.15rem] font-bold text-gray-900 tracking-tight">Active Subscriptions</h2>
+            <Link to="/subscriptions" className="text-[0.875rem] font-bold text-odoo hover:text-odoo/80 transition-colors flex items-center gap-1 group">
+              View All 
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-white/50 text-gray-700 uppercase border-b-[1.5px] border-black/10 font-bold">
-                  <tr>
-                    <th className="px-5 py-3">Subscription #</th>
-                    <th className="px-5 py-3">Customer</th>
-                    <th className="px-5 py-3">Plan</th>
-                    <th className="px-5 py-3">Status</th>
-                    <th className="px-5 py-3 text-right">Amount</th>
+          </div>
+          <div className="px-8 pb-8 pt-2 overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr>
+                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest">Subscription #</th>
+                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest">Customer</th>
+                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest">Plan</th>
+                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest">Status</th>
+                  <th className="py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(!recentSubscriptions || recentSubscriptions.length === 0) ? (
+                  <tr className="border-t border-gray-100">
+                    <td colSpan={5} className="py-8 text-center text-gray-500 font-medium">
+                      No subscriptions found.
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-black/10">
-                  {(!recentSubscriptions || recentSubscriptions.length === 0) ? (
-                    <tr>
-                      <td colSpan={5} className="px-5 py-8 text-center text-gray-500 font-medium">
-                        No subscriptions found.
+                ) : (
+                  recentSubscriptions.map((sub) => (
+                    <tr key={sub.id} className="border-t border-gray-100 group hover:bg-gray-50/50 transition-colors cursor-pointer">
+                      <td className="py-4 text-[0.875rem] font-medium text-gray-500 font-mono">
+                        <Link to={`/subscriptions/${sub.id}`} className="hover:underline text-odoo font-bold">
+                          {sub.number}
+                        </Link>
+                      </td>
+                      <td className="py-4 text-[0.875rem] font-medium text-gray-800">
+                        {sub.customer.name}
+                      </td>
+                      <td className="py-4 text-[0.875rem] text-gray-600 font-medium">{sub.plan.name}</td>
+                      <td className="py-4">
+                        <StatusBadge status={sub.status} />
+                      </td>
+                      <td className="py-4 text-right font-mono font-bold text-[0.875rem] text-odoo-dark">
+                        <CurrencyDisplay amount={sub.total} size="sm" />
                       </td>
                     </tr>
-                  ) : (
-                    recentSubscriptions.map((sub) => (
-                      <tr key={sub.id} className="table-row cursor-pointer">
-                        <td className="px-5 py-3.5 font-bold text-odoo">
-                          <Link to={`/subscriptions/${sub.id}`} className="hover:underline">
-                            {sub.number}
-                          </Link>
-                        </td>
-                        <td className="px-5 py-3.5 text-odoo-dark font-semibold truncate max-w-[130px]">
-                          {sub.customer.name}
-                        </td>
-                        <td className="px-5 py-3.5 text-gray-600 font-medium">{sub.plan.name}</td>
-                        <td className="px-5 py-3.5">
-                          <StatusBadge status={sub.status} />
-                        </td>
-                        <td className="px-5 py-3.5 text-right font-mono font-bold">
-                          <CurrencyDisplay amount={sub.total} size="sm" />
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -38,19 +38,17 @@ export function DataTable<T extends { id?: string | number }>({
   }
 
   return (
-    <div className={cn('glass-panel rounded-xl overflow-hidden anim-slide-up flex flex-col flex-1 shadow-sm', className)}>
-      <div className="overflow-x-auto flex-1">
-        <table className="w-full text-left border-separate border-spacing-0 min-w-[950px]">
-          <thead className="bg-odoo text-white">
+    <div className={cn('w-full bg-white border-[1.5px] border-black rounded-2xl shadow-sm overflow-hidden anim-slide-up flex flex-col flex-1', className)}>
+      <div className="overflow-x-auto flex-1 px-8 pb-8 pt-2">
+        <table className="w-full text-left border-collapse min-w-[850px]">
+          <thead>
             <tr>
               {columns.map((col, idx) => (
                 <th
                   key={idx}
                   scope="col"
                   className={cn(
-                    'px-8 py-4.5 text-[0.75rem] font-bold text-white uppercase tracking-widest border-b-[1.5px] border-black',
-                    idx === 0 && 'rounded-tl-[10px]',
-                    idx === columns.length - 1 && 'rounded-tr-[10px]',
+                    'py-4 text-[0.75rem] font-bold text-gray-600 uppercase tracking-widest',
                     col.className
                   )}
                 >
@@ -65,7 +63,7 @@ export function DataTable<T extends { id?: string | number }>({
                 key={item.id ? String(item.id) : rowIdx}
                 onClick={() => onRowClick && onRowClick(item)}
                 className={cn(
-                  'table-row bg-white group transition-colors duration-150',
+                  'border-t border-gray-100 group hover:bg-gray-50/50 transition-colors',
                   onRowClick && 'cursor-pointer'
                 )}
               >
@@ -73,9 +71,7 @@ export function DataTable<T extends { id?: string | number }>({
                   <td
                     key={colIdx}
                     className={cn(
-                      'px-8 py-5 border-b-[1.5px] border-black/15 group-last:border-b-0',
-                      colIdx === 0 && 'group-last:rounded-bl-[10px]',
-                      colIdx === columns.length - 1 && 'group-last:rounded-br-[10px]',
+                      'py-4 text-[0.875rem] font-medium text-gray-800',
                       col.className
                     )}
                   >
