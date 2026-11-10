@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { ArrowRight, Shield, ShieldCheck, Eye, EyeOff, Sparkles, Moon } from 'lucide-react';
+import { AuthSkeleton } from '../../components/shared/LoadingSkeleton';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -93,9 +94,12 @@ export const Login: React.FC = () => {
 
             {/* Quick Demo Logins Pill */}
             <div className="mt-8 pt-6 border-t border-white/10">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-white/60 mb-2">
-                Instant Demo Logins
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-white/60">
+                  Instant Demo Logins
+                </p>
+                <span className="text-[9px] text-white/50">1-click fill</span>
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
@@ -119,95 +123,104 @@ export const Login: React.FC = () => {
                   Customer
                 </button>
               </div>
+              <p className="text-[10px] text-white/50 mt-2.5">
+                Note: Backend wakes up on Render free-tier (~15s cold start if inactive).
+              </p>
             </div>
           </div>
 
-          {/* Right Sign-in Form Pane */}
-          <div className="p-8 sm:p-10 md:w-1/2 flex flex-col justify-center bg-white">
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <p className="text-[11px] font-bold tracking-wider text-text-secondary uppercase">
-                  ACCESS PORTAL
-                </p>
-                <h2 className="text-2xl font-bold text-text-primary mt-1">Sign in</h2>
-              </div>
-              <div className="w-9 h-9 rounded-xl border border-border-main flex items-center justify-center text-text-secondary bg-surface-main">
-                <Shield className="w-4 h-4 text-plum-primary" />
-              </div>
+          {/* Right Pane: Active Skeleton Loader or Form */}
+          {loading ? (
+            <div className="md:w-1/2 flex flex-col justify-center">
+              <AuthSkeleton title="Sign in" badge="ACCESS PORTAL" isRegister={false} />
             </div>
-
-            {error && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center space-x-2">
-                <ShieldCheck className="w-4 h-4 shrink-0 text-rose-600" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">
-                  WORK EMAIL
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@brightloop.io"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="h-11 rounded-xl text-sm"
-                />
+          ) : (
+            <div className="p-8 sm:p-10 md:w-1/2 flex flex-col justify-center bg-white anim-fade">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <p className="text-[11px] font-bold tracking-wider text-text-secondary uppercase">
+                    ACCESS PORTAL
+                  </p>
+                  <h2 className="text-2xl font-bold text-text-primary mt-1">Sign in</h2>
+                </div>
+                <div className="w-9 h-9 rounded-xl border border-border-main flex items-center justify-center text-text-secondary bg-surface-main">
+                  <Shield className="w-4 h-4 text-plum-primary" />
+                </div>
               </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary">
-                    PASSWORD
+              {error && (
+                <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center space-x-2 anim-slide-up">
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-rose-600" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">
+                    WORK EMAIL
                   </label>
-                  <Link
-                    to="/forgot-password"
-                    className="text-[11px] text-plum-primary hover:underline font-medium"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-                <div className="relative">
                   <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    id="email"
+                    type="email"
+                    placeholder="admin@brightloop.io"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-11 rounded-xl text-sm pr-10 font-mono"
+                    className="h-11 rounded-xl text-sm"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-text-secondary hover:text-text-primary"
-                    aria-label="Toggle password visibility"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary">
+                      PASSWORD
+                    </label>
+                    <Link
+                      to="/forgot-password"
+                      className="text-[11px] text-plum-primary hover:underline font-medium"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="h-11 rounded-xl text-sm pr-10 font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-text-secondary hover:text-text-primary"
+                      aria-label="Toggle password visibility"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-11 rounded-xl text-sm font-semibold mt-2 shadow-sm flex items-center justify-center gap-2"
+                  isLoading={loading}
+                >
+                  Sign In <ArrowRight className="w-4 h-4" />
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center text-xs text-text-secondary">
+                New user?{' '}
+                <Link to="/register" className="font-semibold text-plum-primary hover:underline">
+                  Create account
+                </Link>
               </div>
-
-              <Button
-                type="submit"
-                className="w-full h-11 rounded-xl text-sm font-semibold mt-2 shadow-sm flex items-center justify-center gap-2"
-                isLoading={loading}
-              >
-                Sign In <ArrowRight className="w-4 h-4" />
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center text-xs text-text-secondary">
-              New user?{' '}
-              <Link to="/register" className="font-semibold text-plum-primary hover:underline">
-                Create account
-              </Link>
             </div>
-          </div>
+          )}
         </div>
       </main>
 

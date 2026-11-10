@@ -8,6 +8,7 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isAuthenticating: boolean;
   login: (credentials: any) => Promise<User>;
   register: (data: any) => Promise<User>;
   logout: () => void;
@@ -23,6 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
 
   const refreshUser = async () => {
     const currentToken = localStorage.getItem('token');
@@ -49,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (credentials: any) => {
-    setIsLoading(true);
+    setIsAuthenticating(true);
     try {
       const response = await authService.login(credentials);
       const authToken = response.data.token;
@@ -62,12 +64,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(authUser);
       return authUser;
     } finally {
-      setIsLoading(false);
+      setIsAuthenticating(false);
     }
   };
 
   const register = async (data: any) => {
-    setIsLoading(true);
+    setIsAuthenticating(true);
     try {
       const response = await authService.register(data);
       const authToken = response.data.token;
@@ -80,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(authUser);
       return authUser;
     } finally {
-      setIsLoading(false);
+      setIsAuthenticating(false);
     }
   };
 
@@ -99,6 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         token,
         isAuthenticated: !!token && !!user,
         isLoading,
+        isAuthenticating,
         login,
         register,
         logout,
@@ -117,4 +120,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

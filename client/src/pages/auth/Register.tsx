@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { ArrowRight, ShieldCheck, Sparkles, Moon, Shield } from 'lucide-react';
+import { AuthSkeleton } from '../../components/shared/LoadingSkeleton';
 
 export const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -98,37 +99,71 @@ export const Register: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Form Pane */}
-          <div className="p-8 sm:p-10 md:w-[55%] flex flex-col justify-center bg-white">
-            <div className="flex items-start justify-between mb-5">
-              <div>
-                <p className="text-[11px] font-bold tracking-wider text-text-secondary uppercase">
-                  REGISTRATION
-                </p>
-                <h2 className="text-2xl font-bold text-text-primary mt-1">Create account</h2>
-              </div>
-              <div className="w-9 h-9 rounded-xl border border-border-main flex items-center justify-center text-text-secondary bg-surface-main">
-                <Shield className="w-4 h-4 text-plum-primary" />
-              </div>
+          {/* Right Pane: Active Skeleton or Form */}
+          {loading ? (
+            <div className="md:w-[55%] flex flex-col justify-center">
+              <AuthSkeleton title="Create account" badge="REGISTRATION" isRegister={true} />
             </div>
-
-            {error && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center space-x-2">
-                <ShieldCheck className="w-4 h-4 shrink-0 text-rose-600" />
-                <span>{error}</span>
+          ) : (
+            <div className="p-8 sm:p-10 md:w-[55%] flex flex-col justify-center bg-white anim-fade">
+              <div className="flex items-start justify-between mb-5">
+                <div>
+                  <p className="text-[11px] font-bold tracking-wider text-text-secondary uppercase">
+                    REGISTRATION
+                  </p>
+                  <h2 className="text-2xl font-bold text-text-primary mt-1">Create account</h2>
+                </div>
+                <div className="w-9 h-9 rounded-xl border border-border-main flex items-center justify-center text-text-secondary bg-surface-main">
+                  <Shield className="w-4 h-4 text-plum-primary" />
+                </div>
               </div>
-            )}
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {error && (
+                <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center space-x-2 anim-slide-up">
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-rose-600" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
+                      FULL NAME *
+                    </label>
+                    <Input
+                      name="name"
+                      placeholder="Bruce Wayne"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="h-10 rounded-xl text-xs sm:text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
+                      COMPANY NAME
+                    </label>
+                    <Input
+                      name="companyName"
+                      placeholder="Wayne Enterprises"
+                      value={formData.companyName}
+                      onChange={handleChange}
+                      className="h-10 rounded-xl text-xs sm:text-sm"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
-                    FULL NAME *
+                    WORK EMAIL *
                   </label>
                   <Input
-                    name="name"
-                    placeholder="Bruce Wayne"
-                    value={formData.name}
+                    name="email"
+                    type="email"
+                    placeholder="bruce@wayne.com"
+                    value={formData.email}
                     onChange={handleChange}
                     required
                     className="h-10 rounded-xl text-xs sm:text-sm"
@@ -137,92 +172,64 @@ export const Register: React.FC = () => {
 
                 <div>
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
-                    COMPANY NAME
+                    PASSWORD *
                   </label>
                   <Input
-                    name="companyName"
-                    placeholder="Wayne Enterprises"
-                    value={formData.companyName}
+                    name="password"
+                    type="password"
+                    placeholder="At least 8 chars (upper, lower, num, symbol)"
+                    value={formData.password}
                     onChange={handleChange}
-                    className="h-10 rounded-xl text-xs sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
-                  WORK EMAIL *
-                </label>
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="bruce@wayne.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="h-10 rounded-xl text-xs sm:text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
-                  PASSWORD *
-                </label>
-                <Input
-                  name="password"
-                  type="password"
-                  placeholder="At least 8 chars (upper, lower, num, symbol)"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="h-10 rounded-xl text-xs sm:text-sm font-mono"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
-                    PHONE NUMBER
-                  </label>
-                  <Input
-                    name="phone"
-                    placeholder="+91 98765 43210"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="h-10 rounded-xl text-xs sm:text-sm"
+                    required
+                    className="h-10 rounded-xl text-xs sm:text-sm font-mono"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
-                    BILLING ADDRESS
-                  </label>
-                  <Input
-                    name="billingAddress"
-                    placeholder="Gotham City"
-                    value={formData.billingAddress}
-                    onChange={handleChange}
-                    className="h-10 rounded-xl text-xs sm:text-sm"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
+                      PHONE NUMBER
+                    </label>
+                    <Input
+                      name="phone"
+                      placeholder="+91 98765 43210"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="h-10 rounded-xl text-xs sm:text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-secondary mb-1">
+                      BILLING ADDRESS
+                    </label>
+                    <Input
+                      name="billingAddress"
+                      placeholder="Gotham City"
+                      value={formData.billingAddress}
+                      onChange={handleChange}
+                      className="h-10 rounded-xl text-xs sm:text-sm"
+                    />
+                  </div>
                 </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-11 rounded-xl text-sm font-semibold mt-2 shadow-sm flex items-center justify-center gap-2"
+                  isLoading={loading}
+                >
+                  Create Account <ArrowRight className="w-4 h-4" />
+                </Button>
+              </form>
+
+              <div className="mt-5 text-center text-xs text-text-secondary">
+                Already have an account?{' '}
+                <Link to="/login" className="font-semibold text-plum-primary hover:underline">
+                  Sign in
+                </Link>
               </div>
-
-              <Button
-                type="submit"
-                className="w-full h-11 rounded-xl text-sm font-semibold mt-2 shadow-sm flex items-center justify-center gap-2"
-                isLoading={loading}
-              >
-                Create Account <ArrowRight className="w-4 h-4" />
-              </Button>
-            </form>
-
-            <div className="mt-5 text-center text-xs text-text-secondary">
-              Already have an account?{' '}
-              <Link to="/login" className="font-semibold text-plum-primary hover:underline">
-                Sign in
-              </Link>
             </div>
-          </div>
+          )}
         </div>
       </main>
 

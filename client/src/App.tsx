@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { DashboardSkeleton } from './components/shared/LoadingSkeleton';
 
 // Layout
 import { AppShell } from './components/layout/AppShell';
@@ -46,14 +47,7 @@ const RequireAuth: React.FC<{ children: React.ReactNode; roles?: string[] }> = (
   const { isAuthenticated, role, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-main">
-        <div className="flex flex-col items-center space-y-3">
-          <div className="w-10 h-10 rounded-md bg-plum-deep text-white font-bold text-xl flex items-center justify-center animate-pulse">B</div>
-          <p className="text-xs text-text-secondary">Loading Brightloop...</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
@@ -65,7 +59,7 @@ const RequireAuth: React.FC<{ children: React.ReactNode; roles?: string[] }> = (
 
 const RedirectIfAuthed: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, role, isLoading } = useAuth();
-  if (isLoading) return null;
+  if (isLoading) return <DashboardSkeleton />;
   if (isAuthenticated) {
     return role === 'CUSTOMER' ? <Navigate to="/portal" replace /> : <Navigate to="/dashboard" replace />;
   }
