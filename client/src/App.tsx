@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { useAuth } from './context/AuthContext';
 import { DashboardSkeleton } from './components/shared/LoadingSkeleton';
 
@@ -68,50 +69,53 @@ const RedirectIfAuthed: React.FC<{ children: React.ReactNode }> = ({ children })
 
 export const App: React.FC = () => {
   return (
-    <Routes>
-      {/* Public Auth Routes */}
-      <Route path="/login" element={<RedirectIfAuthed><Login /></RedirectIfAuthed>} />
-      <Route path="/register" element={<RedirectIfAuthed><Register /></RedirectIfAuthed>} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
+    <>
+      <Routes>
+        {/* Public Auth Routes */}
+        <Route path="/login" element={<RedirectIfAuthed><Login /></RedirectIfAuthed>} />
+        <Route path="/register" element={<RedirectIfAuthed><Register /></RedirectIfAuthed>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* Admin / Staff App */}
-      <Route element={<RequireAuth roles={['ADMIN', 'STAFF']}><AppShell /></RequireAuth>}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/customers" element={<Customers />} />
-        <Route path="/customers/:id" element={<CustomerDetail />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/plans" element={<Plans />} />
-        <Route path="/plans/:id" element={<PlanDetail />} />
-        <Route path="/quotation-templates" element={<QuotationTemplates />} />
-        <Route path="/quotations" element={<Quotations />} />
-        <Route path="/quotations/:id" element={<QuotationDetail />} />
-        <Route path="/subscriptions" element={<Subscriptions />} />
-        <Route path="/subscriptions/:id" element={<SubscriptionDetail />} />
-        <Route path="/invoices" element={<Invoices />} />
-        <Route path="/invoices/:id" element={<InvoiceDetail />} />
-        <Route path="/payments" element={<Payments />} />
-        <Route path="/discounts" element={<Discounts />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/settings/taxes" element={<TaxRules />} />
-        <Route path="/settings/staff" element={<RequireAuth roles={['ADMIN']}><StaffManagement /></RequireAuth>} />
-      </Route>
+        {/* Admin / Staff App */}
+        <Route element={<RequireAuth roles={['ADMIN', 'STAFF']}><AppShell /></RequireAuth>}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/customers/:id" element={<CustomerDetail />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/plans" element={<Plans />} />
+          <Route path="/plans/:id" element={<PlanDetail />} />
+          <Route path="/quotation-templates" element={<QuotationTemplates />} />
+          <Route path="/quotations" element={<Quotations />} />
+          <Route path="/quotations/:id" element={<QuotationDetail />} />
+          <Route path="/subscriptions" element={<Subscriptions />} />
+          <Route path="/subscriptions/:id" element={<SubscriptionDetail />} />
+          <Route path="/invoices" element={<Invoices />} />
+          <Route path="/invoices/:id" element={<InvoiceDetail />} />
+          <Route path="/payments" element={<Payments />} />
+          <Route path="/discounts" element={<Discounts />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/taxes" element={<TaxRules />} />
+          <Route path="/settings/staff" element={<RequireAuth roles={['ADMIN']}><StaffManagement /></RequireAuth>} />
+        </Route>
 
-      {/* Customer Portal */}
-      <Route path="/portal" element={<RequireAuth roles={['CUSTOMER']}><PortalShell /></RequireAuth>}>
-        <Route index element={<CustomerDashboard />} />
-        <Route path="explore" element={<ExplorePlans />} />
-        <Route path="catalog" element={<ExplorePlans />} />
-        <Route path="subscriptions" element={<MySubscriptions />} />
-        <Route path="invoices" element={<MyInvoices />} />
-        <Route path="payments" element={<MyPayments />} />
-        <Route path="account" element={<AccountSettings />} />
-      </Route>
+        {/* Customer Portal */}
+        <Route path="/portal" element={<RequireAuth roles={['CUSTOMER']}><PortalShell /></RequireAuth>}>
+          <Route index element={<CustomerDashboard />} />
+          <Route path="explore" element={<ExplorePlans />} />
+          <Route path="catalog" element={<ExplorePlans />} />
+          <Route path="subscriptions" element={<MySubscriptions />} />
+          <Route path="invoices" element={<MyInvoices />} />
+          <Route path="payments" element={<MyPayments />} />
+          <Route path="account" element={<AccountSettings />} />
+        </Route>
 
-      {/* Default redirects */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        {/* Default redirects */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+      <Analytics />
+    </>
   );
 };
